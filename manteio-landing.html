@@ -1,0 +1,772 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Μαντείο — Προσωπική Αστρολογική Καθοδήγηση</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,500&family=Jost:wght@300;400;500;600&display=swap');
+
+  :root{
+    --paper:#FFFFFF;
+    --paper-2:#F5F5F3;
+    --ink:#211D26;
+    --muted:#6E6659;
+    --line:#E4E4E0;
+    --gold:#B8862E;
+    --gold-deep:#8C6420;
+    --violet:#5B4B8A;
+    --ruby:#9C3648;
+    --green:#3F7A5C;
+  }
+
+  *{margin:0;padding:0;box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+
+  body{
+    background:var(--paper);
+    color:var(--ink);
+    font-family:'Jost',sans-serif;
+    font-weight:300;
+    line-height:1.6;
+    overflow-x:hidden;
+    padding-bottom:74px;
+  }
+
+  h1,h2,h3,.serif{
+    font-family:'Cormorant Garamond',serif;
+    font-weight:500;
+    letter-spacing:0.01em;
+  }
+
+  a{color:inherit;text-decoration:none;}
+  :focus-visible{outline:2px solid var(--gold-deep);outline-offset:4px;}
+
+  .wrap{max-width:920px;margin:0 auto;padding:0 24px;}
+
+  /* ---------- Hero ---------- */
+  .hero{
+    position:relative; z-index:1; min-height:100svh;
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    text-align:center; padding:80px 24px 60px;
+  }
+
+  .constellation{ width:220px; height:140px; margin-bottom:36px; opacity:0.95; }
+  .constellation line{
+    stroke:var(--violet); stroke-width:0.7; opacity:0.5;
+    stroke-dasharray:1; stroke-dashoffset:1;
+    animation:con-draw 1.4s ease-out forwards;
+  }
+  .constellation line:nth-of-type(1){ animation-delay:0.1s; }
+  .constellation line:nth-of-type(2){ animation-delay:0.5s; }
+  .constellation line:nth-of-type(3){ animation-delay:0.9s; }
+  .constellation line:nth-of-type(4){ animation-delay:1.3s; }
+  .constellation line:nth-of-type(5){ animation-delay:1.7s; }
+  @keyframes con-draw{ to{ stroke-dashoffset:0; } }
+  .constellation circle{
+    fill:var(--gold-deep); transform-origin:center;
+    animation:con-twinkle 4s ease-in-out infinite;
+  }
+  .constellation circle:nth-of-type(1){ animation-delay:0.3s; }
+  .constellation circle:nth-of-type(2){ animation-delay:0.9s; }
+  .constellation circle:nth-of-type(3){ animation-delay:1.5s; }
+  .constellation circle:nth-of-type(4){ animation-delay:2.1s; }
+  .constellation circle:nth-of-type(5){ animation-delay:2.7s; }
+  .constellation circle:nth-of-type(6){ animation-delay:3.3s; }
+  @keyframes con-twinkle{
+    0%,100%{ opacity:0.55; transform:scale(0.85); }
+    50%{ opacity:1; transform:scale(1.3); filter:drop-shadow(0 0 4px rgba(184,134,46,0.55)); }
+  }
+  @media (prefers-reduced-motion: reduce){
+    .constellation line{ animation:none; stroke-dashoffset:0; }
+    .constellation circle{ animation:none; opacity:0.9; }
+  }
+
+  .eyebrow{ font-size:13px; letter-spacing:0.32em; text-transform:uppercase; color:var(--gold-deep); margin-bottom:22px; }
+
+  h1{ font-size:clamp(38px, 6.5vw, 68px); line-height:1.12; max-width:16ch; margin-bottom:26px; color:var(--ink); }
+  h1 em{ font-style:italic; color:var(--gold-deep); }
+
+  .hero-sub{ max-width:46ch; color:var(--muted); font-size:18px; margin-bottom:44px; }
+
+  .cta{
+    display:inline-flex; align-items:center; gap:10px;
+    background:var(--ink);
+    color:var(--paper); font-weight:500; font-size:15px; letter-spacing:0.03em;
+    padding:17px 34px; border-radius:2px;
+    transition:transform 0.25s ease, box-shadow 0.25s ease, background 0.25s ease;
+  }
+  .cta:hover{ transform:translateY(-2px); background:var(--gold-deep); box-shadow:0 14px 30px rgba(140,100,32,0.22); }
+  .cta.small{ padding:13px 26px; font-size:14px; }
+
+  .price-tag{ margin-top:20px; font-size:14px; color:var(--muted); }
+  .price-tag strong{ color:var(--ink); font-weight:500; }
+  .iris-note{
+    margin-top:10px; font-size:12.5px; color:var(--green);
+    display:inline-flex; align-items:center; gap:6px;
+  }
+  .iris-note svg{ width:13px; height:13px; }
+
+  .founder-badge{
+    display:inline-block; margin:18px auto 26px; padding:9px 18px;
+    border:1px solid var(--ruby); border-radius:2px;
+    font-size:13px; color:var(--ruby); letter-spacing:0.01em;
+  }
+  .founder-badge strong{ font-weight:500; }
+  .founder-badge.small{ margin:0 0 18px; padding:6px 14px; font-size:12px; }
+
+  /* ---------- Section shared ---------- */
+  section{ position:relative; z-index:1; padding:100px 0; border-top:1px solid var(--line); }
+  .kicker{ font-size:13px; letter-spacing:0.28em; text-transform:uppercase; color:var(--gold-deep); margin-bottom:16px; display:block; }
+  h2{ font-size:clamp(28px, 4vw, 42px); max-width:22ch; margin-bottom:18px; color:var(--ink); }
+  .lede{ color:var(--muted); max-width:58ch; font-size:17px; margin-bottom:56px; }
+
+  /* ---------- Converge symbol: zodiac cycle ---------- */
+  .zodiac-cycle{
+    display:flex; justify-content:center; align-items:center;
+    gap:8px; flex-wrap:nowrap; margin:50px auto 0;
+    max-width:100%;
+  }
+  .zodiac-cycle .zsign{
+    font-family:'Segoe UI Symbol','Noto Sans Symbols','Arial Unicode MS',sans-serif;
+    font-size:clamp(18px,2.6vw,25px);
+    color:var(--muted);
+    display:inline-flex; align-items:center; justify-content:center;
+    flex-shrink:0;
+    width:1.9em; height:1.9em; border-radius:50%;
+    background:transparent;
+    animation:zcycle 12s infinite ease-in-out;
+  }
+  .zodiac-cycle .zsign:nth-child(1){ animation-delay:0s; }
+  .zodiac-cycle .zsign:nth-child(2){ animation-delay:1s; }
+  .zodiac-cycle .zsign:nth-child(3){ animation-delay:2s; }
+  .zodiac-cycle .zsign:nth-child(4){ animation-delay:3s; }
+  .zodiac-cycle .zsign:nth-child(5){ animation-delay:4s; }
+  .zodiac-cycle .zsign:nth-child(6){ animation-delay:5s; }
+  .zodiac-cycle .zsign:nth-child(7){ animation-delay:6s; }
+  .zodiac-cycle .zsign:nth-child(8){ animation-delay:7s; }
+  .zodiac-cycle .zsign:nth-child(9){ animation-delay:8s; }
+  .zodiac-cycle .zsign:nth-child(10){ animation-delay:9s; }
+  .zodiac-cycle .zsign:nth-child(11){ animation-delay:10s; }
+  .zodiac-cycle .zsign:nth-child(12){ animation-delay:11s; }
+  @keyframes zcycle{
+    0%{ color:var(--muted); transform:scale(1); background:transparent; box-shadow:none; }
+    3%{ color:var(--gold-deep); transform:scale(1.55); background:rgba(184,134,46,0.14); box-shadow:0 0 18px rgba(184,134,46,0.45); }
+    9%{ color:var(--gold-deep); transform:scale(1.55); background:rgba(184,134,46,0.14); box-shadow:0 0 18px rgba(184,134,46,0.45); }
+    14%{ color:var(--muted); transform:scale(1); background:transparent; box-shadow:none; }
+    100%{ color:var(--muted); transform:scale(1); background:transparent; box-shadow:none; }
+  }
+  @media (prefers-reduced-motion: reduce){
+    .zodiac-cycle .zsign{ animation:none; }
+    .zodiac-cycle .zsign:first-child{ color:var(--gold-deep); background:rgba(184,134,46,0.14); }
+  }
+
+  /* ---------- Offerings ---------- */
+  .offerings{ display:grid; grid-template-columns:1fr 1fr; gap:1px; background:var(--line); border:1px solid var(--line); }
+  .offer{ background:var(--paper); padding:38px 34px; }
+  .offer-icon{ width:26px; height:26px; margin-bottom:18px; animation:icon-breathe 4s ease-in-out infinite; }
+  .offer-icon circle, .offer-icon path, .offer-icon rect, .offer-icon line{ fill:none; stroke:var(--gold-deep); stroke-width:1.3; }
+  @keyframes icon-breathe{
+    0%{ filter:drop-shadow(0 0 0 rgba(184,134,46,0)); }
+    50%{ filter:drop-shadow(0 0 5px rgba(184,134,46,0.55)); }
+    100%{ filter:drop-shadow(0 0 0 rgba(184,134,46,0)); }
+  }
+  @media (prefers-reduced-motion: reduce){
+    .offer-icon{ animation:none; }
+  }
+  .offer h3{ font-size:23px; color:var(--ink); margin-bottom:10px; }
+  .offer p{ color:var(--muted); font-size:15px; line-height:1.7; }
+  @media (max-width:680px){ .offerings{grid-template-columns:1fr;} }
+
+  /* ---------- Iakovos section ---------- */
+  .messenger{ display:flex; align-items:center; gap:56px; }
+  .messenger .portrait{
+    flex-shrink:0; width:220px; height:270px;
+    border-radius:2px; overflow:hidden;
+    border:1px solid var(--line);
+    box-shadow:0 26px 50px rgba(33,29,38,0.10);
+  }
+  .messenger .portrait img{ width:100%; height:100%; object-fit:cover; display:block; }
+  .messenger .copy h3{ font-size:15px; letter-spacing:0.06em; color:var(--muted); font-family:'Jost',sans-serif; font-weight:400; margin-bottom:6px; text-transform:uppercase; }
+  .messenger .copy .name{ font-family:'Cormorant Garamond',serif; font-size:36px; color:var(--gold-deep); margin-bottom:16px; }
+  .messenger .copy p{ color:var(--muted); font-size:16px; max-width:48ch; line-height:1.75; }
+  @media (max-width:680px){
+    .messenger{ flex-direction:column; text-align:center; gap:28px; }
+    .messenger .copy p{ max-width:100%; }
+  }
+
+  /* ---------- Team section ---------- */
+  .team-grid{
+    display:grid; grid-template-columns:repeat(4, 1fr); gap:1px;
+    background:var(--line); border:1px solid var(--line);
+  }
+  .team-card{
+    background:var(--paper); padding:28px 22px; text-align:center;
+  }
+  .team-card .avatar{
+    width:100px; height:130px; margin:0 auto 18px;
+    border-radius:2px; overflow:hidden; border:1px solid var(--line);
+  }
+  .team-card .avatar img{ width:100%; height:100%; object-fit:cover; display:block; }
+  .team-card .avatar.placeholder{
+    display:flex; align-items:center; justify-content:center;
+    background:var(--paper-2); border-style:dashed;
+  }
+  .team-card .avatar.placeholder span{ font-size:24px; color:var(--line); }
+  .team-card .name{ font-family:'Cormorant Garamond',serif; font-size:20px; color:var(--gold-deep); margin-bottom:4px; }
+  .signature-line{ width:70px; height:14px; margin:2px auto 0; display:block; }
+  .signature-line path{
+    fill:none; stroke:var(--gold-deep); stroke-width:1.4; stroke-linecap:round;
+    stroke-dasharray:70; stroke-dashoffset:70;
+    animation:sign-draw 6s ease-in-out infinite;
+  }
+  @keyframes sign-draw{
+    0%{ stroke-dashoffset:70; opacity:0.9; }
+    35%{ stroke-dashoffset:0; opacity:0.9; }
+    70%{ stroke-dashoffset:0; opacity:0.9; }
+    85%{ stroke-dashoffset:-70; opacity:0; }
+    86%{ stroke-dashoffset:70; opacity:0; }
+    100%{ stroke-dashoffset:70; opacity:0; }
+  }
+  @media (prefers-reduced-motion: reduce){
+    .signature-line path{ animation:none; stroke-dashoffset:0; }
+  }
+  .team-card .role{ font-size:12.5px; color:var(--muted); letter-spacing:0.02em; }
+  @media (max-width:680px){ .team-grid{ grid-template-columns:1fr 1fr; } }
+
+  /* ---------- Methodology section ---------- */
+  .method-layout{ display:flex; gap:60px; align-items:flex-start; }
+  .method-copy{ flex:1; }
+  .method-copy > p{ color:var(--muted); font-size:15.5px; line-height:1.8; margin-bottom:28px; }
+  .method-sub{ padding-top:18px; border-top:1px solid var(--line); margin-top:18px; }
+  .method-sub h3{ font-size:15px; letter-spacing:0.04em; text-transform:uppercase; color:var(--ink); font-family:'Jost',sans-serif; font-weight:500; margin-bottom:8px; display:flex; align-items:center; gap:8px; }
+  .method-sub h3 svg{ width:18px; height:18px; flex-shrink:0; }
+  .method-sub h3 svg circle, .method-sub h3 svg path, .method-sub h3 svg rect, .method-sub h3 svg line{ fill:none; stroke:var(--gold-deep); stroke-width:1.3; }
+  .method-sub p{ color:var(--muted); font-size:14.5px; line-height:1.75; }
+  .method-chart{ flex-shrink:0; width:260px; }
+  .natal-chart{ width:260px; height:260px; }
+  .natal-chart .ring{ fill:none; stroke:var(--gold-deep); stroke-width:1; }
+  .natal-chart .ring-2{ fill:none; stroke:var(--line); stroke-width:1; }
+  .natal-chart .spoke{ stroke:var(--line); stroke-width:0.8; }
+  .natal-chart .aspect{ stroke:var(--ruby); stroke-width:0.9; opacity:0.65; fill:none; }
+  .natal-chart .planet{ fill:var(--violet); transform-origin:center; animation:planet-pulse 3s ease-in-out infinite; }
+  .natal-chart .planet.gold{ fill:var(--gold-deep); }
+  .natal-transit{ transform-origin:120px 120px; animation:spin 70s linear infinite; }
+  @keyframes planet-pulse{
+    0%,100%{ filter:drop-shadow(0 0 0 rgba(184,134,46,0)); }
+    50%{ filter:drop-shadow(0 0 3px rgba(184,134,46,0.6)); }
+  }
+  @media (prefers-reduced-motion: reduce){
+    .natal-transit{ animation:none; }
+    .natal-chart .planet{ animation:none; }
+  }
+  @media (max-width:780px){
+    .method-layout{ flex-direction:column; align-items:center; text-align:center; }
+    .method-chart{ order:-1; margin-bottom:20px; }
+  }
+
+  /* ---------- Zodiac line band ---------- */
+  .zodiac-band{
+    position:relative; z-index:1;
+    padding:100px 0 50px;
+    background:var(--paper-2);
+    text-align:center;
+    border-top:1px solid var(--line);
+  }
+  .zodiac-band .wrap{ display:flex; flex-direction:column; align-items:center; }
+  .zodiac-band .lede{ margin-bottom:0; }
+  .zodiac-wheel{ width:180px; height:180px; margin-bottom:40px; }
+  .zodiac-wheel circle{ fill:none; }
+  .zodiac-wheel .ring-out{ stroke:var(--gold-deep); stroke-width:1; }
+  .zodiac-wheel .ring-in{ stroke:var(--violet); stroke-width:1; opacity:0.6; }
+  .zodiac-wheel .tick{ stroke:var(--ruby); stroke-width:1.4; }
+  .zodiac-wheel .tick.minor{ stroke:var(--violet); stroke-width:0.8; opacity:0.55; }
+  .zodiac-wheel .wheel-spin{ transform-origin:90px 90px; animation:spin 40s linear infinite; }
+  @media (prefers-reduced-motion: reduce){
+    .zodiac-wheel .wheel-spin{ animation:none; }
+  }
+
+  /* ---------- Orbit visual ---------- */
+  .orbit-visual{ width:170px; height:170px; margin:36px auto 0; }
+  .orbit-visual .sun{ fill:var(--gold-deep); }
+  .orbit-visual .ring{ fill:none; stroke:var(--line); stroke-width:1; }
+  .orbit-visual .planet{ fill:var(--violet); }
+  .orbit-visual .planet.ruby{ fill:var(--ruby); }
+  .orbit-visual .orbit1{ transform-origin:85px 85px; animation:spin 16s linear infinite; }
+  .orbit-visual .orbit2{ transform-origin:85px 85px; animation:spin-rev 26s linear infinite; }
+  @keyframes spin{ from{ transform:rotate(0deg); } to{ transform:rotate(360deg); } }
+  @keyframes spin-rev{ from{ transform:rotate(360deg); } to{ transform:rotate(0deg); } }
+  @media (prefers-reduced-motion: reduce){
+    .orbit-visual .orbit1, .orbit-visual .orbit2{ animation:none; }
+  }
+
+  /* ---------- Trust reasons ---------- */
+  .reasons{ display:flex; flex-direction:column; gap:0; }
+  .reason{ display:flex; gap:26px; padding:26px 0; border-bottom:1px solid var(--line); }
+  .reason:last-child{ border-bottom:none; }
+  .reason .mark{ font-family:'Cormorant Garamond',serif; font-size:26px; color:var(--violet); flex-shrink:0; width:34px; }
+  .reason h3{ font-size:20px; color:var(--ink); margin-bottom:6px; }
+  .reason p{ color:var(--muted); font-size:15px; max-width:56ch; }
+
+  /* ---------- Testimonials ---------- */
+  .testimonials{ display:grid; grid-template-columns:repeat(3, 1fr); gap:1px; background:var(--line); border:1px solid var(--line); }
+  .testimonial{ background:var(--paper); padding:32px 28px; display:flex; flex-direction:column; justify-content:space-between; }
+  .testimonial .quote{ font-family:'Cormorant Garamond',serif; font-style:italic; font-size:19px; color:var(--ink); line-height:1.5; margin-bottom:20px; }
+  .testimonial .who{ font-size:13px; color:var(--muted); letter-spacing:0.02em; }
+  .stars-row{ color:var(--ruby); font-size:14px; letter-spacing:2px; margin-bottom:14px; }
+  @media (max-width:780px){ .testimonials{grid-template-columns:1fr;} }
+  .placeholder-note{ margin-top:20px; font-size:12.5px; color:var(--muted); opacity:0.75; }
+
+  /* ---------- Proof strip ---------- */
+  .proof{ display:flex; justify-content:center; gap:70px; flex-wrap:wrap; text-align:center; }
+  .proof-item .num{ font-family:'Cormorant Garamond',serif; font-size:44px; color:var(--gold-deep); display:block; animation:proof-glow 3.2s ease-in-out infinite; }
+  .proof-item:nth-child(1) .num{ animation-delay:0s; }
+  .proof-item:nth-child(2) .num{ animation-delay:0.9s; }
+  .proof-item:nth-child(3) .num{ animation-delay:1.8s; }
+  @keyframes proof-glow{
+    0%,100%{ transform:scale(1); text-shadow:none; }
+    50%{ transform:scale(1.08); text-shadow:0 0 16px rgba(184,134,46,0.5); }
+  }
+  @media (prefers-reduced-motion: reduce){
+    .proof-item .num{ animation:none; }
+  }
+  .proof-item .label{ font-size:13px; color:var(--muted); letter-spacing:0.05em; margin-top:6px; }
+
+  /* ---------- Mid CTA banner ---------- */
+  .mid-cta{
+    z-index:1; position:relative;
+    background:var(--paper-2); border-top:1px solid var(--line); border-bottom:1px solid var(--line);
+    padding:28px 24px 56px; text-align:center;
+  }
+  .mid-cta p{ color:var(--muted); font-size:15px; margin-bottom:22px; }
+
+  /* ---------- FAQ ---------- */
+  .faq-item{ padding:22px 0; border-bottom:1px solid var(--line); }
+  .faq-item:last-child{ border-bottom:none; }
+  .faq-item h3{ font-size:19px; color:var(--ink); margin-bottom:8px; font-weight:500; font-family:'Jost',sans-serif; }
+  .faq-item p{ color:var(--muted); font-size:15px; }
+
+  /* ---------- Value stack ---------- */
+  .value-stack{ max-width:440px; margin:0 auto; }
+  .value-row{ display:flex; justify-content:space-between; align-items:baseline; padding:16px 0; border-bottom:1px solid var(--line); }
+  .value-row .item{ font-size:15px; color:var(--ink); }
+  .value-row .price{ font-size:15px; color:var(--muted); }
+  .value-total{ display:flex; justify-content:space-between; align-items:baseline; padding:20px 0 8px; }
+  .value-total .item{ font-size:15px; color:var(--muted); }
+  .value-total .price{ font-size:18px; color:var(--muted); text-decoration:line-through; }
+  .value-final{ display:flex; justify-content:space-between; align-items:baseline; padding:8px 0 0; }
+  .value-final .item{ font-family:'Cormorant Garamond',serif; font-size:22px; color:var(--ink); }
+  .value-final .price{ font-family:'Cormorant Garamond',serif; font-size:30px; color:var(--gold-deep); }
+
+  /* ---------- Calm ripple ---------- */
+  .ripple{ width:140px; height:140px; margin:6px auto 6px; }
+  .ripple circle{ fill:none; stroke:var(--gold-deep); stroke-width:1; transform-origin:center; animation:ripple-out 4.5s ease-out infinite; }
+  .ripple circle:nth-child(1){ animation-delay:0s; }
+  .ripple circle:nth-child(2){ animation-delay:1.5s; }
+  .ripple circle:nth-child(3){ animation-delay:3s; }
+  @keyframes ripple-out{
+    0%{ r:4; opacity:0.8; }
+    100%{ r:64; opacity:0; }
+  }
+  @media (prefers-reduced-motion: reduce){
+    .ripple circle{ animation:none; opacity:0.4; }
+  }
+
+  /* ---------- Final CTA ---------- */
+  .final{ text-align:center; }
+  .final .wrap{ display:flex; flex-direction:column; align-items:center; }
+  .final .price{ font-family:'Cormorant Garamond',serif; font-size:64px; color:var(--ink); margin:8px 0 6px; }
+  .final .price span{ font-size:22px; color:var(--muted); font-family:'Jost',sans-serif; }
+  .final .per-day{ color:var(--gold-deep); font-size:14px; margin-bottom:8px; font-style:italic; font-family:'Cormorant Garamond',serif; }
+  .final .note{ color:var(--muted); font-size:14px; margin-bottom:14px; }
+
+  footer{ position:relative; z-index:1; text-align:center; padding:40px 24px 50px; color:var(--muted); font-size:13px; }
+  footer .disclaimer{ max-width:560px; margin:0 auto 18px; font-size:11.5px; line-height:1.7; color:var(--muted); opacity:0.85; }
+  footer .legal-links{ display:flex; justify-content:center; gap:18px; flex-wrap:wrap; margin-top:14px; font-size:12px; }
+  footer .legal-links a{ color:var(--muted); border-bottom:1px solid var(--line); padding-bottom:1px; transition:color 0.2s ease; }
+  footer .legal-links a:hover{ color:var(--gold-deep); }
+
+  /* ---------- Sticky bottom bar ---------- */
+  .sticky-bar{
+    position:fixed; left:0; right:0; bottom:0; z-index:20;
+    background:rgba(250,247,241,0.94); backdrop-filter:blur(8px);
+    border-top:1px solid var(--line);
+    padding:14px 20px;
+    display:flex; align-items:center; justify-content:center; gap:22px;
+    transform:translateY(100%); transition:transform 0.35s ease;
+  }
+  .sticky-bar.show{ transform:translateY(0); }
+  .sticky-bar .info{ font-size:13.5px; color:var(--muted); display:flex; align-items:center; gap:14px; flex-wrap:wrap; justify-content:center; }
+  .sticky-bar .info strong{ color:var(--gold-deep); font-weight:500; }
+  @media (max-width:520px){
+    .sticky-bar{ flex-direction:column; gap:10px; padding:12px 16px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- HERO -->
+<section class="hero" style="border-top:none;">
+  <svg class="constellation" viewBox="0 0 220 140" aria-hidden="true">
+    <line x1="30" y1="100" x2="70" y2="40" pathLength="1"></line>
+    <line x1="70" y1="40" x2="120" y2="60" pathLength="1"></line>
+    <line x1="120" y1="60" x2="160" y2="20" pathLength="1"></line>
+    <line x1="120" y1="60" x2="150" y2="110" pathLength="1"></line>
+    <line x1="70" y1="40" x2="40" y2="20" pathLength="1"></line>
+    <circle cx="30" cy="100" r="2.6"></circle>
+    <circle cx="70" cy="40" r="3.2"></circle>
+    <circle cx="120" cy="60" r="2.6"></circle>
+    <circle cx="160" cy="20" r="2.8"></circle>
+    <circle cx="150" cy="110" r="2.4"></circle>
+    <circle cx="40" cy="20" r="2.2"></circle>
+  </svg>
+
+  <span class="eyebrow">Μαντείο</span>
+  <h1>Δεν είσαι μόνη/ος σε αυτό.<br>Οι αστερισμοί <em>σου δείχνουν τον δρόμο.</em></h1>
+  <p class="hero-sub">Εξειδικευμένη αστρολογική καθοδήγηση, δύο φορές την εβδομάδα — και απρόσμενες εκπλήξεις ανάμεσα — φτιαγμένη γύρω από τον δικό σου χάρτη, προσωπικά.</p>
+
+  <a href="#eggrafi" class="cta">4,99€/μήνα →</a>
+  <div class="price-tag">Ακύρωση όποτε θες, χωρίς δέσμευση</div>
+  <div class="iris-note">
+    <svg viewBox="0 0 24 24" fill="none"><path d="M12 2L4 6v6c0 5 3.4 8.7 8 10 4.6-1.3 8-5 8-10V6l-8-4z" stroke="currentColor" stroke-width="1.6"/><path d="M9 12l2 2 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    Πληρωμή με κάρτα ή IRIS
+  </div>
+  <div class="founder-badge">Οι θέσεις στα <strong>4,99€/μήνα για πάντα</strong> κλείνουν ταχύτατα — μετά η τιμή ανεβαίνει.</div>
+</section>
+
+<!-- PAIN -->
+<section>
+  <div class="wrap">
+    <span class="kicker">Το πρόβλημα</span>
+    <h2>Οι προβλέψεις που διαβάζεις τώρα δεν μιλάνε σε σένα</h2>
+    <p class="lede">Μια γενική πρόβλεψη για τον Κριό — στην τηλεόραση, σε ένα άρθρο ή σε ένα βίντεο — δε μιλάει για σένα. Δεν ξέρει πού βρίσκεται ο Άρης στον δικό σου χάρτη, ούτε τι σου συμβαίνει αυτή τη στιγμή. Το Μαντείο δεν γράφει για 10 εκατομμύρια ανθρώπους ταυτόχρονα — γράφει για έναν, εσένα...</p>
+    <div class="zodiac-cycle" aria-hidden="true">
+      <span class="zsign">♈︎</span>
+      <span class="zsign">♉︎</span>
+      <span class="zsign">♊︎</span>
+      <span class="zsign">♋︎</span>
+      <span class="zsign">♌︎</span>
+      <span class="zsign">♍︎</span>
+      <span class="zsign">♎︎</span>
+      <span class="zsign">♏︎</span>
+      <span class="zsign">♐︎</span>
+      <span class="zsign">♑︎</span>
+      <span class="zsign">♒︎</span>
+      <span class="zsign">♓︎</span>
+    </div>
+  </div>
+</section>
+
+<!-- WHAT YOU GET -->
+<section>
+  <div class="wrap">
+    <span class="kicker">Τι περιλαμβάνει</span>
+    <h2>Καθοδήγηση φτιαγμένη για εσένα</h2>
+    <p class="lede">2 χρησμοί την εβδομάδα και εκπλήξεις ανάμεσα, χτισμένοι πάνω στον δικό σου αστρολογικό χάρτη — για ό,τι σε απασχολεί πραγματικά.</p>
+
+    <div class="offerings">
+      <div class="offer">
+        <svg class="offer-icon" viewBox="0 0 26 26" aria-hidden="true"><circle cx="10" cy="13" r="7"></circle><circle cx="16" cy="13" r="7"></circle></svg>
+        <h3>Σχέσεις & πρόσωπα του παρελθόντος</h3>
+        <p>Ποιος επανέρχεται στη ζωή σου, και τι σημαίνει αυτό γι' αυτή τη φάση σου.</p>
+      </div>
+      <div class="offer">
+        <svg class="offer-icon" viewBox="0 0 26 26" aria-hidden="true"><circle cx="9" cy="9" r="4.5"></circle><line x1="12.2" y1="12.2" x2="21" y2="21"></line><line x1="16.5" y1="16.5" x2="19.5" y2="13.5"></line><line x1="19" y1="19" x2="22" y2="16"></line></svg>
+        <h3>Επαγγελματικά & αποφάσεις</h3>
+        <p>Πότε είναι η στιγμή να προχωρήσεις, να ζητήσεις, να αλλάξεις — και πότε να περιμένεις.</p>
+      </div>
+      <div class="offer">
+        <svg class="offer-icon" viewBox="0 0 26 26" aria-hidden="true"><path d="M16,4 C11,4 7,8.5 7,13 C7,17.5 11,22 16,22 C12.5,20.3 10.2,16.9 10.2,13 C10.2,9.1 12.5,5.7 16,4 Z"></path></svg>
+        <h3>Τύχη & γενική πορεία</h3>
+        <p>Τι αλλάζει γύρω σου αυτή την περίοδο, και πώς να το εκμεταλλευτείς αντί να σε βρει απροετοίμαστο/η.</p>
+      </div>
+      <div class="offer">
+        <svg class="offer-icon" viewBox="0 0 26 26" aria-hidden="true"><rect x="5" y="3" width="16" height="20" rx="1.5"></rect><path d="M13,9 L14.3,12 L17.5,12.3 L15,14.5 L15.8,17.7 L13,16 L10.2,17.7 L11,14.5 L8.5,12.3 L11.7,12 Z"></path></svg>
+        <h3>Απρόσμενες εκπλήξεις</h3>
+        <p>Ταρώ, αριθμολογία ή τράπουλα — μια επιπλέον ματιά, ακριβώς τη στιγμή που τη χρειάζεσαι.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- MANTEIO TEAM -->
+<section>
+  <div class="wrap">
+    <span class="kicker">Τι θα βρεις μέσα</span>
+    <h2>Τέσσερα θέματα. Ένα Μαντείο.</h2>
+    <p class="lede">Σχέσεις. Καριέρα. Τύχη. Σημάδια. Ό,τι σε απασχολεί, κάθε εβδομάδα.</p>
+    <div class="team-grid">
+      <div class="team-card">
+        <div class="avatar"><img src="iakovos.png" alt="Ιάκωβος" loading="lazy"></div>
+        <div class="name">Ιάκωβος</div>
+        <svg class="signature-line" viewBox="0 0 70 16" aria-hidden="true"><path d="M4,8 L58,8" style="animation-delay:0s"></path></svg>
+      </div>
+      <div class="team-card is-placeholder">
+        <div class="avatar placeholder"><span>?</span></div>
+        <div class="name">Δαμιανός</div>
+        <svg class="signature-line" viewBox="0 0 70 16" aria-hidden="true"><path d="M4,8 L58,8" style="animation-delay:1.5s"></path></svg>
+      </div>
+      <div class="team-card is-placeholder">
+        <div class="avatar placeholder"><span>?</span></div>
+        <div class="name">Θεοδώρα</div>
+        <svg class="signature-line" viewBox="0 0 70 16" aria-hidden="true"><path d="M4,8 L58,8" style="animation-delay:3s"></path></svg>
+      </div>
+      <div class="team-card is-placeholder">
+        <div class="avatar placeholder"><span>?</span></div>
+        <div class="name">Ηλέκτρα</div>
+        <svg class="signature-line" viewBox="0 0 70 16" aria-hidden="true"><path d="M4,8 L58,8" style="animation-delay:4.5s"></path></svg>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- METHODOLOGY -->
+<section>
+  <div class="wrap">
+    <span class="kicker">Η μεθοδολογία</span>
+    <h2>Πίσω από κάθε χρησμό, ακριβής ανάλυση</h2>
+    <div class="method-layout">
+      <div class="method-copy">
+        <p>Κάθε ανάλυση ξεκινά από τον γενέθλιο χάρτη σου — τη θέση των πλανητών στους 12 οίκους τη στιγμή της γέννησής σου. Παρακολουθούμε τις διελεύσεις (transits) πάνω στον χάρτη σου και τις όψεις που σχηματίζουν οι πλανήτες μεταξύ τους — σύνοδοι, τετράγωνα, τρίγωνα — σε σχέση με τον Ωροσκόπο και το Μεσουράνημα σου. Αυτό σου δείχνει πρακτικά πότε είναι η στιγμή να προχωρήσεις σε μια απόφαση και πότε να περιμένεις, αντί να μαντεύεις.</p>
+        <div class="method-sub">
+          <h3><svg viewBox="0 0 26 26" aria-hidden="true"><rect x="6" y="2" width="14" height="22" rx="1.5"></rect><path d="M13,8 L14.3,11 L17.5,11.3 L15,13.5 L15.8,16.7 L13,15 L10.2,16.7 L11,13.5 L8.5,11.3 L11.7,11 Z"></path></svg>Ταρώ</h3>
+          <p>Δουλεύουμε με τα 22 Μείζονα Αρκάνα και δομημένες διατάξεις όπως ο Κελτικός Σταυρός, για εικόνα πέρα από την απλή ημερήσια κάρτα — έτσι έχεις καθαρή απάντηση πριν από μια δύσκολη επιλογή, όχι απλώς μια γενική τάση.</p>
+        </div>
+        <div class="method-sub">
+          <h3><svg viewBox="0 0 26 26" aria-hidden="true"><rect x="3" y="3" width="20" height="20"></rect><line x1="3" y1="9.67" x2="23" y2="9.67"></line><line x1="3" y1="16.33" x2="23" y2="16.33"></line><line x1="9.67" y1="3" x2="9.67" y2="23"></line><line x1="16.33" y1="3" x2="16.33" y2="23"></line></svg>Αριθμολογία</h3>
+          <p>Υπολογίζουμε τον Αριθμό Ζωής σου και εντοπίζουμε κύριους αριθμούς (Master Numbers) που επηρεάζουν βασικές αποφάσεις — βοηθώντας σε να καταλάβεις γιατί επαναλαμβάνονται συγκεκριμένα μοτίβα στη ζωή σου, και πώς να τα σπάσεις.</p>
+        </div>
+      </div>
+      <div class="method-chart">
+        <svg class="natal-chart" viewBox="0 0 240 240" aria-hidden="true">
+          <circle class="ring" cx="120" cy="120" r="98"></circle>
+          <circle class="ring-2" cx="120" cy="120" r="72"></circle>
+          <circle class="ring-2" cx="120" cy="120" r="46"></circle>
+          <g class="spoke">
+            <line x1="120" y1="22" x2="120" y2="218"></line>
+            <line x1="22" y1="120" x2="218" y2="120"></line>
+            <line x1="51.7" y1="51.7" x2="188.3" y2="188.3"></line>
+            <line x1="188.3" y1="51.7" x2="51.7" y2="188.3"></line>
+            <line x1="120" y1="22" x2="151" y2="35.6"></line>
+            <line x1="120" y1="22" x2="89" y2="35.6"></line>
+            <line x1="120" y1="218" x2="151" y2="204.4"></line>
+            <line x1="120" y1="218" x2="89" y2="204.4"></line>
+            <line x1="22" y1="120" x2="35.6" y2="89"></line>
+            <line x1="22" y1="120" x2="35.6" y2="151"></line>
+            <line x1="218" y1="120" x2="204.4" y2="89"></line>
+            <line x1="218" y1="120" x2="204.4" y2="151"></line>
+          </g>
+          <g class="natal-transit">
+            <polygon class="aspect" points="120,22 208,164 32,164"></polygon>
+            <line class="aspect" x1="120" y1="22" x2="120" y2="218"></line>
+            <circle class="planet gold" cx="120" cy="22" r="4"></circle>
+            <circle class="planet" cx="208" cy="164" r="3.6"></circle>
+            <circle class="planet" cx="32" cy="164" r="3.6"></circle>
+            <circle class="planet gold" cx="120" cy="218" r="3.6"></circle>
+            <circle class="planet" cx="198" cy="76" r="3.2"></circle>
+            <circle class="planet" cx="60" cy="182" r="3.2"></circle>
+          </g>
+        </svg>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ZODIAC LINE BAND -->
+<div class="zodiac-band">
+  <div class="wrap">
+    <svg class="zodiac-wheel" viewBox="0 0 180 180" aria-hidden="true">
+      <circle class="ring-out" cx="90" cy="90" r="82"></circle>
+      <circle class="ring-in" cx="90" cy="90" r="58"></circle>
+      <g class="wheel-spin">
+        <line class="tick" x1="90" y1="8" x2="90" y2="24"></line>
+        <line class="tick" x1="90" y1="156" x2="90" y2="172"></line>
+        <line class="tick" x1="8" y1="90" x2="24" y2="90"></line>
+        <line class="tick" x1="156" y1="90" x2="172" y2="90"></line>
+        <line class="tick minor" x1="31.8" y1="31.8" x2="42.6" y2="42.6"></line>
+        <line class="tick minor" x1="148.2" y1="31.8" x2="137.4" y2="42.6"></line>
+        <line class="tick minor" x1="31.8" y1="148.2" x2="42.6" y2="137.4"></line>
+        <line class="tick minor" x1="148.2" y1="148.2" x2="137.4" y2="137.4"></line>
+        <line class="tick minor" x1="90" y1="8" x2="90" y2="8"></line>
+      </g>
+    </svg>
+    <span class="kicker">Πίσω από κάθε μήνυμα</span>
+    <h2>Ο ουρανός κινείται συνέχεια. Το Μαντείο σου λέει τι σημαίνει για σένα.</h2>
+    <p class="lede">Κάθε πανσέληνος, κάθε ανάδρομος, κάθε έκλειψη — μεταφρασμένα σε κατεύθυνση, όχι σε γενικόλογο κείμενο.</p>
+    <svg class="orbit-visual" viewBox="0 0 170 170" aria-hidden="true">
+      <circle class="ring" cx="85" cy="85" r="40"></circle>
+      <circle class="ring" cx="85" cy="85" r="65"></circle>
+      <circle class="sun" cx="85" cy="85" r="6"></circle>
+      <g class="orbit1"><circle class="planet" cx="125" cy="85" r="3.5"></circle></g>
+      <g class="orbit2"><circle class="planet ruby" cx="150" cy="85" r="3"></circle></g>
+    </svg>
+  </div>
+</div>
+
+<!-- MID CTA 1 -->
+<div class="mid-cta">
+  <p>Ήδη 33.000+ άνθρωποι ακολουθούν το Μαντείο, και συνεχώς αυξάνονται. Η προσωπική καθοδήγηση κοστίζει 4,99€/μήνα.</p>
+  <div class="founder-badge small">Οι θέσεις στα 4,99€/μήνα για πάντα κλείνουν ταχύτατα</div>
+  <a href="#eggrafi" class="cta small">Εγγραφή τώρα →</a>
+</div>
+
+<!-- WHY TRUST -->
+<section>
+  <div class="wrap">
+    <span class="kicker">Γιατί να μας εμπιστευτείς</span>
+    <h2>Εξειδικευμένη καθοδήγηση, όχι μαζική παραγωγή</h2>
+    <div class="reasons">
+      <div class="reason">
+        <span class="mark">01</span>
+        <div><h3>Προσωπικό στον χάρτη σου</h3><p>Κάθε μήνυμα λαμβάνει υπόψη τα δικά σου δεδομένα γέννησης — όχι μόνο το ζώδιό σου. Ο προσωπικός σου εξειδικευμένος απόλυτος αστρολόγος.</p></div>
+      </div>
+      <div class="reason">
+        <span class="mark">02</span>
+        <div><h3>Σταθερή, εβδομαδιαία παρουσία</h3><p>Δύο φορές την εβδομάδα, χωρίς διακοπές — και εκπλήξεις ανάμεσα, όποτε δεν το περιμένεις. Στο κινητό σου ή στο mail σου.</p></div>
+      </div>
+      <div class="reason">
+        <span class="mark">03</span>
+        <div><h3>Ιδιωτικός χρησμός, μόνο για σένα</h3><p>Δεν είναι δημόσιο περιεχόμενο. Φτάνει απευθείας σε σένα, χωρίς σχόλια ή κοινό γύρω του. Έρχεται στο κινητό σου μέσω WhatsApp, Viber ή Messenger, ή στο email σου — όποιο επιλέξεις εσύ.</p></div>
+      </div>
+      <div class="reason">
+        <span class="mark">04</span>
+        <div><h3>Ασφαλής πληρωμή</h3><p>Κάρτα ή IRIS — ό,τι σου δίνει μεγαλύτερη σιγουριά.</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TESTIMONIALS -->
+<section>
+  <div class="wrap">
+    <span class="kicker">Τι λένε τα μέλη</span>
+    <h2>Δεν το λέμε μόνο εμείς</h2>
+    <div class="testimonials">
+      <div class="testimonial">
+        <div>
+          <div class="stars-row">★★★★★</div>
+          <p class="quote">"Ο πρώτος χρησμός με βρήκε ακριβώς στη φάση που περνούσα. Δεν το περίμενα."</p>
+        </div>
+        <div class="who">— Μ., 49</div>
+      </div>
+      <div class="testimonial">
+        <div>
+          <div class="stars-row">★★★★★</div>
+          <p class="quote">"Πιο συγκεκριμένο από οτιδήποτε άλλο έχω διαβάσει για το ζώδιό μου, προσωπικά."</p>
+        </div>
+        <div class="who">— Ε., 56</div>
+      </div>
+      <div class="testimonial">
+        <div>
+          <div class="stars-row">★★★★★</div>
+          <p class="quote">"Το περιμένω κάθε βδομάδα. Αξίζει πολύ περισσότερο από 4,99€."</p>
+        </div>
+        <div class="who">— Κ., 41</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PROOF -->
+<section>
+  <div class="wrap">
+    <div class="proof">
+      <div class="proof-item"><span class="num">33K+</span><span class="label">ακόλουθοι, συνεχώς αυξάνονται</span></div>
+      <div class="proof-item"><span class="num">2K</span><span class="label">μέλη στην κοινότητα, συνεχώς αυξάνονται</span></div>
+      <div class="proof-item"><span class="num">2×+</span><span class="label">χρησμοί / εβδομάδα, με εκπλήξεις</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- MID CTA 2 -->
+<div class="mid-cta">
+  <p>Χωρίς δέσμευση. Ακυρώνεις όποτε θες, με ένα κλικ.</p>
+  <div class="founder-badge small">Οι θέσεις στα 4,99€/μήνα για πάντα κλείνουν ταχύτατα, μετά η τιμή ανεβαίνει</div>
+  <a href="#eggrafi" class="cta small">Ξεκίνα τώρα με 4,99€/μήνα →</a>
+</div>
+
+<!-- FAQ -->
+<section>
+  <div class="wrap">
+    <span class="kicker">Συχνές ερωτήσεις</span>
+    <h2>Πριν εγγραφείς</h2>
+    <div class="faq-list">
+      <div class="faq-item"><h3>Πόσο συχνά θα λαμβάνω χρησμό;</h3><p>Δύο φορές την εβδομάδα, σταθερά — και απρόσμενες εκπλήξεις (ταρώ, αριθμολογία, τράπουλα) ανάμεσα, χωρίς σταθερή μέρα.</p></div>
+      <div class="faq-item"><h3>Είναι προσωπικό στον χάρτη μου ή γενικό;</h3><p>Ξεκάθαρα προσωπικό — βασισμένο στα δικά σου στοιχεία γέννησης.</p></div>
+      <div class="faq-item"><h3>Πώς πληρώνω;</h3><p>Με κάρτα ή μέσω IRIS, ό,τι σου είναι πιο βολικό.</p></div>
+      <div class="faq-item"><h3>Μπορώ να ακυρώσω όποτε θέλω;</h3><p>Ναι, χωρίς δέσμευση και χωρίς ερωτήσεις.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- VALUE STACK -->
+<section>
+  <div class="wrap">
+    <span class="kicker">Τι παίρνεις</span>
+    <h2>Αν το αγόραζες ξεχωριστά</h2>
+    <div class="value-stack">
+      <div class="value-row"><span class="item">Προσωπική αστρολογική ανάλυση (2× / εβδομάδα)</span><span class="price">60€/μήνα</span></div>
+      <div class="value-row"><span class="item">Ανάγνωση ταρώ (Κελτικός Σταυρός)</span><span class="price">55€</span></div>
+      <div class="value-row"><span class="item">Αριθμολογική ανάλυση</span><span class="price">50€</span></div>
+      <div class="value-total"><span class="item">Συνολική αξία</span><span class="price">165€/μήνα</span></div>
+      <div class="value-final"><span class="item">Στο Μαντείο</span><span class="price">4,99€/μήνα, για πάντα</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- FINAL CTA -->
+<section class="final" id="eggrafi">
+  <div class="wrap">
+    <span class="kicker">Συνδρομή</span>
+    <h2>Ξεκίνα σήμερα</h2>
+    <svg class="ripple" viewBox="0 0 140 140" aria-hidden="true">
+      <circle cx="70" cy="70" r="4"></circle>
+      <circle cx="70" cy="70" r="4"></circle>
+      <circle cx="70" cy="70" r="4"></circle>
+    </svg>
+    <div class="price">4,99€<span> / μήνα, για πάντα</span></div>
+    <p class="per-day">Λιγότερο από 0,16€ την ημέρα</p>
+    <p class="note">Ακύρωση όποτε θέλεις, χωρίς ερωτήσεις.</p>
+    <div class="iris-note" style="margin-bottom:24px;">
+      <svg viewBox="0 0 24 24" fill="none"><path d="M12 2L4 6v6c0 5 3.4 8.7 8 10 4.6-1.3 8-5 8-10V6l-8-4z" stroke="currentColor" stroke-width="1.6"/><path d="M9 12l2 2 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      Πληρωμή με κάρτα ή IRIS
+    </div>
+    <div class="founder-badge">Οι θέσεις στα <strong>4,99€/μήνα για πάντα</strong> κλείνουν ταχύτατα — μετά η τιμή ανεβαίνει.</div>
+    <a href="#" class="cta">Εγγραφή στο Μαντείο →</a>
+  </div>
+</section>
+
+<footer>
+  <p class="disclaimer">Το περιεχόμενο του Μαντείου έχει ψυχαγωγικό χαρακτήρα και δεν αποτελεί επιστημονική, ιατρική, νομική ή οικονομική συμβουλή. Για αποφάσεις που αφορούν την υγεία, τα οικονομικά ή νομικά σου θέματα, συμβουλεύσου τον αρμόδιο ειδικό.</p>
+  Μαντείο © 2026 — Προσωπική αστρολογική καθοδήγηση
+  <div class="legal-links">
+    <a href="#">Όροι Χρήσης</a>
+    <a href="#">Πολιτική Απορρήτου</a>
+    <a href="#">Στοιχεία Επιχείρησης</a>
+    <a href="#">Επικοινωνία</a>
+  </div>
+</footer>
+
+<div class="sticky-bar" id="stickyBar">
+  <div class="info"><strong>4,99€/μήνα, για πάντα</strong> · Κάρτα ή IRIS · <span style="color:var(--ruby);">Θέσεις κλείνουν ταχύτατα</span></div>
+  <a href="#eggrafi" class="cta small">Εγγραφή →</a>
+</div>
+
+<script>
+  const bar = document.getElementById('stickyBar');
+  const hero = document.querySelector('.hero');
+  const final = document.getElementById('eggrafi');
+  window.addEventListener('scroll', () => {
+    const heroBottom = hero.getBoundingClientRect().bottom;
+    const finalTop = final.getBoundingClientRect().top;
+    const winH = window.innerHeight;
+    if(heroBottom < 0 && finalTop > winH * 0.6){
+      bar.classList.add('show');
+    } else {
+      bar.classList.remove('show');
+    }
+  }, {passive:true});
+</script>
+
+</body>
+</html>
