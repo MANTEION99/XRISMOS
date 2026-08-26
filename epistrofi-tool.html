@@ -299,7 +299,7 @@ form.addEventListener('submit', async (e) => {
     const pct = match ? match[1] : "—";
     let body = text.replace(/\[ΠΟΣΟΣΤΟ:\s*\d+\]/, "").trim();
 
-    const adviceMatch = body.split(/\[ΣΥΜΒΟΥΛΗ\]/);
+    const adviceMatch = body.split(/\[?\s*ΣΥΜΒΟΥΛΗ\s*\]?\s*:?/);
     const readingPart = adviceMatch[0].trim();
     const advicePart = adviceMatch[1] ? adviceMatch[1].trim() : "";
 
