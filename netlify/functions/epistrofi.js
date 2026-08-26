@@ -19,7 +19,7 @@ exports.handler = async function (event) {
       return { statusCode: 400, body: JSON.stringify({ error: "Λείπουν απαραίτητα στοιχεία." }) };
     }
 
-    // --- Βήμα 1: πραγματικά αστρολογικά δεδομένα για το Άτομο 1 ---
+    // --- Βήμα 1+2: πραγματικά αστρολογικά δεδομένα, παράλληλα για ταχύτητα ---
     const [d1, m1, y1] = dob1.split("-").reverse(); // αν dob1 έρχεται σαν YYYY-MM-DD
     const [hour1, min1] = (tob1 || "12:00").split(":");
 
@@ -35,22 +35,20 @@ exports.handler = async function (event) {
       house_type: "placidus"
     };
 
-    const astroRes1 = await fetch("https://json.astrologyapi.com/v1/western_horoscope", {
+    const fetchChart = (body) => fetch("https://json.astrologyapi.com/v1/western_horoscope", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
         "x-astrologyapi-key": process.env.ASTROLOGY_API_KEY
       },
-      body: JSON.stringify(chart1Body)
-    });
-    const astroData1 = await astroRes1.json();
+      body: JSON.stringify(body)
+    }).then(r => r.json());
 
-    // --- Βήμα 2: αν υπάρχουν στοιχεία, ίδιο για το Άτομο 2 ---
-    let astroData2 = null;
+    let chart2Body = null;
     if (dob2) {
       const [d2, m2, y2] = dob2.split("-");
       const [hour2, min2] = (tob2 || "12:00").split(":");
-      const chart2Body = {
+      chart2Body = {
         day: parseInt(d2 || dob2.split("-")[2]),
         month: parseInt(m2 || dob2.split("-")[1]),
         year: parseInt(y2 || dob2.split("-")[0]),
@@ -61,16 +59,12 @@ exports.handler = async function (event) {
         tzone: tzone2 || 2,
         house_type: "placidus"
       };
-      const astroRes2 = await fetch("https://json.astrologyapi.com/v1/western_horoscope", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "x-astrologyapi-key": process.env.ASTROLOGY_API_KEY
-        },
-        body: JSON.stringify(chart2Body)
-      });
-      astroData2 = await astroRes2.json();
     }
+
+    const [astroData1, astroData2] = await Promise.all([
+      fetchChart(chart1Body),
+      chart2Body ? fetchChart(chart2Body) : Promise.resolve(null)
+    ]);
 
     // --- Βήμα 3: δίνουμε τα πραγματικά δεδομένα στο Claude για να γράψει το κείμενο ---
     const prompt = `Είσαι ένας έμπειρος, ζεστός Έλληνας αστρολόγος που γράφει για το "Μαντείο". Το κοινό σου είναι κυρίως γυναίκες 50-65 ετών. Παρακάτω σου δίνω ΠΡΑΓΜΑΤΙΚΑ υπολογισμένα αστρολογικά δεδομένα (θέσεις πλανητών, οίκους, όψεις) για δύο άτομα. Χρησιμοποίησέ τα σαν βάση, μην εφευρίσκεις νέα δεδομένα εκτός αυτών.
