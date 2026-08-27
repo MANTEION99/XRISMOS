@@ -133,6 +133,11 @@
   .result{ margin-top:26px; padding-top:24px; border-top:1px solid var(--line); display:none; }
   .result.show{ display:block; animation:fadein 0.6s ease; }
   .pct-wrap{ text-align:center; margin-bottom:18px; }
+  .advisor-photo{
+    display:block; width:72px; height:72px; margin:0 auto 14px;
+    border-radius:50%; object-fit:cover; object-position:center 20%;
+    border:2px solid var(--gold); box-shadow:0 0 16px rgba(217,178,92,0.25);
+  }
   .pct{ font-family:'Cormorant Garamond',serif; font-size:52px; font-weight:600; color:var(--gold); line-height:1; }
   .pct-label{ font-size:12px; color:var(--muted); letter-spacing:1px; margin-top:4px; }
   .reading{ font-family:'Cormorant Garamond',serif; font-size:17px; line-height:1.7; color:var(--paper); white-space:pre-wrap; }
@@ -209,6 +214,7 @@
     </div>
 
     <div class="result" id="result">
+      <img class="advisor-photo" src="advisor-oikonomika.jpg" alt="" onerror="this.style.display='none'">
       <div class="pct-wrap">
         <div class="pct" id="pctnum">—</div>
         <div class="pct-label">ΠΙΘΑΝΟΤΗΤΑ ΑΝΑΚΟΥΦΙΣΗΣ</div>
