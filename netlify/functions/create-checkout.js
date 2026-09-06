@@ -11,7 +11,10 @@ const PRODUCTS = {
   oikonomika_q3: { name: "Μια Φωτισμένη Οικονομική Αρχή — 3η ερώτηση", price: 199 },
   symvatotita: { name: "Ταιριάζετε; Η Πλήρης Συμβατότητά σας", price: 499 },
   symvatotita_q2: { name: "Ταιριάζετε; — 2η ερώτηση", price: 299 },
-  symvatotita_q3: { name: "Ταιριάζετε; — 3η ερώτηση", price: 199 }
+  symvatotita_q3: { name: "Ταιριάζετε; — 3η ερώτηση", price: 199 },
+  taro: { name: "Το Τρίφυλλο Ταρώ", price: 499 },
+  taro_q2: { name: "Το Τρίφυλλο Ταρώ — 2η ερώτηση", price: 299 },
+  taro_q3: { name: "Το Τρίφυλλο Ταρώ — 3η ερώτηση", price: 199 }
 };
 
 // Το Stripe REST API περιμένουν form-urlencoded body με bracket notation για nested δεδομένα
