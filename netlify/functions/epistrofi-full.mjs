@@ -1,18 +1,14 @@
 // Ο ΠΛΗΡΩΜΕΝΟΣ χρησμός της «Επιστροφής της Χαμένης Αγάπης» (4,99€).
-// Ελέγχει στο Stripe ότι η πληρωμή έγινε για ΑΥΤΟΝ τον χρησμό και γράφει τη συνέχεια με streaming.
-// Η συνέχεια γράφεται ΜΙΑ φορά και αποθηκεύεται: αν η πελάτισσα ανανεώσει τη σελίδα ή ξανανοίξει
-// τον σύνδεσμο, παίρνει τον ίδιο χρησμό, δεν γράφεται νέος. Έτσι μια πληρωμή δεν ξαναχρησιμοποιείται.
+// Η σελίδα ρωτά αυτό το endpoint κάθε 1,5 δευτερόλεπτο. Την πρώτη φορά, αφού ελέγξει την πληρωμή
+// στο Stripe, ξεκινά τη συγγραφή σε background function (έως 15 λεπτά, χωρίς όριο χρόνου απάντησης).
+// Η background function αποθηκεύει το κείμενο όσο γράφεται, και εδώ επιστρέφεται ό,τι έχει γραφτεί.
+// Ο χρησμός γράφεται ΜΙΑ φορά και μένει αποθηκευμένος: ανανέωση ή νέο άνοιγμα δεν χρεώνει ξανά.
 //
-// Μορφή απάντησης (απλό κείμενο):
-//   <δωρεάν άνοιγμα>
-//   <<<ΣΥΝΕΧΕΙΑ>>>
-//   <πληρωμένη συνέχεια, ξεκινά με [ΠΟΣΟΣΤΟ: NN] και περιέχει [ΣΥΜΒΟΥΛΗ]>
+// Απάντηση: { status: "generating" | "done" | "error", teaser, text }
 
-import {
-  readingsStore, json, verifyStripeSession, fullPrompt, skyBlock, streamClaude, streamResponse
-} from "../lib/epistrofi-common.mjs";
+import { readingsStore, json, verifyStripeSession } from "../lib/epistrofi-common.mjs";
 
-const SEP = "\n<<<ΣΥΝΕΧΕΙΑ>>>\n";
+const STALE_MS = 5 * 60 * 1000;
 
 export default async (req) => {
   if (req.method !== "POST") return json(405, { error: "Method Not Allowed" });
@@ -27,37 +23,38 @@ export default async (req) => {
   const reading = await readings.get(readingId, { type: "json" });
   if (!reading) return json(404, { error: "Δεν βρέθηκε ο χρησμός." });
 
-  const paid = await verifyStripeSession(sessionId, "epistrofi", readingId);
-  if (!paid) return json(402, { error: "Δεν βρέθηκε έγκυρη πληρωμή για αυτόν τον χρησμό." });
+  // Η πληρωμή ελέγχεται στο Stripe μόνο μία φορά, μετά κρατιέται μαζί με τον χρησμό.
+  if (reading.paidSession !== sessionId) {
+    const paid = await verifyStripeSession(sessionId, "epistrofi", readingId);
+    if (!paid) return json(402, { error: "Δεν βρέθηκε έγκυρη πληρωμή για αυτόν τον χρησμό." });
+  }
 
-  // Ήδη γραμμένος: τον επιστρέφουμε όπως είναι.
-  if (reading.full) {
-    return new Response((reading.teaser || "") + SEP + reading.full, {
-      headers: { "Content-Type": "text/plain; charset=utf-8", "Cache-Control": "no-store" }
+  const teaser = reading.teaser || "";
+  if (reading.full) return json(200, { status: "done", teaser, text: reading.full });
+
+  const running = reading.generatingSince && Date.now() - reading.generatingSince < STALE_MS;
+  if (!running && (reading.genAttempts || 0) >= 3) {
+    return json(200, { status: "error", teaser, text: reading.partial || "" });
+  }
+  if (!running) {
+    await readings.setJSON(readingId, {
+      ...reading, paidSession: sessionId, generatingSince: Date.now(), partial: "", genError: null,
+      genAttempts: (reading.genAttempts || 0) + 1
     });
+    const origin = new URL(req.url).origin;
+    const r = await fetch(`${origin}/.netlify/functions/epistrofi-full-background`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ reading_id: readingId, session_id: sessionId })
+    }).catch(e => ({ ok: false, status: 0, e }));
+    console.log(`[full] background started status=${r.status}`);
+    return json(200, { status: "generating", teaser, text: "" });
   }
 
-  // Γράφεται ήδη από άλλο παράθυρο: η σελίδα θα ξαναρωτήσει σε λίγο.
-  if (reading.generatingSince && Date.now() - reading.generatingSince < 120000) {
-    return json(409, { error: "generating" });
-  }
-
-  await readings.setJSON(readingId, { ...reading, generatingSince: Date.now(), paidSession: sessionId });
-
-  return streamResponse(async (write) => {
-    write((reading.teaser || "") + SEP);
-    try {
-      const hasTime1 = /^\d{2}:\d{2}$/.test(reading.inputs.tob1 || "");
-      const sky = skyBlock(reading.inputs, reading.charts, hasTime1);
-      const full = await streamClaude(fullPrompt(reading.inputs, reading.charts, reading.teaser, sky), 4000, write, 450);
-      await readings.setJSON(readingId, {
-        ...reading, full, paidSession: sessionId, paidAt: new Date().toISOString(), generatingSince: null
-      });
-    } catch (e) {
-      // Αποτυχία: ελευθερώνουμε το κλείδωμα ώστε η ανανέωση της σελίδας να ξαναδοκιμάσει.
-      await readings.setJSON(readingId, { ...reading, generatingSince: null });
-      throw e;
-    }
+  return json(200, {
+    status: "generating",
+    teaser,
+    text: reading.partial || ""
   });
 };
 

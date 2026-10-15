@@ -164,6 +164,21 @@
   .loading.show{ display:block; }
   .spinner{ width:26px; height:26px; margin:0 auto 14px; border:2px solid var(--line); border-top-color:var(--gold); border-radius:50%; animation:spin 1s linear infinite; }
   @keyframes spin{ to{ transform:rotate(360deg); } }
+  /* Τελετουργία αναμονής: ο ουρανός «γυρίζει» μέχρι να εμφανιστούν οι πρώτες λέξεις */
+  .ritual{ text-align:center; padding:26px 0 10px; animation:fadein 0.8s ease; }
+  .ritual-orb{ position:relative; width:150px; height:150px; margin:0 auto 22px; }
+  .ritual-orb svg{ position:absolute; inset:0; width:100%; height:100%; }
+  .ritual-ring{ animation:spin 40s linear infinite; transform-origin:50% 50%; }
+  .ritual-ring2{ animation:spin 26s linear infinite reverse; transform-origin:50% 50%; }
+  .ritual-core{ position:absolute; left:50%; top:50%; width:46px; height:46px; margin:-23px 0 0 -23px; border-radius:50%;
+    background:radial-gradient(circle at 35% 30%, #f3d98b, #b8862f 60%, #6d4a14); box-shadow:0 0 22px rgba(232,192,104,0.55), 0 0 60px rgba(232,192,104,0.25);
+    display:flex; align-items:center; justify-content:center; font-family:'Cormorant Garamond',serif; font-size:22px; color:#2a1c06; animation:orbpulse 3.2s ease-in-out infinite; }
+  @keyframes orbpulse{ 0%,100%{ transform:scale(1); box-shadow:0 0 22px rgba(232,192,104,0.5), 0 0 60px rgba(232,192,104,0.2);} 50%{ transform:scale(1.07); box-shadow:0 0 32px rgba(232,192,104,0.8), 0 0 90px rgba(232,192,104,0.35);} }
+  .ritual-star{ animation:twinkle 2.6s ease-in-out infinite; }
+  @keyframes twinkle{ 0%,100%{ opacity:0.25; } 50%{ opacity:1; } }
+  .ritual-line{ font-family:'Cormorant Garamond',serif; font-style:italic; font-size:18px; line-height:1.5; color:var(--gold); min-height:56px; max-width:330px; margin:0 auto; transition:opacity 0.7s ease; }
+  .pct.counting{ transition:none; }
+
   @keyframes fadein{ from{opacity:0; transform:translateY(6px);} to{opacity:1; transform:translateY(0);} }
 
   .result{ margin-top:26px; padding-top:24px; border-top:1px solid var(--line); display:none; }
@@ -344,7 +359,8 @@
 
     <!-- Ο πληρωμένος χρησμός -->
     <div class="full-wrap" id="fullWrap">
-      <div class="pct-wrap">
+      <div id="ritualFull"></div>
+      <div class="pct-wrap" id="pctWrap">
         <div class="pct" id="pctnum">—</div>
         <div class="pct-label">ΠΙΘΑΝΟΤΗΤΑ ΕΠΑΝΕΝΩΣΗΣ</div>
       </div>
@@ -459,7 +475,8 @@ function renderContinuation(cont, finished) {
   const m = text.match(/^\s*\[ΠΟΣΟΣΤΟ:\s*(\d+)\]\s*/);
   if (m) { pct = m[1]; text = text.slice(m[0].length); }
   else if (/^\s*\[/.test(text) && !text.includes(']')) { text = ''; }
-  if (pct) pctnum.textContent = pct + '%';
+  if (pct) { stopRitual(); revealPercent(pct); }
+  if (text.trim()) stopRitual();
   const parts = text.split(/\[?\s*ΣΥΜΒΟΥΛΗ\s*\]?\s*:?/);
   readingtext.textContent = parts[0].trim();
   if (parts[1] !== undefined) {
@@ -470,6 +487,90 @@ function renderContinuation(cont, finished) {
   } else {
     readingtext.classList.toggle('typing', !finished);
   }
+}
+
+
+/* ---------- Τελετουργία αναμονής ---------- */
+function ritualHTML() {
+  let ticks = '', stars = '';
+  for (let i = 0; i < 12; i++) {
+    const a = i * Math.PI / 6, x1 = 75 + 62 * Math.cos(a), y1 = 75 + 62 * Math.sin(a), x2 = 75 + 70 * Math.cos(a), y2 = 75 + 70 * Math.sin(a);
+    ticks += `<line x1="${x1.toFixed(1)}" y1="${y1.toFixed(1)}" x2="${x2.toFixed(1)}" y2="${y2.toFixed(1)}" stroke="#d9b45f" stroke-width="1.2" opacity="0.8"/>`;
+    const b = a + Math.PI / 12, r = 50 + (i % 3) * 5;
+    stars += `<circle class="ritual-star" style="animation-delay:${(i * 0.37).toFixed(2)}s" cx="${(75 + r * Math.cos(b)).toFixed(1)}" cy="${(75 + r * Math.sin(b)).toFixed(1)}" r="${i % 4 === 0 ? 1.8 : 1.1}" fill="#f3d98b"/>`;
+  }
+  return `<div class="ritual">
+    <div class="ritual-orb">
+      <svg viewBox="0 0 150 150" aria-hidden="true"><g class="ritual-ring">
+        <circle cx="75" cy="75" r="70" fill="none" stroke="#d9b45f" stroke-width="0.8" opacity="0.7"/>
+        <circle cx="75" cy="75" r="62" fill="none" stroke="#d9b45f" stroke-width="0.5" opacity="0.5"/>${ticks}</g></svg>
+      <svg viewBox="0 0 150 150" aria-hidden="true"><g class="ritual-ring2">
+        <circle cx="75" cy="75" r="40" fill="none" stroke="#d9b45f" stroke-width="0.6" stroke-dasharray="2 6" opacity="0.8"/>${stars}</g></svg>
+      <div class="ritual-core">Μ</div>
+    </div>
+    <p class="ritual-line"></p>
+  </div>`;
+}
+let ritualTimer = null, ritualBox = null;
+function startRitual(container, lines) {
+  stopRitual();
+  container.innerHTML = ritualHTML();
+  container.style.display = 'block';
+  const line = container.querySelector('.ritual-line');
+  let i = 0;
+  const show = () => {
+    line.style.opacity = 0;
+    setTimeout(() => { line.textContent = lines[i % lines.length]; line.style.opacity = 1; i++; }, 700);
+  };
+  show();
+  ritualTimer = setInterval(show, 3600);
+  ritualBox = container;
+}
+function stopRitual() {
+  if (!ritualTimer) return;
+  const c = ritualBox;
+  clearInterval(ritualTimer);
+  ritualTimer = null;
+  ritualBox = null;
+  if (c) { c.style.display = 'none'; c.innerHTML = ''; }
+}
+function namesNow() {
+  const f = (typeof readFields === 'function') ? readFields() : {};
+  const n1 = (f.name1 || (savedFields && savedFields.name1) || '').trim();
+  return { n1 };
+}
+function teaserRitualLines() {
+  const { n1 } = namesNow();
+  return [
+    n1 ? `Ο ουρανός ανοίγει τον χάρτη της γέννησής σου, ${n1}...` : 'Ο ουρανός ανοίγει τον χάρτη της γέννησής σου...',
+    'Οι πλανήτες παίρνουν τις θέσεις που είχαν τη μέρα που γεννηθήκατε...',
+    'Αναζητούμε το αποτύπωμα του δεσμού σας στον ουρανό...',
+    'Η Αφροδίτη και η Σελήνη αρχίζουν να μιλούν...'
+  ];
+}
+function fullRitualLines() {
+  const { n1 } = namesNow();
+  return [
+    'Η σφραγίδα του χρησμού σου ανοίγει...',
+    'Υπολογίζονται οι κινήσεις των πλανητών για τους επόμενους δώδεκα μήνες...',
+    'Αναζητούμε τη μέρα που ανοίγει ξανά ο δρόμος ανάμεσά σας...',
+    'Η Αφροδίτη δείχνει το μονοπάτι της επιστροφής...',
+    n1 ? `Ο χρησμός σου γράφεται, ${n1}...` : 'Ο χρησμός σου γράφεται...'
+  ];
+}
+// Το ποσοστό ανεβαίνει σιγά σιγά, σαν να το μετρά ο ουρανός.
+function revealPercent(target) {
+  const pctWrap = $('pctWrap');
+  if (pctWrap.dataset.done) return;
+  pctWrap.dataset.done = '1';
+  pctWrap.style.display = 'block';
+  const n = parseInt(target, 10) || 0, start = performance.now(), dur = 1800;
+  const step = (now) => {
+    const k = Math.min(1, (now - start) / dur), eased = 1 - Math.pow(1 - k, 3);
+    pctnum.textContent = Math.round(n * eased) + '%';
+    if (k < 1) requestAnimationFrame(step);
+  };
+  requestAnimationFrame(step);
 }
 
 /* ---------- 1. Δωρεάν άνοιγμα ---------- */
@@ -523,8 +624,9 @@ async function submitTeaser() {
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)) { showError('Γράψε ένα σωστό email, για να σου κρατήσουμε τον χρησμό.'); return; }
   err.style.display = 'none';
   btn.disabled = true;
-  setLoadingText('Ο ουρανός συμβουλεύεται τους χάρτες σας...');
+  loading.innerHTML = '';
   loading.classList.add('show');
+  startRitual(loading, teaserRitualLines());
 
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(f));
@@ -541,7 +643,7 @@ async function submitTeaser() {
       const data = await res.json();
       currentReadingId = data.reading_id;
       try { localStorage.setItem(RID_KEY, currentReadingId); } catch (e) {}
-      loading.classList.remove('show');
+      stopRitual(); loading.classList.remove('show');
       form.style.display = 'none';
       result.classList.add('show');
       infoLine.textContent = 'Το δωρεάν άνοιγμα του χρησμού δίνεται μία φορά σε κάθε email, και το έχεις ήδη πάρει. Ο πλήρης χρησμός σου για ' + f.name2 + ' είναι έτοιμος να γραφτεί.';
@@ -557,7 +659,7 @@ async function submitTeaser() {
       try { raw = await res.text(); const data = JSON.parse(raw); if (data.error) msg = data.error; } catch (e) {}
       if (location.hostname.includes('deploy-preview')) msg += ' [' + res.status + ' ' + raw.slice(0, 200) + ']';
       if (res.status === 429) msg = 'Πολλές προσπάθειες μαζί. Περίμενε ένα λεπτό και δοκίμασε ξανά.';
-      loading.classList.remove('show');
+      stopRitual(); loading.classList.remove('show');
       showError(msg);
       btn.disabled = false;
       return;
@@ -565,12 +667,21 @@ async function submitTeaser() {
 
     currentReadingId = res.headers.get('X-Reading-Id');
     try { localStorage.setItem(RID_KEY, currentReadingId); } catch (e) {}
-    loading.classList.remove('show');
     form.style.display = 'none';
-    result.classList.add('show');
     teaserText.classList.add('typing');
 
-    const all = await readStream(res, (t) => { teaserText.textContent = t.replace(ERR_MARK, ''); });
+    const all = await readStream(res, (t) => {
+      const clean = t.replace(ERR_MARK, '');
+      if (clean.trim() && !result.classList.contains('show')) {
+        stopRitual();
+        stopRitual(); loading.classList.remove('show');
+        result.classList.add('show');
+      }
+      teaserText.textContent = clean;
+    });
+    stopRitual();
+    stopRitual(); loading.classList.remove('show');
+    result.classList.add('show');
     teaserText.classList.remove('typing');
     if (all.includes(ERR_MARK)) {
       infoLine.textContent = 'Η σύνδεση διακόπηκε. Μπορείς να δεις ολόκληρο τον χρησμό σου παρακάτω.';
@@ -580,7 +691,7 @@ async function submitTeaser() {
     saveTeaserState(currentReadingId, teaserText.textContent, all.includes(ERR_MARK) ? infoLine.textContent : '');
     $('restartLink').style.display = 'block';
   } catch (e) {
-    loading.classList.remove('show');
+    stopRitual(); loading.classList.remove('show');
     showError('Κάτι διακόπηκε στη σύνδεση με τον ουρανό. Δοκίμασε ξανά σε λίγο.' + (location.hostname.includes('deploy-preview') ? ' [' + e.message + ']' : ''));
   } finally {
     btn.disabled = false;
@@ -589,60 +700,60 @@ async function submitTeaser() {
 
 /* ---------- 2. Ο πληρωμένος χρησμός, μετά την επιστροφή από το Stripe ---------- */
 
-async function loadFullReading(attempt = 0) {
+async function loadFullReading() {
   showCard();
   form.style.display = 'none';
   $('paidBadge').style.display = 'block';
-  setLoadingText('Ο ουρανός ανοίγει τη σφραγίδα του χρησμού σου...');
-  loading.classList.add('show');
+  result.classList.add('show');
+  fullWrap.classList.add('show');
+  $('pctWrap').style.display = 'none';
+  startRitual($('ritualFull'), fullRitualLines());
 
-  try {
-    const res = await fetch('/api/epistrofi-full', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ reading_id: readingIdParam, session_id: sessionId })
-    });
+  // Ο χρησμός γράφεται στον server και η σελίδα τον «διαβάζει» κάθε 1,5 δευτερόλεπτο,
+  // ώστε να εμφανίζεται ζωντανά χωρίς να εξαρτάται από τη σύνδεση να μένει ανοιχτή.
+  let failures = 0;
+  const started = Date.now();
+  const poll = async () => {
+    let data = null, status = 0;
+    try {
+      const res = await fetch('/api/epistrofi-full', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ reading_id: readingIdParam, session_id: sessionId })
+      });
+      status = res.status;
+      data = await res.json();
+    } catch (e) { data = null; }
 
-    if (res.status === 409 && attempt < 40) {
-      setTimeout(() => loadFullReading(attempt + 1), 4000);
+    if (!data || (status !== 200 && status !== 402 && status !== 404)) {
+      if (++failures < 8) return setTimeout(poll, 2500);
+      return fail('Κάτι διακόπηκε στη σύνδεση. Ανανέωσε τη σελίδα, ο χρησμός σου σε περιμένει χωρίς νέα χρέωση.');
+    }
+    if (status !== 200) return fail(data.error || 'Δεν βρέθηκε έγκυρη πληρωμή για αυτόν τον χρησμό.');
+    failures = 0;
+
+    if (data.teaser && !teaserText.textContent) teaserText.textContent = data.teaser;
+    if (!data.teaser) teaserText.style.display = 'none';
+    if (data.text) renderContinuation(data.text, data.status === 'done');
+
+    if (data.status === 'done') {
+      stopRitual();
+      renderContinuation(data.text, true);
+      renderExtraActions();
       return;
     }
-    if (!res.ok) {
-      let msg = 'Δεν βρέθηκε έγκυρη πληρωμή για αυτόν τον χρησμό.';
-      try { const data = await res.json(); if (data.error && data.error !== 'generating') msg = data.error; } catch (e) {}
-      loading.classList.remove('show');
-      result.classList.add('show');
-      infoLine.textContent = msg;
-      infoLine.style.display = 'block';
-      return;
+    if (data.status === 'error' || Date.now() - started > 6 * 60 * 1000) {
+      return fail('Ο χρησμός σου δεν ολοκληρώθηκε αυτή τη φορά. Ανανέωσε τη σελίδα σε λίγο, θα γραφτεί ξανά χωρίς νέα χρέωση.');
     }
-
-    loading.classList.remove('show');
-    result.classList.add('show');
-    fullWrap.classList.add('show');
-
-    const all = await readStream(res, (t) => {
-      const i = t.indexOf(SEP);
-      if (i === -1) { teaserText.textContent = t; return; }
-      teaserText.textContent = t.slice(0, i).trim();
-      renderContinuation(t.slice(i + SEP.length), false);
-    });
-    const i = all.indexOf(SEP);
-    renderContinuation(i === -1 ? '' : all.slice(i + SEP.length), true);
-
-    if (all.includes(ERR_MARK)) {
-      infoLine.textContent = 'Η σύνδεση διακόπηκε πριν ολοκληρωθεί ο χρησμός. Ανανέωσε τη σελίδα και θα γραφτεί ξανά, χωρίς νέα χρέωση.';
-      infoLine.style.display = 'block';
-      return;
-    }
-    if (!teaserText.textContent.trim()) teaserText.style.display = 'none';
-    renderExtraActions();
-  } catch (e) {
-    loading.classList.remove('show');
-    result.classList.add('show');
-    infoLine.textContent = 'Κάτι διακόπηκε στη σύνδεση. Ανανέωσε τη σελίδα, ο χρησμός σου σε περιμένει χωρίς νέα χρέωση.';
+    setTimeout(poll, 1500);
+  };
+  const fail = (msg) => {
+    stopRitual();
+    if (!readingtext.textContent.trim()) fullWrap.classList.remove('show');
+    infoLine.textContent = msg;
     infoLine.style.display = 'block';
-  }
+  };
+  poll();
 }
 
 /* ---------- 3. 2η και 3η ερώτηση (και παλιές πληρωμές) ---------- */
