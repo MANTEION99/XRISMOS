@@ -26,10 +26,13 @@ export default async (req) => {
     lastSave = Date.now();
     const snapshot = text;
     saving = saving.then(() => readings.setJSON(readingId, {
-      ...reading, paidSession: sessionId, generatingSince: reading.generatingSince || Date.now(), partial: snapshot
+      ...reading, paidSession: sessionId, generatingSince: reading.generatingSince || Date.now(), heartbeat: Date.now(), partial: snapshot
     })).catch(e => console.error("[full-bg] save", e));
   };
 
+  // Σημάδι ζωής κάθε 20 δευτερόλεπτα, ακόμα κι όσο το Claude δεν έχει γράψει τίποτα.
+  const beat = setInterval(() => savePartial(true), 20000);
+  savePartial(true);
   try {
     const hasTime1 = /^\d{2}:\d{2}$/.test(reading.inputs.tob1 || "");
     const sky = skyBlock(reading.inputs, reading.charts, hasTime1);
@@ -37,6 +40,7 @@ export default async (req) => {
       fullPrompt(reading.inputs, reading.charts, reading.teaser, sky), 4000,
       (t) => { text += t; savePartial(false); }, 450
     );
+    clearInterval(beat);
     await saving;
     await readings.setJSON(readingId, {
       ...reading, full, partial: null, paidSession: sessionId,
@@ -45,6 +49,7 @@ export default async (req) => {
     console.log(`[full-bg] done words=${full.split(/\s+/).length}`);
   } catch (e) {
     console.error("[full-bg] failed", e);
+    clearInterval(beat);
     await saving;
     await readings.setJSON(readingId, {
       ...reading, partial: text, paidSession: sessionId, generatingSince: null, genError: String(e.message || e)

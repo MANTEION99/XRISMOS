@@ -726,7 +726,7 @@ async function loadFullReading() {
     } catch (e) { data = null; }
 
     if (!data || (status !== 200 && status !== 402 && status !== 404)) {
-      if (++failures < 8) return setTimeout(poll, 2500);
+      if (++failures < 40) return setTimeout(poll, 3000);
       return fail('Κάτι διακόπηκε στη σύνδεση. Ανανέωσε τη σελίδα, ο χρησμός σου σε περιμένει χωρίς νέα χρέωση.');
     }
     if (status !== 200) return fail(data.error || 'Δεν βρέθηκε έγκυρη πληρωμή για αυτόν τον χρησμό.');
@@ -742,9 +742,16 @@ async function loadFullReading() {
       renderExtraActions();
       return;
     }
-    if (data.status === 'error' || Date.now() - started > 6 * 60 * 1000) {
+    if (data.status === 'error') {
       return fail('Ο χρησμός σου δεν ολοκληρώθηκε αυτή τη φορά. Ανανέωσε τη σελίδα σε λίγο, θα γραφτεί ξανά χωρίς νέα χρέωση.');
     }
+    // Όσο αργεί, η σελίδα δεν τα παρατά ποτέ: απλώς καθησυχάζει.
+    if (!readingtext.textContent.trim() && Date.now() - started > 90000 && !infoLine.dataset.patience) {
+      infoLine.dataset.patience = '1';
+      infoLine.textContent = 'Ο χρησμός σου είναι μεγάλος και γράφεται με προσοχή. Μείνε εδώ, θα εμφανιστεί μόνος του. Αν κλείσεις τη σελίδα, θα σε περιμένει όταν την ξανανοίξεις.';
+      infoLine.style.display = 'block';
+    }
+    if (readingtext.textContent.trim() && infoLine.dataset.patience) infoLine.style.display = 'none';
     setTimeout(poll, 1500);
   };
   const fail = (msg) => {

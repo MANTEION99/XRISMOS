@@ -8,7 +8,9 @@
 
 import { readingsStore, json, verifyStripeSession } from "../lib/epistrofi-common.mjs";
 
-const STALE_MS = 5 * 60 * 1000;
+// Αν η συγγραφή δεν έχει δώσει σημάδι ζωής για 90 δευτερόλεπτα, θεωρείται χαμένη και ξεκινά ξανά.
+const STALE_MS = 90 * 1000;
+const MAX_ATTEMPTS = 5;
 
 export default async (req) => {
   if (req.method !== "POST") return json(405, { error: "Method Not Allowed" });
@@ -32,13 +34,14 @@ export default async (req) => {
   const teaser = reading.teaser || "";
   if (reading.full) return json(200, { status: "done", teaser, text: reading.full });
 
-  const running = reading.generatingSince && Date.now() - reading.generatingSince < STALE_MS;
-  if (!running && (reading.genAttempts || 0) >= 3) {
+  const lastSign = reading.heartbeat || reading.generatingSince;
+  const running = reading.generatingSince && Date.now() - lastSign < STALE_MS;
+  if (!running && (reading.genAttempts || 0) >= MAX_ATTEMPTS) {
     return json(200, { status: "error", teaser, text: reading.partial || "" });
   }
   if (!running) {
     await readings.setJSON(readingId, {
-      ...reading, paidSession: sessionId, generatingSince: Date.now(), partial: "", genError: null,
+      ...reading, paidSession: sessionId, generatingSince: Date.now(), heartbeat: Date.now(), partial: "", genError: null,
       genAttempts: (reading.genAttempts || 0) + 1
     });
     const origin = new URL(req.url).origin;
