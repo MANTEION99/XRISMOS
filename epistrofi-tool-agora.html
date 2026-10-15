@@ -333,6 +333,7 @@
         <div class="seal-title">Ο χρησμός σου συνεχίζεται</div>
         <div class="seal-sub">Πότε ανοίγει ξανά ο δρόμος, η πιθανότητα επανένωσης και τι να κάνεις εσύ.</div>
         <div class="enter-btn" id="unlockBtn">Δες τη συνέχεια · 4,99€</div>
+        <p class="value-note" style="font-size:12.5px;line-height:1.55;color:var(--muted);max-width:320px;margin:10px auto 18px;text-align:center;">Μια ανάλυση από αστρολόγο κοστίζει περίπου 100€. Εδώ οι χάρτες σας υπολογίζονται με ακρίβεια και ο χρησμός γράφεται μόνο για σένα, με 4,99€.</p>
         <div class="secure-note">
           <svg viewBox="0 0 24 24" fill="none"><rect x="5" y="11" width="14" height="10" rx="2" stroke="currentColor" stroke-width="1.6"/><path d="M8 11V7a4 4 0 0 1 8 0v4" stroke="currentColor" stroke-width="1.6"/></svg>
           Ασφαλής πληρωμή μέσω Stripe
@@ -642,6 +643,10 @@ function renderExtraActions() {
   button.textContent = `Κάνε ${nextLabel} — ${priceLabel}`;
   button.addEventListener('click', () => startExtraCheckout(nextStage, button));
   extraActions.appendChild(button);
+  const valueNote = document.createElement('p');
+  valueNote.style.cssText = 'font-size:12.5px;line-height:1.55;color:var(--muted);max-width:320px;margin:10px auto 18px;text-align:center;';
+  valueNote.textContent = 'Σε αστρολόγο, κάθε νέα ερώτηση σημαίνει νέα συνεδρία. Εδώ, με τους ίδιους χάρτες, κοστίζει μόνο ' + priceLabel + '.';
+  extraActions.appendChild(valueNote);
 }
 
 async function submitPaidQuestion() {
