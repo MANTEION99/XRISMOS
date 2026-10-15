@@ -178,6 +178,17 @@
   @keyframes twinkle{ 0%,100%{ opacity:0.25; } 50%{ opacity:1; } }
   .ritual-line{ font-family:'Cormorant Garamond',serif; font-style:italic; font-size:18px; line-height:1.5; color:var(--gold); min-height:56px; max-width:330px; margin:0 auto; transition:opacity 0.7s ease; }
   .pct.counting{ transition:none; }
+  .wait-bar{ width:100%; max-width:300px; height:4px; margin:18px auto 0; background:rgba(217,180,95,0.15); border-radius:4px; overflow:hidden; }
+  .wait-bar span{ display:block; height:100%; width:0; background:linear-gradient(90deg,#b8862f,#f3d98b); border-radius:4px; transition:width 1s ease; }
+  .wait-steps{ list-style:none; padding:0; margin:18px auto 0; max-width:300px; text-align:left; font-size:13.5px; line-height:1.5; color:var(--muted); }
+  .wait-steps li{ display:flex; gap:10px; align-items:flex-start; margin:7px 0; transition:color 0.5s; }
+  .wait-steps li .dot{ flex:0 0 16px; height:16px; margin-top:2px; border-radius:50%; border:1px solid rgba(217,180,95,0.5); display:flex; align-items:center; justify-content:center; font-size:10px; color:#1a1206; }
+  .wait-steps li.done{ color:var(--paper); }
+  .wait-steps li.done .dot{ background:#d9b45f; border-color:#d9b45f; }
+  .wait-steps li.active{ color:var(--gold); }
+  .wait-steps li.active .dot{ border-color:#f3d98b; animation:orbpulse 1.6s ease-in-out infinite; }
+  .wait-note{ font-size:12.5px; line-height:1.55; color:var(--muted); max-width:310px; margin:16px auto 0; text-align:center; }
+
 
   @keyframes fadein{ from{opacity:0; transform:translateY(6px);} to{opacity:1; transform:translateY(0);} }
 
@@ -558,6 +569,45 @@ function fullRitualLines() {
     n1 ? `Ο χρησμός σου γράφεται, ${n1}...` : 'Ο χρησμός σου γράφεται...'
   ];
 }
+
+// Πρόοδος στην αναμονή του πληρωμένου χρησμού: η πελάτισσα βλέπει ότι κάτι προχωρά
+// και πόσο περίπου θα πάρει, ώστε να μη νομίσει ότι κάτι πήγε στραβά.
+function addWaitProgress(container) {
+  const box = container.querySelector('.ritual');
+  if (!box) return { update() {}, finish() {} };
+  const steps = [
+    'Η πληρωμή σου επιβεβαιώθηκε',
+    'Οι δύο χάρτες σας ανοίγουν',
+    'Υπολογίζονται οι κινήσεις των πλανητών για τους επόμενους 12 μήνες',
+    'Ο χρησμός σου γράφεται ειδικά για σένα'
+  ];
+  box.insertAdjacentHTML('beforeend',
+    '<div class="wait-bar"><span></span></div>' +
+    '<ul class="wait-steps">' + steps.map(t => '<li><span class="dot"></span><span>' + t + '</span></li>').join('') + '</ul>' +
+    '<p class="wait-note">Συνήθως χρειάζεται 1 με 2 λεπτά. Μείνε σε αυτή τη σελίδα. Κι αν την κλείσεις, ο χρησμός σου θα σε περιμένει εδώ, χωρίς νέα χρέωση.</p>');
+  const bar = box.querySelector('.wait-bar span');
+  const lis = box.querySelectorAll('.wait-steps li');
+  const note = box.querySelector('.wait-note');
+  const t0 = Date.now();
+  const setStep = (k) => lis.forEach((li, i) => {
+    li.className = i < k ? 'done' : (i === k ? 'active' : '');
+    li.querySelector('.dot').textContent = i < k ? '✓' : '';
+  });
+  const tick = () => {
+    if (!box.isConnected) return clearInterval(timer);
+    const t = (Date.now() - t0) / 1000;
+    setStep(t < 5 ? 1 : (t < 14 ? 2 : 3));
+    bar.style.width = Math.min(92, 100 * (1 - Math.exp(-t / 55))) + '%';
+    if (t > 150 && !note.dataset.long) {
+      note.dataset.long = '1';
+      note.textContent = 'Παίρνει λίγο περισσότερο από το συνηθισμένο, αλλά προχωρά κανονικά. Ο χρησμός σου θα εμφανιστεί εδώ μόλις ολοκληρωθεί.';
+    }
+  };
+  tick();
+  const timer = setInterval(tick, 1000);
+  return { finish() { clearInterval(timer); bar.style.width = '100%'; setStep(4); } };
+}
+
 // Το ποσοστό ανεβαίνει σιγά σιγά, σαν να το μετρά ο ουρανός.
 function revealPercent(target) {
   const pctWrap = $('pctWrap');
@@ -708,6 +758,7 @@ async function loadFullReading() {
   fullWrap.classList.add('show');
   $('pctWrap').style.display = 'none';
   startRitual($('ritualFull'), fullRitualLines());
+  const waitUI = addWaitProgress($('ritualFull'));
 
   // Ο χρησμός γράφεται στον server και η σελίδα τον «διαβάζει» κάθε 1,5 δευτερόλεπτο,
   // ώστε να εμφανίζεται ζωντανά χωρίς να εξαρτάται από τη σύνδεση να μένει ανοιχτή.
@@ -745,13 +796,7 @@ async function loadFullReading() {
     if (data.status === 'error') {
       return fail('Ο χρησμός σου δεν ολοκληρώθηκε αυτή τη φορά. Ανανέωσε τη σελίδα σε λίγο, θα γραφτεί ξανά χωρίς νέα χρέωση.');
     }
-    // Όσο αργεί, η σελίδα δεν τα παρατά ποτέ: απλώς καθησυχάζει.
-    if (!readingtext.textContent.trim() && Date.now() - started > 90000 && !infoLine.dataset.patience) {
-      infoLine.dataset.patience = '1';
-      infoLine.textContent = 'Ο χρησμός σου είναι μεγάλος και γράφεται με προσοχή. Μείνε εδώ, θα εμφανιστεί μόνος του. Αν κλείσεις τη σελίδα, θα σε περιμένει όταν την ξανανοίξεις.';
-      infoLine.style.display = 'block';
-    }
-    if (readingtext.textContent.trim() && infoLine.dataset.patience) infoLine.style.display = 'none';
+    // Όσο αργεί, η σελίδα δεν τα παρατά ποτέ· η πρόοδος πάνω καθησυχάζει.
     setTimeout(poll, 1500);
   };
   const fail = (msg) => {
