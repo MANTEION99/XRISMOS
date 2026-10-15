@@ -1,3 +1,4 @@
+const { callClaude } = require("../lib/claude.cjs");
 const astro = require("../lib/astro.cjs");
 // Αρχείο: netlify/functions/epistrofi-agora.js
 // Η ΕΠΙ ΠΛΗΡΩΜΗ (14,99€) εκδοχή, ξεχωριστή από το epistrofi.js που μένει δωρεάν μέσα στη συνδρομή.
@@ -129,21 +130,7 @@ ${mainInstruction}
 
 ΠΟΛΥ ΣΗΜΑΝΤΙΚΟ: Πρέπει να ολοκληρώσεις πάντα κάθε πρόταση και ολόκληρο το κείμενο κανονικά, ποτέ να μην κοπεί στη μέση λέξης ή πρότασης. Αν πλησιάζεις στο όριο μήκους, συντόμευσε νωρίτερα (λιγότερες λεπτομέρειες, πιο σύντομη συμβουλή) αλλά πάντα κλείσε το κείμενο ολοκληρωμένο, με τελεία στο τέλος.`;
 
-    const claudeRes = await fetch("https://api.anthropic.com/v1/messages", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "x-api-key": process.env.ANTHROPIC_API_KEY,
-        "anthropic-version": "2023-06-01"
-      },
-      body: JSON.stringify({
-        model: "claude-sonnet-5",
-        max_tokens: 1400,
-        messages: [{ role: "user", content: prompt + astro.RULES + astro.sky({ name1, name2, tob1, dob1 }, astroData1, astroData2) }]
-      })
-    });
-    const claudeData = await claudeRes.json();
-    const text = claudeData.content.map(b => b.text || "").join("").trim();
+    const text = await callClaude(prompt + astro.RULES + astro.sky({ name1, name2, tob1, dob1 }, astroData1, astroData2), 3000);
     await usedSessions.setJSON(session_id, { reading: text, tool: "epistrofi", at: new Date().toISOString() });
 
     return {

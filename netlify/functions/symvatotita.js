@@ -1,3 +1,4 @@
+const { callClaude } = require("../lib/claude.cjs");
 const astro = require("../lib/astro.cjs");
 // Αρχείο: netlify/functions/symvatotita.js
 // Ανέβασέ το ακριβώς σε αυτόν τον φάκελο μέσα στο repo σου: netlify/functions/symvatotita.js
@@ -72,21 +73,7 @@ ${astro.forPrompt(astroData2, tob2, name2, dob2)}
 
 ΠΟΛΥ ΣΗΜΑΝΤΙΚΟ: Πρέπει να ολοκληρώσεις πάντα κάθε πρόταση και ολόκληρο το κείμενο κανονικά, ποτέ να μην κοπεί στη μέση λέξης ή πρότασης. Αν πλησιάζεις στο όριο μήκους, συντόμευσε νωρίτερα αλλά πάντα κλείσε το κείμενο ολοκληρωμένο, με τελεία στο τέλος.`;
 
-    const claudeRes = await fetch("https://api.anthropic.com/v1/messages", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "x-api-key": process.env.ANTHROPIC_API_KEY,
-        "anthropic-version": "2023-06-01"
-      },
-      body: JSON.stringify({
-        model: "claude-sonnet-5",
-        max_tokens: 1400,
-        messages: [{ role: "user", content: prompt + astro.RULES }]
-      })
-    });
-    const claudeData = await claudeRes.json();
-    const text = claudeData.content.map(b => b.text || "").join("").trim();
+    const text = await callClaude(prompt + astro.RULES, 3000);
 
     return {
       statusCode: 200,
