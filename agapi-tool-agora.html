@@ -472,6 +472,7 @@ form.addEventListener('submit', async (e) => {
     localStorage.setItem(STORAGE_KEY, JSON.stringify({ name1, dob1, tob1, pob1, name2, dob2, tob2, pob2 }));
 
     const text = data.reading || "";
+    if (!text) throw new Error((data.error || "κενή απάντηση") + (data.details ? " | " + data.details : ""));
     const match = text.match(/\[ΠΟΣΟΣΤΟ:\s*(\d+)\]/);
     const pct = match ? match[1] : "—";
     let body = text.replace(/\[ΠΟΣΟΣΤΟ:\s*\d+\]/, "").trim();
@@ -501,7 +502,7 @@ form.addEventListener('submit', async (e) => {
     renderExtraActions();
   } catch (error) {
     loading.classList.remove('show');
-    readingtext.textContent = "Κάτι διακόπηκε στη σύνδεση με τον ουρανό. Δοκίμασε ξανά σε λίγο.";
+    readingtext.textContent = "Κάτι διακόπηκε στη σύνδεση με τον ουρανό. Δοκίμασε ξανά σε λίγο." + (location.hostname.includes("deploy-preview") ? " [" + e.message + "]" : "");
     result.classList.add('show');
   } finally {
     btn.disabled = false;

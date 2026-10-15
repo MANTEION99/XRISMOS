@@ -301,6 +301,7 @@ form.addEventListener('submit', async (e) => {
     });
     const data = await response.json();
     const text = data.reading || "";
+    if (!text) throw new Error((data.error || "κενή απάντηση") + (data.details ? " | " + data.details : ""));
     const match = text.match(/\[ΠΟΣΟΣΤΟ:\s*(\d+)\]/);
     const pct = match ? match[1] : "—";
     let body = text.replace(/\[ΠΟΣΟΣΤΟ:\s*\d+\]/, "").trim();
@@ -331,7 +332,7 @@ form.addEventListener('submit', async (e) => {
     result.classList.add('show');
   } catch (error) {
     loading.classList.remove('show');
-    readingtext.textContent = "Κάτι διακόπηκε στη σύνδεση με τον ουρανό. Δοκίμασε ξανά σε λίγο.";
+    readingtext.textContent = "Κάτι διακόπηκε στη σύνδεση με τον ουρανό. Δοκίμασε ξανά σε λίγο." + (location.hostname.includes("deploy-preview") ? " [" + error.message + "]" : "");
     result.classList.add('show');
   } finally {
     btn.disabled = false;
