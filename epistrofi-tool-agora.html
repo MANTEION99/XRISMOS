@@ -174,6 +174,37 @@
   .reading{ font-family:'Cormorant Garamond',serif; font-size:17px; line-height:1.7; color:var(--paper); white-space:pre-wrap; }
   .note{ text-align:center; font-size:11px; color:var(--muted); margin-top:20px; line-height:1.5; }
   .done-note{ text-align:center; font-size:12.5px; color:var(--muted); margin-top:22px; }
+
+  /* Δωρεάν χρησμός και σφραγισμένη συνέχεια */
+  .field.consent{ display:flex; gap:10px; align-items:flex-start; }
+  .field.consent input{ width:auto; margin-top:3px; accent-color:var(--gold); }
+  .field.consent label{ color:var(--muted); font-size:12.5px; line-height:1.5; margin:0; letter-spacing:0; }
+  .typing::after{ content:'▍'; color:var(--gold); animation:blink 1s steps(2) infinite; margin-left:2px; }
+  @keyframes blink{ 50%{ opacity:0; } }
+  .seal-wrap{ position:relative; margin-top:18px; border-radius:12px; overflow:hidden; display:none; }
+  .seal-wrap.show{ display:block; animation:fadein 0.6s ease; }
+  .seal-blur{
+    font-family:'Cormorant Garamond',serif; font-size:17px; line-height:1.7; color:var(--paper);
+    filter:blur(6px); opacity:0.55; user-select:none; pointer-events:none; padding:4px 2px 90px;
+  }
+  .seal-overlay{
+    position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center;
+    gap:12px; text-align:center; padding:20px;
+    background:linear-gradient(180deg, rgba(11,10,22,0) 0%, rgba(11,10,22,0.85) 45%, rgba(11,10,22,0.95) 100%);
+  }
+  .wax{
+    width:74px; height:74px; border-radius:50%;
+    background:radial-gradient(circle at 35% 30%, #c4596b, #7d2234 70%);
+    box-shadow:0 6px 18px rgba(0,0,0,0.5), inset 0 -4px 8px rgba(0,0,0,0.35);
+    display:flex; align-items:center; justify-content:center;
+    color:#f3d9a0; font-family:'Cormorant Garamond',serif; font-size:28px;
+  }
+  .seal-title{ font-family:'Cormorant Garamond',serif; font-size:20px; color:var(--gold); }
+  .seal-sub{ font-size:13px; color:var(--muted); max-width:300px; line-height:1.5; }
+  .full-wrap{ display:none; margin-top:22px; padding-top:22px; border-top:1px solid var(--line); }
+  .full-wrap.show{ display:block; animation:fadein 0.6s ease; }
+  #unlockBtn{ padding:12px 26px; font-size:15px; letter-spacing:1px; white-space:nowrap; }
+  .info{ text-align:center; font-size:13.5px; color:var(--paper); line-height:1.6; margin:4px 0 6px; }
 </style>
 <script type="text/javascript">
     (function(c,l,a,r,i,t,y){
@@ -206,14 +237,14 @@
     </svg>
 
     <p class="sub">Κατανόησε τους αστρολογικούς κύκλους και τις ευκαιρίες για να ξαναβρείς αυτό το πρόσωπο που δεν έχεις ξεχάσει.</p>
-    <p class="price-line">4,99€ — μία ανάλυση</p>
+    <p class="price-line">Η αρχή του χρησμού σου δωρεάν</p>
     <p class="trust-line"><svg viewBox="0 0 24 24" fill="none"><path d="M12 2l2.4 6.6L21 10l-5 4.4 1.5 6.6L12 17.8 6.5 21l1.5-6.6L3 10l6.6-1.4z" stroke="currentColor" stroke-width="1.4"/></svg>Εμπιστεύονται ήδη πάνω από 33.000 άνθρωποι στο Facebook</p>
-    <div class="enter-btn" id="enterBtn">Αγόρασε τον χρησμό σου →</div>
+    <div class="enter-btn" id="enterBtn">Δες τον χρησμό σου →</div>
     <div class="secure-note">
       <svg viewBox="0 0 24 24" fill="none"><rect x="5" y="11" width="14" height="10" rx="2" stroke="currentColor" stroke-width="1.6"/><path d="M8 11V7a4 4 0 0 1 8 0v4" stroke="currentColor" stroke-width="1.6"/></svg>
-      Ασφαλής πληρωμή μέσω Stripe
+      Χωρίς κάρτα για το δωρεάν άνοιγμα
     </div>
-    <p class="pay-error" id="payError">Κάτι πήγε στραβά με την πληρωμή, δοκίμασε ξανά.</p>
+    <p class="pay-error" id="payError">Κάτι πήγε στραβά, δοκίμασε ξανά.</p>
   </div>
 </div>
 
@@ -225,7 +256,7 @@
     <div class="corner br"><svg viewBox="0 0 22 22"><path d="M2,2 L2,14 M2,2 L14,2" stroke="#D9B25C" stroke-width="1.2" fill="none"/></svg></div>
 
     <div class="eyebrow">Μαντείο</div>
-    <div class="paid-badge">Η πληρωμή σου επιβεβαιώθηκε ✓</div>
+    <div class="paid-badge" id="paidBadge" style="display:none;">Η πληρωμή σου επιβεβαιώθηκε ✓</div>
   <h2 id="cardTitle">Η Επιστροφή της Χαμένης Αγάπης</h2>
 
   <form id="form">
@@ -263,6 +294,17 @@
         <label>Πόλη γέννησής του/της (αν την ξέρεις)</label>
         <input type="text" id="pob2" placeholder="π.χ. Θεσσαλονίκη" />
       </div>
+      <div id="emailFields">
+        <div class="divider">ΠΟΥ ΝΑ ΣΟΥ ΤΟΝ ΚΡΑΤΗΣΟΥΜΕ</div>
+        <div class="field">
+          <label>Το email σου</label>
+          <input type="email" id="email" placeholder="π.χ. maria@gmail.com" autocomplete="email" />
+        </div>
+        <div class="field consent">
+          <input type="checkbox" id="consent" />
+          <label for="consent">Θέλω να λαμβάνω τους χρησμούς και τα νέα του Μαντείου στο email μου. Μπορώ να διαγραφώ όποτε θέλω.</label>
+        </div>
+      </div>
     </div>
     <div class="field" id="questionField" style="display:none;">
       <label id="questionLabel">Η δεύτερη ερώτησή σου</label>
@@ -278,11 +320,36 @@
   </div>
 
   <div class="result" id="result">
-    <div class="pct-wrap">
-      <div class="pct" id="pctnum">—</div>
-      <div class="pct-label">ΠΙΘΑΝΟΤΗΤΑ ΕΠΑΝΕΝΩΣΗΣ</div>
+    <!-- Ο δωρεάν χρησμός (και στην αρχή του πληρωμένου) -->
+    <div class="reading" id="teaserText"></div>
+    <p class="info" id="infoLine" style="display:none;"></p>
+
+    <div class="seal-wrap" id="seal">
+      <div class="seal-blur" aria-hidden="true">Ο χάρτης σου δείχνει καθαρά την περίοδο που ανοίγει ξανά ο δρόμος ανάμεσά σας. Η Αφροδίτη περνά πάνω από το σημείο που σας ένωσε, και τότε ένα μήνυμα, μια συνάντηση ή μια σκέψη που δεν φεύγει θα δείξει την πρόθεσή του. Αυτό που χρειάζεται να κάνεις εσύ εκείνες τις μέρες είναι συγκεκριμένο, και βγαίνει από το σημείο του χάρτη σου που κρατά ακόμα αυτή την ιστορία ανοιχτή.</div>
+      <div class="seal-overlay">
+        <div class="wax">Μ</div>
+        <div class="seal-title">Ο χρησμός σου συνεχίζεται</div>
+        <div class="seal-sub">Πότε ανοίγει ξανά ο δρόμος, η πιθανότητα επανένωσης και τι να κάνεις εσύ.</div>
+        <div class="enter-btn" id="unlockBtn">Δες τη συνέχεια · 4,99€</div>
+        <div class="secure-note">
+          <svg viewBox="0 0 24 24" fill="none"><rect x="5" y="11" width="14" height="10" rx="2" stroke="currentColor" stroke-width="1.6"/><path d="M8 11V7a4 4 0 0 1 8 0v4" stroke="currentColor" stroke-width="1.6"/></svg>
+          Ασφαλής πληρωμή μέσω Stripe
+        </div>
+      </div>
     </div>
-    <div class="reading" id="readingtext"></div>
+
+    <!-- Ο πληρωμένος χρησμός -->
+    <div class="full-wrap" id="fullWrap">
+      <div class="pct-wrap">
+        <div class="pct" id="pctnum">—</div>
+        <div class="pct-label">ΠΙΘΑΝΟΤΗΤΑ ΕΠΑΝΕΝΩΣΗΣ</div>
+      </div>
+      <div class="reading" id="readingtext"></div>
+      <div id="adviceWrap" style="display:none; margin-top:20px; padding-top:18px; border-top:1px solid var(--line);">
+        <div style="font-size:11.5px; letter-spacing:2px; color:var(--gold); text-transform:uppercase; margin-bottom:8px;">Πρακτική συμβουλή</div>
+        <div id="adviceText" style="font-family:'Inter',sans-serif; font-size:14.5px; line-height:1.65; color:var(--paper); white-space:pre-wrap;"></div>
+      </div>
+    </div>
     <div id="extraActions" style="margin-top:22px; text-align:center;"></div>
   </div>
 
@@ -292,8 +359,12 @@
 
 <script>
 const STORAGE_KEY = 'manteio_epistrofi_fields';
+const RID_KEY = 'manteio_epistrofi_rid';
+const SEP = '<<<ΣΥΝΕΧΕΙΑ>>>';
+const ERR_MARK = '<<<ΣΦΑΛΜΑ>>>';
 const params = new URLSearchParams(window.location.search);
 const sessionId = params.get('session_id');
+const readingIdParam = params.get('rid');
 const stage = params.get('stage') || 'q1';
 
 const STAGE_INFO = {
@@ -302,62 +373,234 @@ const STAGE_INFO = {
   q3: { title: 'Η Επιστροφή της Χαμένης Αγάπης — 3η ερώτηση', label: 'Η τρίτη ερώτησή σου', btn: 'Δες τη 3η απάντηση →' }
 };
 
-const personalFields = document.getElementById('personalFields');
-const questionField = document.getElementById('questionField');
-const questionLabel = document.getElementById('questionLabel');
-const cardTitle = document.getElementById('cardTitle');
-const btnEl = document.getElementById('btn');
+const $ = (id) => document.getElementById(id);
+const cover = $('cover'), card = $('card');
+const personalFields = $('personalFields'), emailFields = $('emailFields');
+const questionField = $('questionField'), questionLabel = $('questionLabel');
+const cardTitle = $('cardTitle');
+const form = $('form'), btn = $('btn'), err = $('err');
+const loading = $('loading'), result = $('result');
+const teaserText = $('teaserText'), infoLine = $('infoLine'), seal = $('seal');
+const fullWrap = $('fullWrap'), pctnum = $('pctnum'), readingtext = $('readingtext');
+const adviceWrap = $('adviceWrap'), adviceText = $('adviceText');
 
 let savedFields = null;
 try { savedFields = JSON.parse(localStorage.getItem(STORAGE_KEY) || 'null'); } catch (e) {}
+let currentReadingId = null;
 
-if (sessionId) {
-  document.getElementById('cover').style.display = 'none';
-  document.getElementById('card').classList.add('show');
+function showCard() {
+  cover.style.display = 'none';
+  card.classList.add('show');
+}
+function setLoadingText(t) {
+  loading.innerHTML = '<div class="spinner"></div>' + t;
+}
+function fillSavedFields() {
+  if (!savedFields) return;
+  ['name1','dob1','tob1','pob1','name2','dob2','tob2','pob2'].forEach(k => { if ($(k)) $(k).value = savedFields[k] || ''; });
+}
+function readFields() {
+  const v = (id) => $(id).value.trim();
+  return {
+    name1: v('name1'), dob1: $('dob1').value, tob1: $('tob1').value, pob1: v('pob1'),
+    name2: v('name2'), dob2: $('dob2').value, tob2: $('tob2').value, pob2: v('pob2')
+  };
+}
+function showError(t) { err.textContent = t; err.style.display = 'block'; }
 
-  cardTitle.textContent = STAGE_INFO[stage].title;
-  btnEl.textContent = STAGE_INFO[stage].btn;
+// Διαβάζει μια απάντηση με streaming και καλεί το onText με όλο το κείμενο που έχει έρθει μέχρι στιγμής.
+async function readStream(response, onText) {
+  const reader = response.body.getReader();
+  const decoder = new TextDecoder();
+  let all = '';
+  while (true) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    all += decoder.decode(value, { stream: true });
+    onText(all);
+  }
+  all += decoder.decode();
+  onText(all);
+  return all;
+}
 
-  if (stage !== 'q1') {
-    personalFields.style.display = 'none';
-    questionField.style.display = 'block';
-    questionLabel.textContent = STAGE_INFO[stage].label;
-    if (savedFields) {
-      document.getElementById('name1').value = savedFields.name1 || '';
-      document.getElementById('dob1').value = savedFields.dob1 || '';
-      document.getElementById('tob1').value = savedFields.tob1 || '';
-      document.getElementById('pob1').value = savedFields.pob1 || '';
-      document.getElementById('name2').value = savedFields.name2 || '';
-      document.getElementById('dob2').value = savedFields.dob2 || '';
-      document.getElementById('tob2').value = savedFields.tob2 || '';
-      document.getElementById('pob2').value = savedFields.pob2 || '';
-    }
+// Χωρίζει τη συνέχεια σε ποσοστό, κείμενο και συμβουλή, ακόμα κι όσο γράφεται.
+function renderContinuation(cont, finished) {
+  let text = cont.replace(ERR_MARK, '');
+  let pct = null;
+  const m = text.match(/^\s*\[ΠΟΣΟΣΤΟ:\s*(\d+)\]\s*/);
+  if (m) { pct = m[1]; text = text.slice(m[0].length); }
+  else if (/^\s*\[/.test(text) && !text.includes(']')) { text = ''; }
+  if (pct) pctnum.textContent = pct + '%';
+  const parts = text.split(/\[?\s*ΣΥΜΒΟΥΛΗ\s*\]?\s*:?/);
+  readingtext.textContent = parts[0].trim();
+  if (parts[1] !== undefined) {
+    adviceWrap.style.display = 'block';
+    adviceText.textContent = parts[1].trim();
+    readingtext.classList.remove('typing');
+    adviceText.classList.toggle('typing', !finished);
+  } else {
+    readingtext.classList.toggle('typing', !finished);
   }
 }
 
-document.getElementById('enterBtn').addEventListener('click', async () => {
-  const enterBtn = document.getElementById('enterBtn');
-  const payError = document.getElementById('payError');
-  payError.style.display = 'none';
-  enterBtn.textContent = 'Μεταφορά στην ασφαλή πληρωμή...';
+/* ---------- 1. Δωρεάν άνοιγμα ---------- */
+
+$('enterBtn').addEventListener('click', () => {
+  showCard();
+  fillSavedFields();
+});
+
+async function startCheckout(buttonEl, readingId) {
+  const original = buttonEl.textContent;
+  buttonEl.textContent = 'Μεταφορά στην ασφαλή πληρωμή...';
+  buttonEl.style.pointerEvents = 'none';
   try {
-    const returnUrl = window.location.origin + window.location.pathname;
+    const returnUrl = window.location.origin + window.location.pathname + '?rid=' + encodeURIComponent(readingId);
     const res = await fetch('/.netlify/functions/create-checkout', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ tool: 'epistrofi', returnUrl })
+      body: JSON.stringify({ tool: 'epistrofi', reading_id: readingId, returnUrl })
     });
     const data = await res.json();
-    if (data.url) {
-      window.location.href = data.url;
-    } else {
-      throw new Error('no url');
-    }
+    if (!data.url) throw new Error('no url');
+    window.location.href = data.url;
   } catch (e) {
-    enterBtn.textContent = 'Αγόρασε τον χρησμό σου →';
-    payError.style.display = 'block';
+    buttonEl.textContent = original;
+    buttonEl.style.pointerEvents = 'auto';
+    infoLine.textContent = 'Κάτι πήγε στραβά με την πληρωμή, δοκίμασε ξανά.';
+    infoLine.style.display = 'block';
   }
+}
+
+$('unlockBtn').addEventListener('click', () => {
+  if (currentReadingId) startCheckout($('unlockBtn'), currentReadingId);
 });
+
+async function submitTeaser() {
+  const f = readFields();
+  const email = $('email').value.trim();
+  if (!f.name1 || !f.name2 || !f.dob1) { showError('Συμπλήρωσε τουλάχιστον τα δύο ονόματα και τη δική σου ημερομηνία γέννησης.'); return; }
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)) { showError('Γράψε ένα σωστό email, για να σου κρατήσουμε τον χρησμό.'); return; }
+  err.style.display = 'none';
+  btn.disabled = true;
+  setLoadingText('Ο ουρανός συμβουλεύεται τους χάρτες σας...');
+  loading.classList.add('show');
+
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(f));
+  } catch (e) {}
+
+  try {
+    const res = await fetch('/api/epistrofi-teaser', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ ...f, email, consent: $('consent').checked })
+    });
+
+    if (res.status === 409) {
+      const data = await res.json();
+      currentReadingId = data.reading_id;
+      try { localStorage.setItem(RID_KEY, currentReadingId); } catch (e) {}
+      loading.classList.remove('show');
+      form.style.display = 'none';
+      result.classList.add('show');
+      infoLine.textContent = 'Το δωρεάν άνοιγμα του χρησμού δίνεται μία φορά σε κάθε email, και το έχεις ήδη πάρει. Ο πλήρης χρησμός σου για ' + f.name2 + ' είναι έτοιμος να γραφτεί.';
+      infoLine.style.display = 'block';
+      seal.classList.add('show');
+      return;
+    }
+    if (!res.ok) {
+      let msg = 'Κάτι διακόπηκε στη σύνδεση με τον ουρανό. Δοκίμασε ξανά σε λίγο.';
+      try { const data = await res.json(); if (data.error) msg = data.error; } catch (e) {}
+      if (res.status === 429) msg = 'Πολλές προσπάθειες μαζί. Περίμενε ένα λεπτό και δοκίμασε ξανά.';
+      loading.classList.remove('show');
+      showError(msg);
+      btn.disabled = false;
+      return;
+    }
+
+    currentReadingId = res.headers.get('X-Reading-Id');
+    try { localStorage.setItem(RID_KEY, currentReadingId); } catch (e) {}
+    loading.classList.remove('show');
+    form.style.display = 'none';
+    result.classList.add('show');
+    teaserText.classList.add('typing');
+
+    const all = await readStream(res, (t) => { teaserText.textContent = t.replace(ERR_MARK, ''); });
+    teaserText.classList.remove('typing');
+    if (all.includes(ERR_MARK)) {
+      infoLine.textContent = 'Η σύνδεση διακόπηκε. Μπορείς να δεις ολόκληρο τον χρησμό σου παρακάτω.';
+      infoLine.style.display = 'block';
+    }
+    seal.classList.add('show');
+  } catch (e) {
+    loading.classList.remove('show');
+    showError('Κάτι διακόπηκε στη σύνδεση με τον ουρανό. Δοκίμασε ξανά σε λίγο.');
+  } finally {
+    btn.disabled = false;
+  }
+}
+
+/* ---------- 2. Ο πληρωμένος χρησμός, μετά την επιστροφή από το Stripe ---------- */
+
+async function loadFullReading(attempt = 0) {
+  showCard();
+  form.style.display = 'none';
+  $('paidBadge').style.display = 'block';
+  setLoadingText('Ο ουρανός ανοίγει τη σφραγίδα του χρησμού σου...');
+  loading.classList.add('show');
+
+  try {
+    const res = await fetch('/api/epistrofi-full', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ reading_id: readingIdParam, session_id: sessionId })
+    });
+
+    if (res.status === 409 && attempt < 40) {
+      setTimeout(() => loadFullReading(attempt + 1), 4000);
+      return;
+    }
+    if (!res.ok) {
+      let msg = 'Δεν βρέθηκε έγκυρη πληρωμή για αυτόν τον χρησμό.';
+      try { const data = await res.json(); if (data.error && data.error !== 'generating') msg = data.error; } catch (e) {}
+      loading.classList.remove('show');
+      result.classList.add('show');
+      infoLine.textContent = msg;
+      infoLine.style.display = 'block';
+      return;
+    }
+
+    loading.classList.remove('show');
+    result.classList.add('show');
+    fullWrap.classList.add('show');
+
+    const all = await readStream(res, (t) => {
+      const i = t.indexOf(SEP);
+      if (i === -1) { teaserText.textContent = t; return; }
+      teaserText.textContent = t.slice(0, i).trim();
+      renderContinuation(t.slice(i + SEP.length), false);
+    });
+    const i = all.indexOf(SEP);
+    renderContinuation(i === -1 ? '' : all.slice(i + SEP.length), true);
+
+    if (all.includes(ERR_MARK)) {
+      infoLine.textContent = 'Η σύνδεση διακόπηκε πριν ολοκληρωθεί ο χρησμός. Ανανέωσε τη σελίδα και θα γραφτεί ξανά, χωρίς νέα χρέωση.';
+      infoLine.style.display = 'block';
+      return;
+    }
+    if (!teaserText.textContent.trim()) teaserText.style.display = 'none';
+    renderExtraActions();
+  } catch (e) {
+    loading.classList.remove('show');
+    result.classList.add('show');
+    infoLine.textContent = 'Κάτι διακόπηκε στη σύνδεση. Ανανέωσε τη σελίδα, ο χρησμός σου σε περιμένει χωρίς νέα χρέωση.';
+    infoLine.style.display = 'block';
+  }
+}
+
+/* ---------- 3. 2η και 3η ερώτηση (και παλιές πληρωμές) ---------- */
 
 function startExtraCheckout(nextStage, buttonEl) {
   const priceLabel = nextStage === 'q2' ? '2,99€' : '1,99€';
@@ -372,11 +615,8 @@ function startExtraCheckout(nextStage, buttonEl) {
   })
     .then(res => res.json())
     .then(data => {
-      if (data.url) {
-        window.location.href = data.url;
-      } else {
-        throw new Error('no url');
-      }
+      if (data.url) window.location.href = data.url;
+      else throw new Error('no url');
     })
     .catch(() => {
       buttonEl.textContent = `Δοκίμασε ξανά — ${priceLabel}`;
@@ -385,7 +625,7 @@ function startExtraCheckout(nextStage, buttonEl) {
 }
 
 function renderExtraActions() {
-  const extraActions = document.getElementById('extraActions');
+  const extraActions = $('extraActions');
   extraActions.innerHTML = '';
   const nextStage = stage === 'q1' ? 'q2' : (stage === 'q2' ? 'q3' : null);
   if (!nextStage) return;
@@ -400,94 +640,83 @@ function renderExtraActions() {
   extraActions.appendChild(button);
 }
 
-const form = document.getElementById('form');
-const btn = document.getElementById('btn');
-const err = document.getElementById('err');
-const loading = document.getElementById('loading');
-const result = document.getElementById('result');
-const pctnum = document.getElementById('pctnum');
-const readingtext = document.getElementById('readingtext');
-
-form.addEventListener('submit', async (e) => {
-  e.preventDefault();
-
-  const name1 = document.getElementById('name1').value.trim();
-  const dob1 = document.getElementById('dob1').value;
-  const tob1 = document.getElementById('tob1').value;
-  const pob1 = document.getElementById('pob1').value.trim();
-  const name2 = document.getElementById('name2').value.trim();
-  const dob2 = document.getElementById('dob2').value;
-  const tob2 = document.getElementById('tob2').value;
-  const pob2 = document.getElementById('pob2').value.trim();
-  const question = stage !== 'q1' ? document.getElementById('question').value.trim() : '';
-
-  if (!name1 || !name2 || !dob1) {
-    err.style.display = 'block';
-    return;
-  }
+async function submitPaidQuestion() {
+  const f = readFields();
+  const question = stage !== 'q1' ? $('question').value.trim() : '';
+  if (!f.name1 || !f.name2 || !f.dob1) { showError('Συμπλήρωσε τουλάχιστον τα δύο ονόματα και τη δική σου ημερομηνία γέννησης.'); return; }
+  if (stage !== 'q1' && !question) { showError('Γράψε την ερώτησή σου.'); return; }
   err.style.display = 'none';
   btn.disabled = true;
   result.classList.remove('show');
   loading.classList.add('show');
 
   try {
-    const response = await fetch("/.netlify/functions/epistrofi-agora", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        name1, dob1, tob1, pob1,
-        name2, dob2, tob2, pob2,
-        question,
-        session_id: sessionId
-      })
+    const response = await fetch('/.netlify/functions/epistrofi-agora', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ ...f, question, session_id: sessionId })
     });
     const data = await response.json();
 
     if (response.status === 402) {
       loading.classList.remove('show');
-      err.textContent = 'Δεν βρέθηκε έγκυρη πληρωμή. Ξεκίνα ξανά από το κουμπί αγοράς.';
-      err.style.display = 'block';
+      showError('Δεν βρέθηκε έγκυρη πληρωμή. Ξεκίνα ξανά από το κουμπί αγοράς.');
       btn.disabled = false;
       return;
     }
 
-    localStorage.setItem(STORAGE_KEY, JSON.stringify({ name1, dob1, tob1, pob1, name2, dob2, tob2, pob2 }));
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(f)); } catch (e) {}
 
-    const text = data.reading || "";
+    const text = data.reading || '';
     const match = text.match(/\[ΠΟΣΟΣΤΟ:\s*(\d+)\]/);
-    const pct = match ? match[1] : "—";
-    let body = text.replace(/\[ΠΟΣΟΣΤΟ:\s*\d+\]/, "").trim();
+    pctnum.textContent = (match ? match[1] : '—') + '%';
+    const body = text.replace(/\[ΠΟΣΟΣΤΟ:\s*\d+\]/, '').trim();
+    const parts = body.split(/\[?\s*ΣΥΜΒΟΥΛΗ\s*\]?\s*:?/);
+    readingtext.textContent = parts[0].trim();
+    if (parts[1]) { adviceWrap.style.display = 'block'; adviceText.textContent = parts[1].trim(); }
 
-    const adviceMatch = body.split(/\[?\s*ΣΥΜΒΟΥΛΗ\s*\]?\s*:?/);
-    const readingPart = adviceMatch[0].trim();
-    const advicePart = adviceMatch[1] ? adviceMatch[1].trim() : "";
-
-    pctnum.textContent = pct + "%";
-    readingtext.textContent = readingPart;
-
-    const existingAdvice = document.getElementById('advice-block');
-    if (existingAdvice) existingAdvice.remove();
-
-    if (advicePart) {
-      readingtext.insertAdjacentHTML('afterend',
-        '<div id="advice-block" style="margin-top:20px; padding-top:18px; border-top:1px solid var(--line);">' +
-        '<div style="font-size:11.5px; letter-spacing:2px; color:var(--gold); text-transform:uppercase; margin-bottom:8px;">Πρακτική συμβουλή</div>' +
-        '<div style="font-family:\'Inter\',sans-serif; font-size:14.5px; line-height:1.65; color:var(--paper);">' +
-        advicePart.replace(/</g,'&lt;') + '</div></div>'
-      );
-    }
-
+    teaserText.style.display = 'none';
     loading.classList.remove('show');
     result.classList.add('show');
+    fullWrap.classList.add('show');
     form.style.display = 'none';
     renderExtraActions();
   } catch (error) {
     loading.classList.remove('show');
-    readingtext.textContent = "Κάτι διακόπηκε στη σύνδεση με τον ουρανό. Δοκίμασε ξανά σε λίγο.";
-    result.classList.add('show');
+    showError('Κάτι διακόπηκε στη σύνδεση με τον ουρανό. Δοκίμασε ξανά σε λίγο.');
   } finally {
     btn.disabled = false;
   }
+}
+
+/* ---------- Ποια εκδοχή της σελίδας δείχνουμε ---------- */
+
+const mode = (sessionId && readingIdParam) ? 'full'
+  : (sessionId ? 'paidQuestion' : 'teaser');
+
+if (mode === 'teaser') {
+  btn.textContent = 'Δες δωρεάν τον χρησμό σου →';
+} else if (mode === 'full') {
+  loadFullReading();
+} else if (mode === 'paidQuestion') {
+  showCard();
+  $('paidBadge').style.display = 'block';
+  emailFields.style.display = 'none';
+  cardTitle.textContent = STAGE_INFO[stage].title;
+  btn.textContent = STAGE_INFO[stage].btn;
+  fillSavedFields();
+  if (stage !== 'q1') {
+    questionField.style.display = 'block';
+    questionLabel.textContent = STAGE_INFO[stage].label;
+    // Τα στοιχεία κρύβονται μόνο αν τα έχουμε ήδη από πριν σε αυτή τη συσκευή.
+    if (savedFields && savedFields.name1) personalFields.style.display = 'none';
+  }
+}
+
+form.addEventListener('submit', (e) => {
+  e.preventDefault();
+  if (mode === 'teaser') submitTeaser();
+  else submitPaidQuestion();
 });
 </script>
 </body>

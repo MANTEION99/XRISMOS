@@ -2,6 +2,10 @@
 // Η ΕΠΙ ΠΛΗΡΩΜΗ (14,99€) εκδοχή, ξεχωριστή από το epistrofi.js που μένει δωρεάν μέσα στη συνδρομή.
 // Ανέβασέ το στο netlify/functions/epistrofi-agora.js
 // Χρειάζεται τα ίδια environment variables (ASTROLOGY_API_KEY, ANTHROPIC_API_KEY) + το νέο STRIPE_SECRET_KEY
+// Χρησιμοποιείται πλέον για τη 2η και 3η ερώτηση (και για παλιές πληρωμές πριν τον δωρεάν χρησμό).
+// Κάθε πληρωμή δίνει ΜΙΑ απάντηση: αν ξαναχρησιμοποιηθεί ο ίδιος σύνδεσμος, επιστρέφεται η ίδια απάντηση.
+
+const { getStore, connectLambda } = require("@netlify/blobs");
 
 async function verifyPaidSession(sessionId, expectedTool) {
   if (!sessionId) return false;
@@ -11,6 +15,8 @@ async function verifyPaidSession(sessionId, expectedTool) {
     });
     const session = await res.json();
     if (session.payment_status !== "paid" || !session.metadata || !session.metadata.tool) return false;
+    // Οι πληρωμές του νέου πλήρους χρησμού εξυπηρετούνται μόνο από το epistrofi-full.
+    if (session.metadata.reading_id) return false;
     const paidTool = session.metadata.tool;
     return paidTool === expectedTool || paidTool.startsWith(expectedTool + "_q");
   } catch (e) {
@@ -37,6 +43,17 @@ exports.handler = async function (event) {
     const paid = await verifyPaidSession(session_id, "epistrofi");
     if (!paid) {
       return { statusCode: 402, body: JSON.stringify({ error: "Δεν βρέθηκε έγκυρη πληρωμή για αυτό το εργαλείο." }) };
+    }
+
+    connectLambda(event);
+    const usedSessions = getStore({ name: "used-sessions", consistency: "strong" });
+    const previous = await usedSessions.get(session_id, { type: "json" });
+    if (previous && previous.reading) {
+      return {
+        statusCode: 200,
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ reading: previous.reading })
+      };
     }
 
     // --- Βήμα 1: πραγματικά αστρολογικά δεδομένα, παράλληλα για ταχύτητα ---
@@ -66,7 +83,7 @@ exports.handler = async function (event) {
 
     let chart2Body = null;
     if (dob2) {
-      const [d2, m2, y2] = dob2.split("-");
+      const [d2, m2, y2] = dob2.split("-").reverse(); // dob2 έρχεται σαν YYYY-MM-DD
       const [hour2, min2] = (tob2 || "12:00").split(":");
       chart2Body = {
         day: parseInt(d2 || dob2.split("-")[2]),
@@ -125,6 +142,7 @@ ${mainInstruction}
     });
     const claudeData = await claudeRes.json();
     const text = claudeData.content.map(b => b.text || "").join("").trim();
+    await usedSessions.setJSON(session_id, { reading: text, tool: "epistrofi", at: new Date().toISOString() });
 
     return {
       statusCode: 200,

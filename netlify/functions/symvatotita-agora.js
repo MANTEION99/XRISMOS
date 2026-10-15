@@ -41,7 +41,7 @@ exports.handler = async function (event) {
 
     // --- Βήμα 1: πραγματικά αστρολογικά δεδομένα, παράλληλα για ταχύτητα ---
     const buildChartBody = (dob, tob) => {
-      const [d, m, y] = dob.split("-");
+      const [d, m, y] = dob.split("-").reverse(); // dob έρχεται σαν YYYY-MM-DD
       const [hour, min] = (tob || "12:00").split(":");
       return {
         day: parseInt(d || dob.split("-")[2]),

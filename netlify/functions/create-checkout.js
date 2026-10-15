@@ -47,7 +47,7 @@ exports.handler = async function (event) {
   }
 
   try {
-    const { tool, returnUrl } = JSON.parse(event.body);
+    const { tool, returnUrl, reading_id } = JSON.parse(event.body);
     const product = PRODUCTS[tool];
 
     if (!product || !returnUrl) {
@@ -58,6 +58,15 @@ exports.handler = async function (event) {
     const separator = returnUrl.includes("?") ? "&" : "?";
     const successUrl = `${returnUrl}${separator}session_id={CHECKOUT_SESSION_ID}`;
     const cancelUrl = returnUrl;
+
+    // Για τον δωρεάν χρησμό που συνεχίζεται μετά την πληρωμή: η πληρωμή δένεται με τον συγκεκριμένο χρησμό.
+    const metadata = { tool };
+    if (reading_id) {
+      if (!/^[0-9a-f-]{36}$/.test(String(reading_id))) {
+        return { statusCode: 400, body: JSON.stringify({ error: "Λάθος χρησμός." }) };
+      }
+      metadata.reading_id = String(reading_id);
+    }
 
     const body = toFormBody({
       mode: "payment",
@@ -73,7 +82,7 @@ exports.handler = async function (event) {
           }
         }
       ],
-      metadata: { tool }
+      metadata
     });
 
     const stripeRes = await fetch("https://api.stripe.com/v1/checkout/sessions", {

@@ -36,7 +36,7 @@ exports.handler = async function (event) {
     }
 
     // --- Βήμα 1: πραγματικά αστρολογικά δεδομένα ---
-    const [d1, m1, y1] = dob1.split("-");
+    const [d1, m1, y1] = dob1.split("-").reverse(); // dob1 έρχεται σαν YYYY-MM-DD
     const [hour1, min1] = (tob1 || "12:00").split(":");
 
     const chart1Body = {

@@ -44,7 +44,7 @@ exports.handler = async function (event) {
 
     let chart2Body = null;
     if (dob2) {
-      const [d2, m2, y2] = dob2.split("-");
+      const [d2, m2, y2] = dob2.split("-").reverse(); // dob2 έρχεται σαν YYYY-MM-DD
       const [hour2, min2] = (tob2 || "12:00").split(":");
       chart2Body = {
         day: parseInt(d2 || dob2.split("-")[2]),
