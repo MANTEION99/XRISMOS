@@ -43,7 +43,8 @@ export default async (req) => {
     const sky = skyBlock(reading.inputs, reading.charts, hasTime1);
     const full = await streamClaude(
       fullPrompt(reading.inputs, reading.charts, reading.teaser, sky), 4000,
-      (t) => { text += t; savePartial(false); }, 450, prefix
+      (t) => { text += t; savePartial(false); }, 450, prefix,
+      (rewound) => { text = rewound; savePartial(true); }
     );
     clearInterval(beat);
     await saving;

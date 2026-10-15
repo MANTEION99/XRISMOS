@@ -178,6 +178,9 @@
   @keyframes twinkle{ 0%,100%{ opacity:0.25; } 50%{ opacity:1; } }
   .ritual-line{ font-family:'Cormorant Garamond',serif; font-style:italic; font-size:18px; line-height:1.5; color:var(--gold); min-height:56px; max-width:330px; margin:0 auto; transition:opacity 0.7s ease; }
   .pct.counting{ transition:none; }
+  .pause-note{ margin:14px 0 0; font-family:'Cormorant Garamond',serif; font-style:italic; font-size:16px; color:var(--gold); text-align:center; animation:fadein 0.6s ease; }
+  .pause-note .dots i{ font-style:normal; animation:twinkle 1.4s infinite; }
+  .pause-note .dots i:nth-child(2){ animation-delay:0.25s; } .pause-note .dots i:nth-child(3){ animation-delay:0.5s; }
   .wait-bar{ width:100%; max-width:300px; height:4px; margin:18px auto 0; background:rgba(217,180,95,0.15); border-radius:4px; overflow:hidden; }
   .wait-bar span{ display:block; height:100%; width:0; background:linear-gradient(90deg,#b8862f,#f3d98b); border-radius:4px; transition:width 1s ease; }
   .wait-steps{ list-style:none; padding:0; margin:18px auto 0; max-width:300px; text-align:left; font-size:13.5px; line-height:1.5; color:var(--muted); }
@@ -376,6 +379,7 @@
         <div class="pct-label">ΠΙΘΑΝΟΤΗΤΑ ΕΠΑΝΕΝΩΣΗΣ</div>
       </div>
       <div class="reading" id="readingtext"></div>
+      <p id="pauseNote" class="pause-note" style="display:none;">Ο χρησμός σου συνεχίζει να γράφεται, μείνε εδώ<span class="dots"><i>.</i><i>.</i><i>.</i></span></p>
       <div id="adviceWrap" style="display:none; margin-top:20px; padding-top:18px; border-top:1px solid var(--line);">
         <div style="font-size:11.5px; letter-spacing:2px; color:var(--gold); text-transform:uppercase; margin-bottom:8px;">Πρακτική συμβουλή</div>
         <div id="adviceText" style="font-family:'Inter',sans-serif; font-size:14.5px; line-height:1.65; color:var(--paper); white-space:pre-wrap;"></div>
@@ -764,6 +768,7 @@ async function loadFullReading() {
   // ώστε να εμφανίζεται ζωντανά χωρίς να εξαρτάται από τη σύνδεση να μένει ανοιχτή.
   let failures = 0;
   const started = Date.now();
+  let lastLen = 0, lastGrow = Date.now();
   const poll = async () => {
     let data = null, status = 0;
     try {
@@ -783,6 +788,11 @@ async function loadFullReading() {
     if (status !== 200) return fail(data.error || 'Δεν βρέθηκε έγκυρη πληρωμή για αυτόν τον χρησμό.');
     failures = 0;
 
+    // Αν το κείμενο σταματήσει για λίγο, η πελάτισσα βλέπει ότι συνεχίζει, για να μη νομίσει ότι κόλλησε.
+    const len = (data.text || '').length;
+    if (len !== lastLen) { lastLen = len; lastGrow = Date.now(); $('pauseNote').style.display = 'none'; }
+    else if (len > 0 && data.status !== 'done' && Date.now() - lastGrow > 5000) $('pauseNote').style.display = 'block';
+    if (data.status === 'done') $('pauseNote').style.display = 'none';
     if (data.teaser && !teaserText.textContent) teaserText.textContent = data.teaser;
     if (!data.teaser) teaserText.style.display = 'none';
     if (data.text) renderContinuation(data.text, data.status === 'done');
@@ -803,6 +813,7 @@ async function loadFullReading() {
   };
   const fail = (msg) => {
     stopRitual();
+    $('pauseNote').style.display = 'none';
     if (!readingtext.textContent.trim()) fullWrap.classList.remove('show');
     infoLine.textContent = msg;
     infoLine.style.display = 'block';

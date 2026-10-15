@@ -10,6 +10,8 @@ import {
 } from "../lib/epistrofi-common.mjs";
 
 const clip = (v, n) => String(v || "").trim().slice(0, n);
+// Κεφαλαίο το πρώτο γράμμα κάθε λέξης του ονόματος (maria → Maria, μαρία → Μαρία).
+const nameCase = (v) => clip(v, 40).replace(/(^|\s)(\S)/g, (m, sp, c) => sp + c.toLocaleUpperCase("el"));
 
 export default async (req) => {
   if (req.method !== "POST") return json(405, { error: "Method Not Allowed" });
@@ -18,9 +20,9 @@ export default async (req) => {
   try { b = await req.json(); } catch { return json(400, { error: "Λάθος αίτημα." }); }
 
   const p = {
-    name1: clip(b.name1, 40), dob1: clip(b.dob1, 10), tob1: clip(b.tob1, 5), pob1: clip(b.pob1, 60),
+    name1: nameCase(b.name1), dob1: clip(b.dob1, 10), tob1: clip(b.tob1, 5), pob1: clip(b.pob1, 60),
     lat1: b.lat1, lon1: b.lon1, tzone1: b.tzone1,
-    name2: clip(b.name2, 40), dob2: clip(b.dob2, 10), tob2: clip(b.tob2, 5), pob2: clip(b.pob2, 60),
+    name2: nameCase(b.name2), dob2: clip(b.dob2, 10), tob2: clip(b.tob2, 5), pob2: clip(b.pob2, 60),
     lat2: b.lat2, lon2: b.lon2, tzone2: b.tzone2
   };
   const email = normalizeEmail(b.email);

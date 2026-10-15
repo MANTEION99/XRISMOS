@@ -135,7 +135,7 @@ function upcomingSky(p, charts, hasTime1, start = new Date()) {
             const d0 = norm180(days[i - 1].pos[b] - tg.lon - sign * a.angle);
             const d1 = norm180(days[i].pos[b] - tg.lon - sign * a.angle);
             if (Math.abs(d0) < 10 && Math.abs(d1) < 10 && (d0 === 0 || (d0 < 0) !== (d1 < 0))) {
-              personal.push({ t: days[i].date, text: `${fmtDate(days[i].date)}: ${GR[b]} ${a.name} ${tg.label}` });
+              personal.push({ t: days[i].date, text: `${fmtDate(days[i].date)}: ${GR[b]} του ουρανού ${a.name} ${tg.label}` });
             }
           }
         }
@@ -151,6 +151,7 @@ function upcomingSky(p, charts, hasTime1, start = new Date()) {
 function skyBlock(p, charts, hasTime1, start = new Date()) {
   const s = upcomingSky(p, charts, hasTime1, start);
   return `ΠΡΑΓΜΑΤΙΚΟΣ ΟΥΡΑΝΟΣ ΤΩΝ ΕΠΟΜΕΝΩΝ 12 ΜΗΝΩΝ (σήμερα είναι ${fmtDate(start)}). Υπολογισμένες ημερομηνίες, οι ΜΟΝΕΣ που επιτρέπεται να χρησιμοποιήσεις:
+(Είναι κινήσεις των πλανητών του σημερινού ουρανού, όχι πλανήτες των χαρτών τους. Γράψε π.χ. «η Αφροδίτη του ουρανού ενώνεται με την Αφροδίτη του», ποτέ «η Αφροδίτη του» για πλανήτη που περνά.)
 Γενικές κινήσεις:
 ${s.general.map(x => "• " + x).join("\n")}
 
