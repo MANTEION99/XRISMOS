@@ -47,7 +47,7 @@ export default async (req) => {
   return streamResponse(async (write) => {
     write((reading.teaser || "") + SEP);
     try {
-      const full = await streamClaude(fullPrompt(reading.inputs, reading.charts, reading.teaser), 3500, write);
+      const full = await streamClaude(fullPrompt(reading.inputs, reading.charts, reading.teaser), 4000, write, 450);
       await readings.setJSON(readingId, {
         ...reading, full, paidSession: sessionId, paidAt: new Date().toISOString(), generatingSince: null
       });

@@ -83,7 +83,7 @@ ${chartsBlock(p, charts)}
 Η ${p.name1} ρωτά αν και πότε θα επιστρέψει στη ζωή της ο/η ${p.name2}.
 
 Γράψε ΜΟΝΟ το άνοιγμα του χρησμού, 140 έως 170 λέξεις. Ο σκοπός του είναι να την πλησιάσει, να την αγγίξει και να νιώσει ότι κάποιος επιτέλους την καταλαβαίνει.
-1. Ξεκίνα με προσωπικό χαιρετισμό με το όνομά της, π.χ. «Γεια σου ${p.name1} μου, εύχομαι η σημερινή μέρα να σε βρίσκει καλά».
+1. Ξεκίνα με προσωπικό χαιρετισμό με το όνομά της, π.χ. «Γεια σου ${p.name1} μου, εύχομαι η σημερινή μέρα να σε βρίσκει καλά», και συνέχισε αμέσως με το κυρίως κείμενο. Ο χαιρετισμός μόνος του ΔΕΝ είναι απάντηση.
 2. Πες της δύο συγκεκριμένα χαρακτηριστικά του χαρακτήρα της, το καθένα δεμένο με μια πραγματική θέση από τον χάρτη της (πλανήτης, ζώδιο, οίκος). Να είναι τόσο ακριβή ώστε να σκεφτεί «με ξέρει».
 3. Δείξε ότι βλέπεις τον πόνο της για αυτόν τον άνθρωπο, με μια πρόταση για το δέσιμο που φαίνεται ανάμεσα στους δύο χάρτες.
 4. Κλείσε με μια πρόταση που ανοίγει την επόμενη σελίδα χωρίς να τη λέει: ότι ο χάρτης δείχνει καθαρά μια συγκεκριμένη περίοδο και μια κίνηση που θα κρίνει την επιστροφή του/της, και ότι αυτά ακολουθούν αμέσως παρακάτω. Μην πεις ποια είναι η περίοδος, μην πεις το αποτέλεσμα, μην δώσεις ποσοστό.
@@ -120,9 +120,47 @@ ${opening}
 Ολοκλήρωσε πάντα κάθε πρόταση. Αν πλησιάζεις το όριο, συντόμευσε νωρίτερα, ποτέ μην κόψεις στη μέση.`;
 }
 
+const wordCount = (t) => (t.trim().match(/\S+/g) || []).length;
+
 // Καλεί το Claude με streaming. Κάθε κομμάτι κειμένου πηγαίνει στο onText,
 // και στο τέλος επιστρέφεται ολόκληρο το κείμενο.
-export async function streamClaude(prompt, maxTokens, onText) {
+// Αν η απάντηση σταματήσει πρόωρα (κομμένη ροή, όριο, ή λιγότερες από minWords λέξεις),
+// ζητά αυτόματα τη συνέχεια από το σημείο που σταμάτησε, έως δύο φορές, ώστε η πελάτισσα
+// να μη δει ποτέ μισό χρησμό.
+export async function streamClaude(prompt, maxTokens, onText, minWords = 0) {
+  let full = "";
+  for (let attempt = 0; attempt < 3; attempt++) {
+    const p = attempt === 0 ? prompt : `${prompt}
+
+Έχεις ήδη γράψει την αρχή, που είναι αυτή:
+"""
+${full}
+"""
+Συνέχισε ΑΚΡΙΒΩΣ από το σημείο που σταματά, με την επόμενη λέξη. Μην επαναλάβεις τίποτα από όσα γράφτηκαν, μην ξαναχαιρετήσεις, μη γράψεις εισαγωγή. Ολοκλήρωσε το κείμενο σύμφωνα με τις οδηγίες.`;
+    let chunkStart = true;
+    let r;
+    try {
+      r = await streamClaudeOnce(p, maxTokens, (t) => {
+        if (chunkStart && full && !/\s$/.test(full) && !/^[\s.,;:!·»)]/.test(t)) t = " " + t;
+        chunkStart = false;
+        full += t;
+        onText(t);
+      });
+    } catch (e) {
+      if (!full) throw e;
+      console.error("[claude] retry failed", e);
+      break;
+    }
+    const words = wordCount(full);
+    console.log(`[claude] attempt=${attempt} stop=${r.stopReason} ended=${r.ended} words=${words}`);
+    if (r.ended && r.stopReason === "end_turn" && words >= minWords) return full;
+    if (r.stopReason === "refusal") break;
+  }
+  if (wordCount(full) < Math.max(20, minWords / 2)) throw new Error("Η απάντηση βγήκε ελλιπής");
+  return full;
+}
+
+async function streamClaudeOnce(prompt, maxTokens, onText) {
   const res = await fetch("https://api.anthropic.com/v1/messages", {
     method: "POST",
     headers: {
@@ -144,26 +182,36 @@ export async function streamClaude(prompt, maxTokens, onText) {
   const reader = res.body.getReader();
   const decoder = new TextDecoder();
   let buffer = "";
-  let full = "";
-  while (true) {
-    const { done, value } = await reader.read();
-    if (done) break;
-    buffer += decoder.decode(value, { stream: true });
-    const lines = buffer.split("\n");
-    buffer = lines.pop();
-    for (const line of lines) {
-      if (!line.startsWith("data: ")) continue;
-      let evt;
-      try { evt = JSON.parse(line.slice(6)); } catch { continue; }
-      if (evt.type === "content_block_delta" && evt.delta && evt.delta.type === "text_delta") {
-        full += evt.delta.text;
-        onText(evt.delta.text);
-      } else if (evt.type === "error") {
-        throw new Error(evt.error && evt.error.message ? evt.error.message : "stream error");
+  let stopReason = null;
+  let ended = false;
+  try {
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      buffer += decoder.decode(value, { stream: true });
+      const lines = buffer.split("\n");
+      buffer = lines.pop();
+      for (const line of lines) {
+        if (!line.startsWith("data:")) continue;
+        let evt;
+        try { evt = JSON.parse(line.slice(5).trim()); } catch { continue; }
+        if (evt.type === "content_block_delta" && evt.delta && evt.delta.type === "text_delta") {
+          onText(evt.delta.text);
+        } else if (evt.type === "message_delta" && evt.delta && evt.delta.stop_reason) {
+          stopReason = evt.delta.stop_reason;
+        } else if (evt.type === "message_stop") {
+          ended = true;
+        } else if (evt.type === "error") {
+          console.error("[claude] stream error", JSON.stringify(evt.error));
+          return { stopReason: "error", ended: false };
+        }
       }
     }
+  } catch (e) {
+    // Η ροή κόπηκε στη μέση: ό,τι γράφτηκε μένει και ζητάμε τη συνέχεια.
+    console.error("[claude] stream cut", e);
   }
-  return full;
+  return { stopReason, ended };
 }
 
 // Επαληθεύει στο Stripe ότι η πληρωμή έγινε, ότι αφορά αυτό το εργαλείο
