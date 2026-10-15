@@ -7,7 +7,8 @@ export default async () => {
   try {
     const res = await fetch("https://json.astrologyapi.com/v1/western_horoscope", {
       method: "POST",
-      headers: { "Content-Type": "application/json", "x-astrologyapi-key": key },
+      headers: { "Content-Type": "application/json", "Accept-Language": "en",
+        "x-astrologyapi-key": key },
       body: JSON.stringify(body)
     });
     status = res.status;

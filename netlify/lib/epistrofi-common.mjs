@@ -44,7 +44,8 @@ async function fetchChart(body) {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      "x-astrologyapi-key": process.env.ASTROLOGY_API_KEY
+      "Accept-Language": "en",
+        "x-astrologyapi-key": process.env.ASTROLOGY_API_KEY
     },
     body: JSON.stringify(body)
   });

@@ -60,6 +60,7 @@ exports.handler = async function (event) {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
+        "Accept-Language": "en",
         "x-astrologyapi-key": process.env.ASTROLOGY_API_KEY
       },
       body: JSON.stringify(body)
