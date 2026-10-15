@@ -794,8 +794,10 @@ async function loadFullReading() {
       return;
     }
     if (data.status === 'error') {
-      return fail('Ο χρησμός σου δεν ολοκληρώθηκε αυτή τη φορά. Ανανέωσε τη σελίδα σε λίγο, θα γραφτεί ξανά χωρίς νέα χρέωση.');
+      return fail('Ο χρησμός σου δεν ολοκληρώθηκε αυτή τη φορά. Ανανέωσε τη σελίδα σε λίγο, θα γραφτεί ξανά χωρίς νέα χρέωση.' +
+        (location.hostname.includes('deploy-preview') ? ' [' + (data.detail || '') + ']' : ''));
     }
+    if (data.detail && location.hostname.includes('deploy-preview')) console.log('προηγούμενο σφάλμα:', data.detail);
     // Όσο αργεί, η σελίδα δεν τα παρατά ποτέ· η πρόοδος πάνω καθησυχάζει.
     setTimeout(poll, 1500);
   };

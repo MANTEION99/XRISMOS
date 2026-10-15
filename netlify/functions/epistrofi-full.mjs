@@ -36,13 +36,17 @@ export default async (req) => {
 
   const lastSign = reading.heartbeat || reading.generatingSince;
   const running = reading.generatingSince && Date.now() - lastSign < STALE_MS;
+  // Μετά από 5 αποτυχημένες προσπάθειες σταματά, αλλά μετά από 10 λεπτά ξαναδοκιμάζει από την αρχή.
   if (!running && (reading.genAttempts || 0) >= MAX_ATTEMPTS) {
-    return json(200, { status: "error", teaser, text: reading.partial || "" });
+    if (Date.now() - (reading.lastAttemptAt || 0) < 10 * 60 * 1000) {
+      return json(200, { status: "error", teaser, text: reading.partial || "", detail: reading.genError || "" });
+    }
+    reading.genAttempts = 0;
   }
   if (!running) {
     await readings.setJSON(readingId, {
       ...reading, paidSession: sessionId, generatingSince: Date.now(), heartbeat: Date.now(), partial: "", genError: null,
-      genAttempts: (reading.genAttempts || 0) + 1
+      genAttempts: (reading.genAttempts || 0) + 1, lastAttemptAt: Date.now(), lastError: reading.genError || null
     });
     const origin = new URL(req.url).origin;
     const r = await fetch(`${origin}/.netlify/functions/epistrofi-full-background`, {
@@ -57,7 +61,8 @@ export default async (req) => {
   return json(200, {
     status: "generating",
     teaser,
-    text: reading.partial || ""
+    text: reading.partial || "",
+    detail: reading.lastError || ""
   });
 };
 
