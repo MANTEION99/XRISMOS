@@ -2,6 +2,7 @@
   "name": "manteio",
   "private": true,
   "dependencies": {
-    "@netlify/blobs": "^11.1.4"
+    "@netlify/blobs": "^11.1.4",
+    "astronomy-engine": "^2.1.19"
   }
 }

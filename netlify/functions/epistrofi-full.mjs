@@ -9,7 +9,7 @@
 //   <πληρωμένη συνέχεια, ξεκινά με [ΠΟΣΟΣΤΟ: NN] και περιέχει [ΣΥΜΒΟΥΛΗ]>
 
 import {
-  readingsStore, json, verifyStripeSession, fullPrompt, streamClaude, streamResponse
+  readingsStore, json, verifyStripeSession, fullPrompt, skyBlock, streamClaude, streamResponse
 } from "../lib/epistrofi-common.mjs";
 
 const SEP = "\n<<<ΣΥΝΕΧΕΙΑ>>>\n";
@@ -47,7 +47,9 @@ export default async (req) => {
   return streamResponse(async (write) => {
     write((reading.teaser || "") + SEP);
     try {
-      const full = await streamClaude(fullPrompt(reading.inputs, reading.charts, reading.teaser), 4000, write, 450);
+      const hasTime1 = /^\d{2}:\d{2}$/.test(reading.inputs.tob1 || "");
+      const sky = skyBlock(reading.inputs, reading.charts, hasTime1);
+      const full = await streamClaude(fullPrompt(reading.inputs, reading.charts, reading.teaser, sky), 4000, write, 450);
       await readings.setJSON(readingId, {
         ...reading, full, paidSession: sessionId, paidAt: new Date().toISOString(), generatingSince: null
       });
