@@ -340,6 +340,7 @@
         </div>
       </div>
     </div>
+    <p id="restartLink" style="display:none;text-align:center;font-size:12.5px;color:var(--muted);margin-top:16px;cursor:pointer;text-decoration:underline;">Θέλεις χρησμό για άλλο πρόσωπο; Ξεκίνα από την αρχή</p>
 
     <!-- Ο πληρωμένος χρησμός -->
     <div class="full-wrap" id="fullWrap">
@@ -363,6 +364,8 @@
 <script>
 const STORAGE_KEY = 'manteio_epistrofi_fields';
 const RID_KEY = 'manteio_epistrofi_rid';
+const TEASER_KEY = 'manteio_epistrofi_teaser';   // το δωρεάν άνοιγμα, για να μένει μετά από ανανέωση
+const ENTERED_KEY = 'manteio_epistrofi_entered'; // είχε ανοίξει τη φόρμα
 const SEP = '<<<ΣΥΝΕΧΕΙΑ>>>';
 const ERR_MARK = '<<<ΣΦΑΛΜΑ>>>';
 const params = new URLSearchParams(window.location.search);
@@ -394,6 +397,28 @@ let currentReadingId = null;
 function showCard() {
   cover.style.display = 'none';
   card.classList.add('show');
+}
+function saveTeaserState(rid, text, info) {
+  try { localStorage.setItem(TEASER_KEY, JSON.stringify({ rid, text, info, ts: Date.now() })); } catch (e) {}
+}
+function clearTeaserState() {
+  try { localStorage.removeItem(TEASER_KEY); localStorage.removeItem(ENTERED_KEY); } catch (e) {}
+}
+// Μετά από ανανέωση: ξαναδείχνει το δωρεάν άνοιγμα και τη σφραγίδα, όπως ήταν.
+function restoreTeaser() {
+  let st = null;
+  try { st = JSON.parse(localStorage.getItem(TEASER_KEY) || 'null'); } catch (e) {}
+  if (!st || !st.rid || Date.now() - st.ts > 7 * 86400000) return false;
+  currentReadingId = st.rid;
+  showCard();
+  form.style.display = 'none';
+  result.classList.add('show');
+  teaserText.textContent = st.text || '';
+  if (!st.text) teaserText.style.display = 'none';
+  if (st.info) { infoLine.textContent = st.info; infoLine.style.display = 'block'; }
+  seal.classList.add('show');
+  $('restartLink').style.display = 'block';
+  return true;
 }
 function setLoadingText(t) {
   loading.innerHTML = '<div class="spinner"></div>' + t;
@@ -452,6 +477,17 @@ function renderContinuation(cont, finished) {
 $('enterBtn').addEventListener('click', () => {
   showCard();
   fillSavedFields();
+  try { localStorage.setItem(ENTERED_KEY, '1'); } catch (e) {}
+});
+// Ό,τι γράφει στη φόρμα κρατιέται, ώστε μια ανανέωση να μην το σβήνει.
+['name1','dob1','tob1','pob1','name2','dob2','tob2','pob2'].forEach(k => {
+  const el = $(k);
+  if (el) el.addEventListener('input', () => {
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(readFields())); } catch (e) {}
+  });
+});
+if ($('email')) $('email').addEventListener('input', () => {
+  try { localStorage.setItem('manteio_epistrofi_email', $('email').value); } catch (e) {}
 });
 
 async function startCheckout(buttonEl, readingId) {
@@ -511,6 +547,8 @@ async function submitTeaser() {
       infoLine.textContent = 'Το δωρεάν άνοιγμα του χρησμού δίνεται μία φορά σε κάθε email, και το έχεις ήδη πάρει. Ο πλήρης χρησμός σου για ' + f.name2 + ' είναι έτοιμος να γραφτεί.';
       infoLine.style.display = 'block';
       seal.classList.add('show');
+      saveTeaserState(currentReadingId, '', infoLine.textContent);
+      $('restartLink').style.display = 'block';
       return;
     }
     if (!res.ok) {
@@ -539,6 +577,8 @@ async function submitTeaser() {
       infoLine.style.display = 'block';
     }
     seal.classList.add('show');
+    saveTeaserState(currentReadingId, teaserText.textContent, all.includes(ERR_MARK) ? infoLine.textContent : '');
+    $('restartLink').style.display = 'block';
   } catch (e) {
     loading.classList.remove('show');
     showError('Κάτι διακόπηκε στη σύνδεση με τον ουρανό. Δοκίμασε ξανά σε λίγο.' + (location.hostname.includes('deploy-preview') ? ' [' + e.message + ']' : ''));
@@ -705,6 +745,15 @@ const mode = (sessionId && readingIdParam) ? 'full'
 
 if (mode === 'teaser') {
   btn.textContent = 'Δες δωρεάν τον χρησμό σου →';
+  if (!restoreTeaser()) {
+    let entered = null;
+    try { entered = localStorage.getItem(ENTERED_KEY); } catch (e) {}
+    if (entered) {
+      showCard();
+      fillSavedFields();
+      try { const em = localStorage.getItem('manteio_epistrofi_email'); if (em && $('email')) $('email').value = em; } catch (e) {}
+    }
+  }
 } else if (mode === 'full') {
   loadFullReading();
 } else if (mode === 'paidQuestion') {
@@ -721,6 +770,11 @@ if (mode === 'teaser') {
     if (savedFields && savedFields.name1) personalFields.style.display = 'none';
   }
 }
+
+$('restartLink').addEventListener('click', () => {
+  clearTeaserState();
+  window.location.href = window.location.pathname;
+});
 
 form.addEventListener('submit', (e) => {
   e.preventDefault();
