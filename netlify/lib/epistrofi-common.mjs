@@ -48,7 +48,16 @@ async function fetchChart(body) {
     },
     body: JSON.stringify(body)
   });
-  return res.json();
+  const text = await res.text();
+  let data = null;
+  try { data = JSON.parse(text); } catch {}
+  // Ένας σωστός χάρτης έχει πάντα λίστα πλανητών. Αλλιώς το AstrologyAPI απάντησε με σφάλμα
+  // (κλειδί, όριο, λάθος στοιχεία) και ΔΕΝ αφήνουμε το Claude να γράψει χρησμό χωρίς χάρτη.
+  if (!res.ok || !data || !Array.isArray(data.planets) || data.planets.length === 0) {
+    console.error(`[astrologyapi] status=${res.status} key=${process.env.ASTROLOGY_API_KEY ? "set" : "MISSING"} body=${text.slice(0, 300)}`);
+    throw new Error("Ο χάρτης δεν υπολογίστηκε");
+  }
+  return data;
 }
 
 // Υπολογίζει τους δύο χάρτες μία φορά. Το αποτέλεσμα αποθηκεύεται μαζί με τον χρησμό,
