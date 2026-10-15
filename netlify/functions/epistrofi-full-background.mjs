@@ -18,7 +18,12 @@ export default async (req) => {
   if (!reading || reading.full) return;
   if (!(await verifyStripeSession(sessionId, "epistrofi", readingId))) return;
 
-  let text = "";
+  // Αν μια προηγούμενη προσπάθεια κόπηκε, συνεχίζουμε από όσα είχαν ήδη γραφτεί.
+  // Κόβεται στην τελευταία ολόκληρη πρόταση, ώστε η συνέχεια να μη «κολλήσει» σε μισή λέξη.
+  const rawPrefix = reading.partial || "";
+  const cut = Math.max(rawPrefix.lastIndexOf("."), rawPrefix.lastIndexOf("!"), rawPrefix.lastIndexOf(";"), rawPrefix.lastIndexOf("]"));
+  const prefix = cut > 0 ? rawPrefix.slice(0, cut + 1) : "";
+  let text = prefix;
   let lastSave = 0;
   let saving = Promise.resolve();
   const savePartial = (force) => {
@@ -31,14 +36,14 @@ export default async (req) => {
   };
 
   // Σημάδι ζωής κάθε 20 δευτερόλεπτα, ακόμα κι όσο το Claude δεν έχει γράψει τίποτα.
-  const beat = setInterval(() => savePartial(true), 20000);
+  const beat = setInterval(() => savePartial(true), 15000);
   savePartial(true);
   try {
     const hasTime1 = /^\d{2}:\d{2}$/.test(reading.inputs.tob1 || "");
     const sky = skyBlock(reading.inputs, reading.charts, hasTime1);
     const full = await streamClaude(
       fullPrompt(reading.inputs, reading.charts, reading.teaser, sky), 4000,
-      (t) => { text += t; savePartial(false); }, 450
+      (t) => { text += t; savePartial(false); }, 450, prefix
     );
     clearInterval(beat);
     await saving;

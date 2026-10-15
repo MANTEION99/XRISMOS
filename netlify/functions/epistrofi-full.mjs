@@ -8,9 +8,9 @@
 
 import { readingsStore, json, verifyStripeSession } from "../lib/epistrofi-common.mjs";
 
-// Αν η συγγραφή δεν έχει δώσει σημάδι ζωής για 90 δευτερόλεπτα, θεωρείται χαμένη και ξεκινά ξανά.
-const STALE_MS = 90 * 1000;
-const MAX_ATTEMPTS = 5;
+// Αν η συγγραφή δεν έχει δώσει σημάδι ζωής για 45 δευτερόλεπτα, θεωρείται χαμένη και ξεκινά ξανά.
+const STALE_MS = 45 * 1000;
+const MAX_ATTEMPTS = 6;
 
 export default async (req) => {
   if (req.method !== "POST") return json(405, { error: "Method Not Allowed" });
@@ -44,18 +44,28 @@ export default async (req) => {
     reading.genAttempts = 0;
   }
   if (!running) {
+    // Το κείμενο που είχε ήδη γραφτεί ΚΡΑΤΙΕΤΑΙ: η νέα προσπάθεια συνεχίζει από εκεί.
+    // Προσπάθεια που πρόσθεσε κείμενο δεν μετρά ως αποτυχία.
+    const partial = reading.partial || "";
+    const progressed = partial.length > (reading.lastPartialLen || 0);
     await readings.setJSON(readingId, {
-      ...reading, paidSession: sessionId, generatingSince: Date.now(), heartbeat: Date.now(), partial: "", genError: null,
-      genAttempts: (reading.genAttempts || 0) + 1, lastAttemptAt: Date.now(), lastError: reading.genError || null
+      ...reading, paidSession: sessionId, generatingSince: Date.now(), heartbeat: Date.now(), partial, genError: null,
+      genAttempts: progressed ? 1 : (reading.genAttempts || 0) + 1, lastPartialLen: partial.length,
+      lastAttemptAt: Date.now(), lastError: reading.genError || null
     });
     const origin = new URL(req.url).origin;
+    // Δεν περιμένουμε τη background function: απαντά αμέσως 202, και αν αργήσει την αφήνουμε.
+    const ctl = new AbortController();
+    const timer = setTimeout(() => ctl.abort(), 4000);
     const r = await fetch(`${origin}/.netlify/functions/epistrofi-full-background`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ reading_id: readingId, session_id: sessionId })
-    }).catch(e => ({ ok: false, status: 0, e }));
-    console.log(`[full] background started status=${r.status}`);
-    return json(200, { status: "generating", teaser, text: "" });
+      body: JSON.stringify({ reading_id: readingId, session_id: sessionId }),
+      signal: ctl.signal
+    }).catch(e => ({ status: "aborted/" + e.name }));
+    clearTimeout(timer);
+    console.log(`[full] background started status=${r.status} from=${partial.length}`);
+    return json(200, { status: "generating", teaser, text: partial });
   }
 
   return json(200, {

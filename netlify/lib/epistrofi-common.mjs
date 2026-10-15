@@ -172,10 +172,11 @@ const wordCount = (t) => (t.trim().match(/\S+/g) || []).length;
 // Αν η απάντηση σταματήσει πρόωρα (κομμένη ροή, όριο, ή λιγότερες από minWords λέξεις),
 // ζητά αυτόματα τη συνέχεια από το σημείο που σταμάτησε, έως δύο φορές, ώστε η πελάτισσα
 // να μη δει ποτέ μισό χρησμό.
-export async function streamClaude(prompt, maxTokens, onText, minWords = 0) {
-  let full = "";
+export async function streamClaude(prompt, maxTokens, onText, minWords = 0, prefix = "") {
+  // prefix: κείμενο που έχει ήδη γραφτεί σε προηγούμενη προσπάθεια· συνεχίζουμε από εκεί.
+  let full = prefix;
   for (let attempt = 0; attempt < 3; attempt++) {
-    const p = attempt === 0 ? prompt : `${prompt}
+    const p = (attempt === 0 && !full) ? prompt : `${prompt}
 
 Έχεις ήδη γράψει την αρχή, που είναι αυτή:
 """
