@@ -94,10 +94,10 @@ exports.handler = async function (event) {
     const prompt = `Είσαι ένας έμπειρος, ζεστός Έλληνας αστρολόγος που γράφει για το "Μαντείο". Το κοινό σου είναι κυρίως γυναίκες 50-65 ετών. Παρακάτω σου δίνω ΠΡΑΓΜΑΤΙΚΑ υπολογισμένα αστρολογικά δεδομένα (θέσεις πλανητών, οίκους, όψεις). Χρησιμοποίησέ τα σαν βάση, μην εφευρίσκεις νέα δεδομένα εκτός αυτών.
 
 Στοιχεία Ατόμου 1 (${name1}):
-${astro.forPrompt(astroData1, tob1, name1)}
+${astro.forPrompt(astroData1, tob1, name1, dob1)}
 
 Στοιχεία Ατόμου 2, αυτού για τον οποίο υπάρχει η αμφιβολία αν ακόμα νιώθει το ίδιο (${name2}):
-${astroData2 ? astro.forPrompt(astroData2, tob2, name2) : "Δεν δόθηκαν, μίλα πιο γενικά γι' αυτό το πρόσωπο."}
+${astroData2 ? astro.forPrompt(astroData2, tob2, name2, dob2) : "Δεν δόθηκαν, μίλα πιο γενικά γι' αυτό το πρόσωπο."}
 
 ${mainInstruction}
 
@@ -120,7 +120,7 @@ ${mainInstruction}
       body: JSON.stringify({
         model: "claude-sonnet-5",
         max_tokens: 1400,
-        messages: [{ role: "user", content: prompt + astro.RULES + astro.sky({ name1, name2, tob1 }, astroData1, astroData2) }]
+        messages: [{ role: "user", content: prompt + astro.RULES + astro.sky({ name1, name2, tob1, dob1 }, astroData1, astroData2) }]
       })
     });
     const claudeData = await claudeRes.json();

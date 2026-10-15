@@ -5,7 +5,7 @@
 //  - χωρίς ώρα γέννησης δεν δίνονται οίκοι και Ωροσκόπος,
 //  - οι πλανήτες της γενιάς δεν παρουσιάζονται ως προσωπικοί,
 //  - πραγματικές ημερομηνίες για τις ερωτήσεις «πότε».
-const { greeceTzone, skyBlock } = require("./sky.cjs");
+const { greeceTzone, skyBlock, moonChangesSign } = require("./sky.cjs");
 
 const hasTime = (tob) => /^\d{2}:\d{2}$/.test(String(tob || ""));
 
@@ -28,17 +28,22 @@ function check(chart) {
 }
 
 // Τα δεδομένα του χάρτη όπως τα βλέπει το Claude, με σημείωση αν λείπει η ώρα.
-function forPrompt(chart, tob, name) {
+function forPrompt(chart, tob, name, dob) {
   check(chart);
   if (hasTime(tob)) return JSON.stringify(chart);
-  const { houses, ascendant, midheaven, vertex, ...rest } = chart;
+  const moonUnsure = moonChangesSign(dob);
+  const { houses, ascendant, midheaven, vertex, aspects, ...rest } = chart;
   const clean = {
     ...rest,
     planets: chart.planets
       .filter(pl => !/ascendant|midheaven/i.test(pl.name || ""))
-      .map(({ house, ...pl }) => pl)
+      .filter(pl => !(moonUnsure && pl.name === "Moon"))
+      .map(({ house, ...pl }) => pl),
+    aspects: (aspects || []).filter(a => !moonUnsure || !/moon/i.test(`${a.aspecting_planet} ${a.aspected_planet}`))
   };
-  return `(Για ${name || "αυτό το πρόσωπο"} δεν δόθηκε ώρα γέννησης: ΜΗΝ αναφέρεις οίκους ούτε Ωροσκόπο. Μίλα μόνο για πλανήτες σε ζώδια και τις όψεις τους.)\n` + JSON.stringify(clean);
+  const who = name || "αυτό το πρόσωπο";
+  return `(Για ${who} δεν δόθηκε ώρα γέννησης: ΜΗΝ αναφέρεις οίκους ούτε Ωροσκόπο. Μίλα μόνο για πλανήτες σε ζώδια και τις όψεις τους.` +
+    (moonUnsure ? ` Η Σελήνη άλλαξε ζώδιο τη μέρα που γεννήθηκε, οπότε ΜΗΝ αναφέρεις καθόλου τη Σελήνη για ${who}.` : "") + `)\n` + JSON.stringify(clean);
 }
 
 const RULES = `
@@ -53,4 +58,4 @@ function sky(p, chart1, chart2) {
 Αν η απάντηση χρειάζεται χρόνο («πότε»), δώσε περίοδο ΜΟΝΟ με ημερομηνίες από την παραπάνω λίστα και πες ποια κίνηση την ανοίγει. Μη γράψεις καμία ημερομηνία ή κίνηση πλανήτη που δεν υπάρχει στη λίστα.`;
 }
 
-module.exports = { tz, check, forPrompt, RULES, sky, hasTime };
+module.exports = { tz, check, forPrompt, RULES, sky, hasTime, moonChangesSign };

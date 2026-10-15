@@ -26,6 +26,16 @@ function greeceTzone(year, month, day, hour, min) {
   return off;
 }
 
+// Χωρίς ώρα γέννησης: αλλάζει ζώδιο η Σελήνη μέσα σε εκείνη τη μέρα (ώρα Ελλάδας);
+// Αν ναι, το ζώδιο της Σελήνης είναι αβέβαιο και δεν πρέπει να αναφερθεί.
+function moonChangesSign(dob) {
+  const [y, m, d] = String(dob || "").split("-").map(n => parseInt(n, 10));
+  if (!y || !m || !d) return false;
+  const at = (h, mi) => new Date(Date.UTC(y, m - 1, d, h, mi) - greeceTzone(y, m, d, h, mi) * 3600000);
+  const sign = (date) => Math.floor(lonOf("Moon", date) / 30);
+  return sign(at(0, 0)) !== sign(at(23, 59));
+}
+
 /* ---------- 2. Διελεύσεις ---------- */
 
 const SIGNS = ["Κριό", "Ταύρο", "Διδύμους", "Καρκίνο", "Λέοντα", "Παρθένο", "Ζυγό", "Σκορπιό", "Τοξότη", "Αιγόκερω", "Υδροχόο", "Ιχθείς"];
@@ -66,8 +76,10 @@ function sampleYear(bodies, start) {
 // Τα σημεία των χαρτών που μας ενδιαφέρουν για την αγάπη.
 function natalTargets(p, charts, hasTime1) {
   const out = [];
+  const moonUnsure = !hasTime1 && moonChangesSign(p.dob1);
   const pick = (chart, who, names) => {
     for (const pl of (chart && chart.planets) || []) {
+      if (pl.name === "Moon" && moonUnsure && chart === charts.chart1) continue;
       if (names[pl.name] && Number.isFinite(+pl.full_degree)) {
         out.push({ label: `${names[pl.name]} ${who} (${signOf(+pl.full_degree)})`, lon: +pl.full_degree });
       }
@@ -144,4 +156,4 @@ ${s.general.map(x => "• " + x).join("\n")}
 ${s.personal.length ? s.personal.map(x => "• " + x).join("\n") : "• (καμία ακριβής επαφή)"}`;
 }
 
-module.exports = { greeceTzone, upcomingSky, skyBlock };
+module.exports = { greeceTzone, upcomingSky, skyBlock, moonChangesSign };

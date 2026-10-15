@@ -3,7 +3,7 @@
 
 import { getStore } from "@netlify/blobs";
 import sky from "./sky.cjs";
-const { greeceTzone } = sky;
+const { greeceTzone, moonChangesSign } = sky;
 export const skyBlock = sky.skyBlock;
 
 export const MODEL = "claude-sonnet-5";
@@ -77,29 +77,34 @@ export async function computeCharts(p) {
 
 // Χωρίς ώρα γέννησης οι οίκοι και ο Ωροσκόπος βγαίνουν λάθος (υπολογίζονται για τις 12:00),
 // οπότε τους αφαιρούμε εντελώς για να μην τους χρησιμοποιήσει ο χρησμός.
-function chartForPrompt(chart, hasTime) {
+function chartForPrompt(chart, hasTime, moonUnsure) {
   if (!chart || hasTime) return chart;
-  const { houses, ascendant, midheaven, vertex, ...rest } = chart;
+  const { houses, ascendant, midheaven, vertex, aspects, ...rest } = chart;
   return {
     ...rest,
     planets: (chart.planets || [])
       .filter(pl => !/ascendant|midheaven/i.test(pl.name || ""))
-      .map(({ house, ...pl }) => pl)
+      .filter(pl => !(moonUnsure && pl.name === "Moon"))
+      .map(({ house, ...pl }) => pl),
+    aspects: (aspects || []).filter(a => !moonUnsure || !/moon/i.test(`${a.aspecting_planet} ${a.aspected_planet}`))
   };
 }
 
-const timeNote = (name, hasTime) => hasTime
+const timeNote = (name, hasTime, moonUnsure) => hasTime
   ? ""
-  : `\n(Για ${name} δεν δόθηκε ώρα γέννησης: ΜΗΝ αναφέρεις οίκους ούτε Ωροσκόπο. Μίλα μόνο για πλανήτες σε ζώδια και τις όψεις τους.)`;
+  : `\n(Για ${name} δεν δόθηκε ώρα γέννησης: ΜΗΝ αναφέρεις οίκους ούτε Ωροσκόπο. Μίλα μόνο για πλανήτες σε ζώδια και τις όψεις τους.` +
+    (moonUnsure ? ` Η Σελήνη άλλαξε ζώδιο τη μέρα που γεννήθηκε, οπότε ΜΗΝ αναφέρεις καθόλου τη Σελήνη για ${name}.` : "") + `)`;
 
 export function chartsBlock(p, charts) {
   const t1 = /^\d{2}:\d{2}$/.test(p.tob1 || "");
   const t2 = /^\d{2}:\d{2}$/.test(p.tob2 || "");
-  return `Στοιχεία ${p.name1}:${timeNote(p.name1, t1)}
-${JSON.stringify(chartForPrompt(charts.chart1, t1))}
+  const m1 = !t1 && moonChangesSign(p.dob1);
+  const m2 = !t2 && moonChangesSign(p.dob2);
+  return `Στοιχεία ${p.name1}:${timeNote(p.name1, t1, m1)}
+${JSON.stringify(chartForPrompt(charts.chart1, t1, m1))}
 
-Στοιχεία ${p.name2}:${charts.chart2 ? timeNote(p.name2, t2) : ""}
-${charts.chart2 ? JSON.stringify(chartForPrompt(charts.chart2, t2)) : "Δεν δόθηκε ημερομηνία γέννησης. Μίλα για αυτό το πρόσωπο μέσα από τον χάρτη του/της " + p.name1 + " (Αφροδίτη, Άρης, Σελήνη, Δεσμοί της Σελήνης" + (t1 ? ", 5ος, 7ος, 8ος οίκος" : "") + ")."}`;
+Στοιχεία ${p.name2}:${charts.chart2 ? timeNote(p.name2, t2, m2) : ""}
+${charts.chart2 ? JSON.stringify(chartForPrompt(charts.chart2, t2, m2)) : "Δεν δόθηκε ημερομηνία γέννησης. Μίλα για αυτό το πρόσωπο μέσα από τον χάρτη του/της " + p.name1 + " (Αφροδίτη, Άρης, Σελήνη, Δεσμοί της Σελήνης" + (t1 ? ", 5ος, 7ος, 8ος οίκος" : "") + ")."}`;
 }
 
 const VOICE = `Είσαι ο Ιάκωβος, ο αστρολόγος του «Μαντείου». Έμπειρος, ζεστός, σοβαρός, με βαθιά γνώση. Το κοινό σου είναι κυρίως γυναίκες 50 έως 65 ετών στην Ελλάδα. Γράφεις στα ελληνικά, σε απλή και τρυφερή γλώσσα, με σύντομες προτάσεις.
