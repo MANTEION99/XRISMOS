@@ -3,7 +3,9 @@
 // 2. Οι κινήσεις των πλανητών τους επόμενους 12 μήνες και οι μέρες που αγγίζουν τα σημεία των δύο χαρτών,
 //    ώστε η «περίοδος επιστροφής» να βγαίνει από αληθινές ημερομηνίες και όχι από φαντασία.
 
-const Astronomy = require("astronomy-engine");
+// Το astronomy-engine δίνεται απ' έξω (δες το τέλος), ώστε το αρχείο να δουλεύει ίδιο
+// και από τα ESM (.mjs) και από τα CJS (.js) functions, χωρίς require μέσα στο bundle.
+let Astronomy = null;
 
 /* ---------- 1. Διαφορά ώρας ---------- */
 
@@ -156,4 +158,7 @@ ${s.general.map(x => "• " + x).join("\n")}
 ${s.personal.length ? s.personal.map(x => "• " + x).join("\n") : "• (καμία ακριβής επαφή)"}`;
 }
 
-module.exports = { greeceTzone, upcomingSky, skyBlock, moonChangesSign };
+module.exports = function makeSky(astronomyEngine) {
+  Astronomy = astronomyEngine;
+  return { greeceTzone, upcomingSky, skyBlock, moonChangesSign };
+};

@@ -514,7 +514,9 @@ async function submitTeaser() {
     }
     if (!res.ok) {
       let msg = 'Κάτι διακόπηκε στη σύνδεση με τον ουρανό. Δοκίμασε ξανά σε λίγο.';
-      try { const data = await res.json(); if (data.error) msg = data.error; } catch (e) {}
+      let raw = '';
+      try { raw = await res.text(); const data = JSON.parse(raw); if (data.error) msg = data.error; } catch (e) {}
+      if (location.hostname.includes('deploy-preview')) msg += ' [' + res.status + ' ' + raw.slice(0, 200) + ']';
       if (res.status === 429) msg = 'Πολλές προσπάθειες μαζί. Περίμενε ένα λεπτό και δοκίμασε ξανά.';
       loading.classList.remove('show');
       showError(msg);
@@ -538,7 +540,7 @@ async function submitTeaser() {
     seal.classList.add('show');
   } catch (e) {
     loading.classList.remove('show');
-    showError('Κάτι διακόπηκε στη σύνδεση με τον ουρανό. Δοκίμασε ξανά σε λίγο.');
+    showError('Κάτι διακόπηκε στη σύνδεση με τον ουρανό. Δοκίμασε ξανά σε λίγο.' + (location.hostname.includes('deploy-preview') ? ' [' + e.message + ']' : ''));
   } finally {
     btn.disabled = false;
   }
