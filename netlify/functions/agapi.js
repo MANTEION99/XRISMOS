@@ -1,3 +1,4 @@
+const astro = require("../lib/astro.cjs");
 // Αρχείο: netlify/functions/agapi.js
 // Ανέβασέ το ακριβώς σε αυτόν τον φάκελο μέσα στο repo σου: netlify/functions/agapi.js
 // Χρειάζεται τα ίδια environment variables: ASTROLOGY_API_KEY, ANTHROPIC_API_KEY
@@ -28,7 +29,7 @@ exports.handler = async function (event) {
       min: parseInt(min1),
       lat: lat1 || 37.9838,
       lon: lon1 || 23.7275,
-      tzone: tzone1 || 2,
+      tzone: tzone1 || astro.tz(dob1, tob1),
       house_type: "placidus"
     };
 
@@ -54,7 +55,7 @@ exports.handler = async function (event) {
         min: parseInt(min2),
         lat: lat2 || 37.9838,
         lon: lon2 || 23.7275,
-        tzone: tzone2 || 2,
+        tzone: tzone2 || astro.tz(dob2, tob2),
         house_type: "placidus"
       };
     }
@@ -67,10 +68,10 @@ exports.handler = async function (event) {
     const prompt = `Είσαι ένας έμπειρος, ζεστός Έλληνας αστρολόγος που γράφει για το "Μαντείο". Το κοινό σου είναι κυρίως γυναίκες 50-65 ετών. Παρακάτω σου δίνω ΠΡΑΓΜΑΤΙΚΑ υπολογισμένα αστρολογικά δεδομένα (θέσεις πλανητών, οίκους, όψεις). Χρησιμοποίησέ τα σαν βάση, μην εφευρίσκεις νέα δεδομένα εκτός αυτών.
 
 Στοιχεία Ατόμου 1 (${name1}):
-${JSON.stringify(astroData1)}
+${astro.forPrompt(astroData1, tob1, name1)}
 
 Στοιχεία Ατόμου 2, αυτού για τον οποίο υπάρχει η αμφιβολία αν ακόμα νιώθει το ίδιο (${name2}):
-${astroData2 ? JSON.stringify(astroData2) : "Δεν δόθηκαν, μίλα πιο γενικά γι' αυτό το πρόσωπο."}
+${astroData2 ? astro.forPrompt(astroData2, tob2, name2) : "Δεν δόθηκαν, μίλα πιο γενικά γι' αυτό το πρόσωπο."}
 
 Γράψε μια προσωπική, ζεστή ανάλυση (100-120 λέξεις, στα ελληνικά) για το αν το συναίσθημα του/της ${name2} για τον/την ${name1} είναι ακόμα ζωντανό αυτή την περίοδο, ή αν έχει αρχίσει να ξεθωριάζει. Βασίσου σε: τη θέση και τις όψεις της Αφροδίτης του (πλανήτης της αγάπης, δείχνει πόσο ενεργά αγαπά αυτή την περίοδο), τη σχέση της Αφροδίτης του με τη Σελήνη του/της ${name1} (πώς επικοινωνούν τα δύο συναισθηματικά προφίλ), τον 5ο και 7ο οίκο του (ρομαντισμός, δέσμευση), και τυχόν διελεύσεις πάνω σε αυτά τα σημεία.
 
@@ -93,7 +94,7 @@ ${astroData2 ? JSON.stringify(astroData2) : "Δεν δόθηκαν, μίλα π�
       body: JSON.stringify({
         model: "claude-sonnet-5",
         max_tokens: 1400,
-        messages: [{ role: "user", content: prompt }]
+        messages: [{ role: "user", content: prompt + astro.RULES }]
       })
     });
     const claudeData = await claudeRes.json();

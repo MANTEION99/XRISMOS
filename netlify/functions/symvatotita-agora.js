@@ -1,3 +1,4 @@
+const astro = require("../lib/astro.cjs");
 // Αρχείο: netlify/functions/symvatotita-agora.js
 // Η ΕΠΙ ΠΛΗΡΩΜΗ (14,99€) εκδοχή, ξεχωριστή από το symvatotita.js που μένει δωρεάν μέσα στη συνδρομή.
 // Ανέβασέ το στο netlify/functions/symvatotita-agora.js
@@ -51,7 +52,7 @@ exports.handler = async function (event) {
         min: parseInt(min),
         lat: 37.9838,
         lon: 23.7275,
-        tzone: 2,
+        tzone: astro.tz(dob, tob),
         house_type: "placidus"
       };
     };
@@ -75,10 +76,10 @@ exports.handler = async function (event) {
     const prompt = `Είσαι ένας έμπειρος, ζεστός Έλληνας αστρολόγος που γράφει για το "Μαντείο". Το κοινό σου είναι κυρίως γυναίκες 50-65 ετών. Παρακάτω σου δίνω ΠΡΑΓΜΑΤΙΚΑ υπολογισμένα αστρολογικά δεδομένα (θέσεις πλανητών, οίκους, όψεις) για δύο άτομα. Χρησιμοποίησέ τα σαν βάση, μην εφευρίσκεις νέα δεδομένα εκτός αυτών.
 
 Στοιχεία Ατόμου 1 (${name1}):
-${JSON.stringify(astroData1)}
+${astro.forPrompt(astroData1, tob1, name1)}
 
 Στοιχεία Ατόμου 2 (${name2}):
-${JSON.stringify(astroData2)}
+${astro.forPrompt(astroData2, tob2, name2)}
 
 ΠΟΛΥ ΣΗΜΑΝΤΙΚΟ: Τα παραπάνω στοιχεία είναι πλήρη και επαρκή για ανάλυση. ΜΗΝ αναφέρεις πουθενά ότι λείπουν στοιχεία, ότι τα δεδομένα είναι ελλιπή, ή οτιδήποτε παρόμοιο. Γράψε την ανάλυση με σιγουριά, σαν να έχεις όλα όσα χρειάζεσαι, γιατί πράγματι τα έχεις.
 
@@ -106,7 +107,7 @@ ${question
       body: JSON.stringify({
         model: "claude-sonnet-5",
         max_tokens: 1400,
-        messages: [{ role: "user", content: prompt }]
+        messages: [{ role: "user", content: prompt + astro.RULES + astro.sky({ name1, name2, tob1 }, astroData1, astroData2) }]
       })
     });
     const claudeData = await claudeRes.json();

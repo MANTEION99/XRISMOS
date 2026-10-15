@@ -2,8 +2,9 @@
 // Δεν είναι function από μόνο του: το εισάγουν τα epistrofi-teaser.mjs και epistrofi-full.mjs.
 
 import { getStore } from "@netlify/blobs";
-import { greeceTzone, skyBlock } from "./sky.mjs";
-export { skyBlock };
+import sky from "./sky.cjs";
+const { greeceTzone } = sky;
+export const skyBlock = sky.skyBlock;
 
 export const MODEL = "claude-sonnet-5";
 

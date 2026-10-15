@@ -1,3 +1,4 @@
+const astro = require("../lib/astro.cjs");
 // Αρχείο: netlify/functions/alitheia-agora.js
 // Η ΕΠΙ ΠΛΗΡΩΜΗ εκδοχή, ξεχωριστή από το alitheia.js που μένει δωρεάν μέσα στη συνδρομή.
 // Ανέβασέ το στο netlify/functions/alitheia-agora.js
@@ -50,7 +51,7 @@ exports.handler = async function (event) {
       min: parseInt(min1),
       lat: lat1 || 37.9838,
       lon: lon1 || 23.7275,
-      tzone: tzone1 || 2,
+      tzone: tzone1 || astro.tz(dob1, tob1),
       house_type: "placidus"
     };
 
@@ -76,7 +77,7 @@ exports.handler = async function (event) {
         min: parseInt(min2),
         lat: lat2 || 37.9838,
         lon: lon2 || 23.7275,
-        tzone: tzone2 || 2,
+        tzone: tzone2 || astro.tz(dob2, tob2),
         house_type: "placidus"
       };
     }
@@ -93,10 +94,10 @@ exports.handler = async function (event) {
     const prompt = `Είσαι ένας έμπειρος, ζεστός Έλληνας αστρολόγος που γράφει για το "Μαντείο". Το κοινό σου είναι κυρίως γυναίκες 50-65 ετών. Παρακάτω σου δίνω ΠΡΑΓΜΑΤΙΚΑ υπολογισμένα αστρολογικά δεδομένα (θέσεις πλανητών, οίκους, όψεις). Χρησιμοποίησέ τα σαν βάση, μην εφευρίσκεις νέα δεδομένα εκτός αυτών.
 
 Στοιχεία Ατόμου 1 (${name1}):
-${JSON.stringify(astroData1)}
+${astro.forPrompt(astroData1, tob1, name1)}
 
 Στοιχεία Ατόμου 2, αυτού για τον οποίο υπάρχει η αμφιβολία (${name2}):
-${astroData2 ? JSON.stringify(astroData2) : "Δεν δόθηκαν, μίλα πιο γενικά γι' αυτό το πρόσωπο."}
+${astroData2 ? astro.forPrompt(astroData2, tob2, name2) : "Δεν δόθηκαν, μίλα πιο γενικά γι' αυτό το πρόσωπο."}
 
 ${mainInstruction}
 
@@ -119,7 +120,7 @@ ${mainInstruction}
       body: JSON.stringify({
         model: "claude-sonnet-5",
         max_tokens: 1400,
-        messages: [{ role: "user", content: prompt }]
+        messages: [{ role: "user", content: prompt + astro.RULES + astro.sky({ name1, name2, tob1 }, astroData1, astroData2) }]
       })
     });
     const claudeData = await claudeRes.json();

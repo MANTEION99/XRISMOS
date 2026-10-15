@@ -1,3 +1,4 @@
+const astro = require("../lib/astro.cjs");
 // Αρχείο: netlify/functions/symvatotita.js
 // Ανέβασέ το ακριβώς σε αυτόν τον φάκελο μέσα στο repo σου: netlify/functions/symvatotita.js
 // Χρησιμοποιεί τα ΙΔΙΑ environment variables με τα υπόλοιπα (ASTROLOGY_API_KEY, ANTHROPIC_API_KEY), δεν χρειάζεται τίποτα νέο.
@@ -29,7 +30,7 @@ exports.handler = async function (event) {
         min: parseInt(min),
         lat: 37.9838,
         lon: 23.7275,
-        tzone: 2,
+        tzone: astro.tz(dob, tob),
         house_type: "placidus"
       };
     };
@@ -53,10 +54,10 @@ exports.handler = async function (event) {
     const prompt = `Είσαι ένας έμπειρος, ζεστός Έλληνας αστρολόγος που γράφει για το "Μαντείο". Το κοινό σου είναι κυρίως γυναίκες 50-65 ετών. Παρακάτω σου δίνω ΠΡΑΓΜΑΤΙΚΑ υπολογισμένα αστρολογικά δεδομένα (θέσεις πλανητών, οίκους, όψεις) για δύο άτομα. Χρησιμοποίησέ τα σαν βάση, μην εφευρίσκεις νέα δεδομένα εκτός αυτών.
 
 Στοιχεία Ατόμου 1 (${name1}):
-${JSON.stringify(astroData1)}
+${astro.forPrompt(astroData1, tob1, name1)}
 
 Στοιχεία Ατόμου 2 (${name2}):
-${JSON.stringify(astroData2)}
+${astro.forPrompt(astroData2, tob2, name2)}
 
 ΠΟΛΥ ΣΗΜΑΝΤΙΚΟ: Τα παραπάνω στοιχεία είναι πλήρη και επαρκή για ανάλυση. ΜΗΝ αναφέρεις πουθενά ότι λείπουν στοιχεία, ότι τα δεδομένα είναι ελλιπή, ή οτιδήποτε παρόμοιο. Γράψε την ανάλυση με σιγουριά, σαν να έχεις όλα όσα χρειάζεσαι, γιατί πράγματι τα έχεις.
 
@@ -81,7 +82,7 @@ ${JSON.stringify(astroData2)}
       body: JSON.stringify({
         model: "claude-sonnet-5",
         max_tokens: 1400,
-        messages: [{ role: "user", content: prompt }]
+        messages: [{ role: "user", content: prompt + astro.RULES }]
       })
     });
     const claudeData = await claudeRes.json();

@@ -1,3 +1,4 @@
+const astro = require("../lib/astro.cjs");
 // Αρχείο: netlify/functions/oikonomika.js
 // Ανέβασέ το ακριβώς σε αυτόν τον φάκελο μέσα στο repo σου: netlify/functions/oikonomika.js
 // Χρησιμοποιεί τα ΙΔΙΑ environment variables με το epistrofi.js (ASTROLOGY_API_KEY, ANTHROPIC_API_KEY), δεν χρειάζεται τίποτα νέο.
@@ -26,7 +27,7 @@ exports.handler = async function (event) {
       min: parseInt(min1),
       lat: 37.9838,
       lon: 23.7275,
-      tzone: 2,
+      tzone: astro.tz(dob1, tob1),
       house_type: "placidus"
     };
 
@@ -45,7 +46,7 @@ exports.handler = async function (event) {
     const prompt = `Είσαι ένας έμπειρος, ζεστός Έλληνας αστρολόγος που γράφει για το "Μαντείο". Το κοινό σου είναι κυρίως γυναίκες 50-65 ετών. Παρακάτω σου δίνω ΠΡΑΓΜΑΤΙΚΑ υπολογισμένα αστρολογικά δεδομένα (θέσεις πλανητών, οίκους, όψεις) για το άτομο. Χρησιμοποίησέ τα σαν βάση, μην εφευρίσκεις νέα δεδομένα εκτός αυτών.
 
 Στοιχεία (${name1}):
-${JSON.stringify(astroData1)}
+${astro.forPrompt(astroData1, tob1, name1)}
 
 Η ερώτηση που έθεσε το άτομο: "${question}"
 
@@ -70,7 +71,7 @@ ${JSON.stringify(astroData1)}
       body: JSON.stringify({
         model: "claude-sonnet-5",
         max_tokens: 1100,
-        messages: [{ role: "user", content: prompt }]
+        messages: [{ role: "user", content: prompt + astro.RULES }]
       })
     });
     const claudeData = await claudeRes.json();

@@ -3,7 +3,7 @@
 // 2. Οι κινήσεις των πλανητών τους επόμενους 12 μήνες και οι μέρες που αγγίζουν τα σημεία των δύο χαρτών,
 //    ώστε η «περίοδος επιστροφής» να βγαίνει από αληθινές ημερομηνίες και όχι από φαντασία.
 
-import * as Astronomy from "astronomy-engine";
+const Astronomy = require("astronomy-engine");
 
 /* ---------- 1. Διαφορά ώρας ---------- */
 
@@ -19,7 +19,7 @@ function offsetAt(ts) {
 }
 
 // Επιστρέφει τη διαφορά από UTC (π.χ. 2 ή 3) για τοπική ώρα Ελλάδας στη συγκεκριμένη ημερομηνία.
-export function greeceTzone(year, month, day, hour, min) {
+function greeceTzone(year, month, day, hour, min) {
   const local = Date.UTC(year, month - 1, day, hour, min);
   let off = 2;
   for (let i = 0; i < 3; i++) off = offsetAt(local - off * 3600000);
@@ -82,7 +82,7 @@ function natalTargets(p, charts, hasTime1) {
   return out;
 }
 
-export function upcomingSky(p, charts, hasTime1, start = new Date()) {
+function upcomingSky(p, charts, hasTime1, start = new Date()) {
   const bodies = ["Mercury", "Venus", "Mars", "Jupiter", "Saturn"];
   const days = sampleYear(bodies, start);
   const general = [];
@@ -134,7 +134,7 @@ export function upcomingSky(p, charts, hasTime1, start = new Date()) {
   return { general: general.map(x => x.text), personal: personal.map(x => x.text) };
 }
 
-export function skyBlock(p, charts, hasTime1, start = new Date()) {
+function skyBlock(p, charts, hasTime1, start = new Date()) {
   const s = upcomingSky(p, charts, hasTime1, start);
   return `ΠΡΑΓΜΑΤΙΚΟΣ ΟΥΡΑΝΟΣ ΤΩΝ ΕΠΟΜΕΝΩΝ 12 ΜΗΝΩΝ (σήμερα είναι ${fmtDate(start)}). Υπολογισμένες ημερομηνίες, οι ΜΟΝΕΣ που επιτρέπεται να χρησιμοποιήσεις:
 Γενικές κινήσεις:
@@ -143,3 +143,5 @@ ${s.general.map(x => "• " + x).join("\n")}
 Επαφές με τα σημεία των δύο χαρτών:
 ${s.personal.length ? s.personal.map(x => "• " + x).join("\n") : "• (καμία ακριβής επαφή)"}`;
 }
+
+module.exports = { greeceTzone, upcomingSky, skyBlock };
