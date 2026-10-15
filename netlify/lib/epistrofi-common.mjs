@@ -2,7 +2,7 @@
 // Δεν είναι function από μόνο του: το εισάγουν τα epistrofi-teaser.mjs και epistrofi-full.mjs.
 
 import { getStore } from "@netlify/blobs";
-import * as Astronomy from "astronomy-engine";
+import Astronomy from "./vendor/astronomy.cjs";
 import makeSky from "./sky.cjs";
 const sky = makeSky(Astronomy);
 const { greeceTzone, moonChangesSign } = sky;

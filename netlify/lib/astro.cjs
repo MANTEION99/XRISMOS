@@ -5,7 +5,7 @@
 //  - χωρίς ώρα γέννησης δεν δίνονται οίκοι και Ωροσκόπος,
 //  - οι πλανήτες της γενιάς δεν παρουσιάζονται ως προσωπικοί,
 //  - πραγματικές ημερομηνίες για τις ερωτήσεις «πότε».
-const { greeceTzone, skyBlock, moonChangesSign } = require("./sky.cjs")(require("astronomy-engine"));
+const { greeceTzone, skyBlock, moonChangesSign } = require("./sky.cjs")(require("./vendor/astronomy.cjs"));
 
 const hasTime = (tob) => /^\d{2}:\d{2}$/.test(String(tob || ""));
 
