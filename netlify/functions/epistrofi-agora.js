@@ -9,23 +9,44 @@ const astro = require("../lib/astro.cjs");
 
 const { getStore, connectLambda } = require("@netlify/blobs");
 
+async function getSession(sessionId) {
+  const res = await fetch(`https://api.stripe.com/v1/checkout/sessions/${encodeURIComponent(sessionId)}?expand[]=payment_intent`, {
+    headers: { "Authorization": `Bearer ${process.env.STRIPE_SECRET_KEY}` }
+  });
+  return res.json();
+}
+
+// Δεκτή είναι πληρωμή που έχει χρεωθεί ή που έχει μόνο δεσμευτεί (χρέωση μόνο όταν δοθεί απάντηση).
 async function verifyPaidSession(sessionId, expectedTool) {
-  if (!sessionId) return false;
+  if (!sessionId) return null;
   try {
-    const res = await fetch(`https://api.stripe.com/v1/checkout/sessions/${sessionId}`, {
-      headers: { "Authorization": `Bearer ${process.env.STRIPE_SECRET_KEY}` }
-    });
-    const session = await res.json();
-    if (session.payment_status !== "paid" || !session.metadata || !session.metadata.tool) return false;
+    const session = await getSession(sessionId);
+    const pi = session.payment_intent;
+    const piStatus = pi && typeof pi === "object" ? pi.status : null;
+    const ok = session.payment_status === "paid" || piStatus === "requires_capture" || piStatus === "succeeded";
+    if (!ok || !session.metadata || !session.metadata.tool) return null;
     // Οι πληρωμές του νέου πλήρους χρησμού εξυπηρετούνται μόνο από το epistrofi-full.
-    if (session.metadata.reading_id) return false;
+    if (session.metadata.reading_id) return null;
     const paidTool = session.metadata.tool;
-    return paidTool === expectedTool || paidTool.startsWith(expectedTool + "_q");
+    return (paidTool === expectedTool || paidTool.startsWith(expectedTool + "_q")) ? session : null;
   } catch (e) {
-    return false;
+    return null;
   }
 }
 
+// Οριστική χρέωση της δέσμευσης, μόνο αφού δοθεί απάντηση.
+async function capturePayment(session) {
+  const pi = session && session.payment_intent;
+  if (!pi || typeof pi !== "object" || pi.status !== "requires_capture") return;
+  try {
+    await fetch(`https://api.stripe.com/v1/payment_intents/${pi.id}/capture`, {
+      method: "POST",
+      headers: { "Authorization": `Bearer ${process.env.STRIPE_SECRET_KEY}` }
+    });
+  } catch (e) {
+    console.error("[capture]", e.message);
+  }
+}
 
 async function generate({ name1, dob1, tob1, lat1, lon1, tzone1, name2, dob2, tob2, lat2, lon2, tzone2, question }) {
   // --- Βήμα 1: πραγματικά αστρολογικά δεδομένα, παράλληλα για ταχύτητα ---
@@ -138,6 +159,7 @@ exports.handler = async function (event) {
     const usedSessions = getStore({ name: "used-sessions" });
     const previous = await usedSessions.get(session_id, { type: "json" });
     if (previous && previous.reading) {
+      await capturePayment(paid);
       return {
         statusCode: 200,
         headers: { "Content-Type": "application/json" },
@@ -157,6 +179,7 @@ exports.handler = async function (event) {
     }
 
     await usedSessions.setJSON(session_id, { reading: text, tool: "epistrofi", at: new Date().toISOString() });
+    await capturePayment(paid);
 
     return {
       statusCode: 200,

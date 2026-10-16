@@ -85,7 +85,8 @@ exports.handler = async function (event) {
       metadata,
       // Για τον πλήρη χρησμό: τα χρήματα μόνο ΔΕΣΜΕΥΟΝΤΑΙ στην κάρτα. Χρεώνονται οριστικά μόνο όταν ο
       // χρησμός γραφτεί ολόκληρος. Αν δεν γραφτεί, η δέσμευση ακυρώνεται και η πελάτισσα δεν χρεώνεται.
-      ...(reading_id ? { payment_intent_data: { capture_method: "manual", metadata } } : {})
+      // Το ίδιο και για την 2η/3η ερώτηση της Επιστροφής: χρέωση μόνο όταν δοθεί απάντηση.
+      ...((reading_id || tool === "epistrofi_q2" || tool === "epistrofi_q3") ? { payment_intent_data: { capture_method: "manual", metadata } } : {})
     });
 
     const stripeRes = await fetch("https://api.stripe.com/v1/checkout/sessions", {
