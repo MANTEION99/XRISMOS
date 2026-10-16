@@ -1,0 +1,24 @@
+<!doctype html><html lang="el"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Δοκιμή ερωτήσεων</title>
+<style>body{font-family:Georgia,serif;background:#14101f;color:#eee;margin:0;padding:16px;max-width:760px;margin:auto}
+.q{border:1px solid #6b5a8e;border-radius:10px;padding:14px;margin:14px 0;background:#1d1730}
+.q h3{margin:0 0 8px;color:#e6c77a;font-size:17px}.t{white-space:pre-wrap;line-height:1.55;font-size:15px}
+.meta{font-size:12px;opacity:.6;margin-top:8px}.red{color:#ff9a9a}.tag{display:inline-block;font-size:12px;padding:2px 8px;border-radius:20px;background:#6b5a8e;margin-bottom:8px}</style></head>
+<body><h2>Δοκιμή 2ης ερώτησης (Μαρία 12/5/1968, Γιώργος 3/9/1965, χωρίς ώρα)</h2><div id="out"></div>
+<script>
+const out=document.getElementById('out');
+for(let i=0;i<7;i++){
+  const box=document.createElement('div');box.className='q';box.innerHTML='<h3>Ερώτηση '+(i+1)+'</h3><div class="t">Γράφεται...</div>';out.appendChild(box);
+  const t0=Date.now();
+  fetch('/.netlify/functions/test-erotiseis?i='+i).then(async r=>{
+    let d={};try{d=await r.json();}catch(e){d={error:'HTTP '+r.status+' (πιθανό timeout μετά από '+Math.round((Date.now()-t0)/1000)+'s)'}}
+    box.querySelector('h3').textContent=(i+1)+'. '+(d.question||'');
+    const tx=box.querySelector('.t');
+    if(d.error){tx.innerHTML='<span class="red">Σφάλμα: '+d.error+'</span>';return;}
+    const red=/\[\s*ΑΝΑΚΑΤΕΥΘΥΝΣΗ\s*\]/.test(d.text);
+    tx.insertAdjacentHTML('beforebegin','<span class="tag">'+(red?'Δεν απαντήθηκε, η πληρωμή μένει':'Απαντήθηκε')+'</span>');
+    tx.textContent=d.text;
+    box.insertAdjacentHTML('beforeend','<div class="meta">'+d.seconds+' δευτερόλεπτα</div>');
+  });
+}
+</script></body></html>
