@@ -743,7 +743,7 @@ async function submitTeaser() {
       stopRitual(); loading.classList.remove('show');
       form.style.display = 'none';
       result.classList.add('show');
-      infoLine.textContent = 'Το δωρεάν άνοιγμα του χρησμού δίνεται μία φορά σε κάθε email, και το έχεις ήδη πάρει. Ο πλήρης χρησμός σου για ' + f.name2 + ' είναι έτοιμος να γραφτεί.';
+      infoLine.textContent = 'Το δωρεάν άνοιγμα του χρησμού δίνεται μία φορά σε κάθε email, και το έχεις ήδη πάρει. Ο πλήρης χρησμός σου για ' + f.name2.replace(/(^|\s)(\S)/g, (m, sp, c) => sp + c.toLocaleUpperCase('el')) + ' είναι έτοιμος να γραφτεί.';
       infoLine.style.display = 'block';
       seal.classList.add('show');
       saveTeaserState(currentReadingId, '', infoLine.textContent);
