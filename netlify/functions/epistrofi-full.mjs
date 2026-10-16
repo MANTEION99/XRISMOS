@@ -41,7 +41,8 @@ export default async (req) => {
   const running = reading.generatingSince && Date.now() - lastSign < STALE_MS && Date.now() - lastProgress < 150 * 1000;
   // Μετά από 5 αποτυχημένες προσπάθειες σταματά, αλλά μετά από 10 λεπτά ξαναδοκιμάζει από την αρχή.
   if (!running && (reading.genAttempts || 0) >= MAX_ATTEMPTS) {
-    if (Date.now() - (reading.lastAttemptAt || 0) < 10 * 60 * 1000) {
+    // Όταν η πελάτισσα ανανεώνει η ίδια τη σελίδα (retry), ξαναδοκιμάζουμε αμέσως.
+    if (!b.retry && Date.now() - (reading.lastAttemptAt || 0) < 10 * 60 * 1000) {
       return json(200, { status: "error", teaser, text: reading.partial || "", detail: reading.genError || "" });
     }
     reading.genAttempts = 0;

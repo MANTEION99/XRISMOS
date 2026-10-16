@@ -822,7 +822,7 @@ async function loadFullReading() {
       const res = await fetch('/api/epistrofi-full', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ reading_id: readingIdParam, session_id: sessionId })
+        body: JSON.stringify({ reading_id: readingIdParam, session_id: sessionId, retry: firstPoll })
       });
       status = res.status;
       data = await res.json();
