@@ -199,7 +199,12 @@ function cutToSentence(t) {
 export async function streamClaude(prompt, maxTokens, onText, minWords = 0, prefix = "", onRewind = null) {
   // prefix: κείμενο που έχει ήδη γραφτεί σε προηγούμενη προσπάθεια· συνεχίζουμε από εκεί.
   let full = prefix;
+  const diag = [];
   for (let attempt = 0; attempt < 3; attempt++) {
+    // Αν η προηγούμενη προσπάθεια απέτυχε με σφάλμα (π.χ. υπερφόρτωση), περιμένουμε λίγο πριν ξαναρωτήσουμε.
+    if (attempt > 0 && /error|σφάλμα|cut/.test(diag[diag.length - 1] || "")) {
+      await new Promise(r => setTimeout(r, attempt * 5000));
+    }
     if (onRewind && full) { full = cutToSentence(full); onRewind(full); }
     const p = (attempt === 0 && !full) ? prompt : `${prompt}
 
@@ -230,21 +235,37 @@ ${full}
       flushHeld();
     } catch (e) {
       flushHeld();
-      if (!full) throw e;
+      diag.push(`#${attempt} σφάλμα ${String(e.message || e).slice(0, 160)}`);
+      if (!full) throw new Error(diag.join(" | "));
       console.error("[claude] retry failed", e);
       break;
     }
     const words = wordCount(full);
     console.log(`[claude] attempt=${attempt} stop=${r.stopReason} ended=${r.ended} words=${words}`);
+    diag.push(`#${attempt} ${r.stopReason || "-"}${r.detail ? " (" + r.detail + ")" : ""} λέξεις=${words}`);
     if (r.ended && r.stopReason === "end_turn" && words >= minWords) return full;
     if (r.stopReason === "refusal") break;
   }
-  if (wordCount(full) < Math.max(20, minWords / 2)) throw new Error("Η απάντηση βγήκε ελλιπής");
+  if (wordCount(full) < Math.max(20, minWords / 2)) throw new Error("Η απάντηση βγήκε ελλιπής: " + diag.join(" | "));
   return full;
 }
 
 async function streamClaudeOnce(prompt, maxTokens, onText) {
+  // Αν το Claude δεν στείλει τίποτα για 50 δευτερόλεπτα, η σύνδεση κόβεται και ζητάμε τη συνέχεια,
+  // αντί να περιμένουμε για πάντα μια ροή που κόλλησε.
+  const ctl = new AbortController();
+  let idle = setTimeout(() => ctl.abort(), 50000);
+  const bump = () => { clearTimeout(idle); idle = setTimeout(() => ctl.abort(), 50000); };
+  try {
+    return await streamClaudeOnceInner(prompt, maxTokens, onText, ctl.signal, bump);
+  } finally {
+    clearTimeout(idle);
+  }
+}
+
+async function streamClaudeOnceInner(prompt, maxTokens, onText, signal, bump) {
   const res = await fetch("https://api.anthropic.com/v1/messages", {
+    signal,
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -271,6 +292,7 @@ async function streamClaudeOnce(prompt, maxTokens, onText) {
     while (true) {
       const { done, value } = await reader.read();
       if (done) break;
+      bump();
       buffer += decoder.decode(value, { stream: true });
       const lines = buffer.split("\n");
       buffer = lines.pop();
@@ -286,13 +308,14 @@ async function streamClaudeOnce(prompt, maxTokens, onText) {
           ended = true;
         } else if (evt.type === "error") {
           console.error("[claude] stream error", JSON.stringify(evt.error));
-          return { stopReason: "error", ended: false };
+          return { stopReason: "error", ended: false, detail: `${evt.error && evt.error.type}: ${evt.error && evt.error.message}`.slice(0, 160) };
         }
       }
     }
   } catch (e) {
     // Η ροή κόπηκε στη μέση: ό,τι γράφτηκε μένει και ζητάμε τη συνέχεια.
     console.error("[claude] stream cut", e);
+    return { stopReason, ended, detail: "cut: " + (e && e.name) };
   }
   return { stopReason, ended };
 }

@@ -11,11 +11,13 @@ export default async (req) => {
   try { b = await req.json(); } catch { return; }
   const readingId = String(b.reading_id || "");
   const sessionId = String(b.session_id || "");
+  const genId = String(b.gen_id || "");
   if (!/^[0-9a-f-]{36}$/.test(readingId)) return;
 
   const readings = readingsStore();
   const reading = await readings.get(readingId, { type: "json" });
   if (!reading || reading.full) return;
+  if (genId && reading.genId && reading.genId !== genId) return;   // έχει ήδη ξεκινήσει νεότερη προσπάθεια
   if (!(await verifyStripeSession(sessionId, "epistrofi", readingId))) return;
 
   // Αν μια προηγούμενη προσπάθεια κόπηκε, συνεχίζουμε από όσα είχαν ήδη γραφτεί.
@@ -24,15 +26,30 @@ export default async (req) => {
   const cut = Math.max(rawPrefix.lastIndexOf("."), rawPrefix.lastIndexOf("!"), rawPrefix.lastIndexOf(";"), rawPrefix.lastIndexOf("]"));
   const prefix = cut > 0 ? rawPrefix.slice(0, cut + 1) : "";
   let text = prefix;
-  let lastSave = 0;
+  let lastSave = 0, lastLen = -1, progressAt = Date.now(), superseded = false;
   let saving = Promise.resolve();
+  // Πριν από κάθε αποθήκευση ελέγχουμε ότι αυτή είναι ακόμα η τρέχουσα προσπάθεια· αν έχει ξεκινήσει
+  // νεότερη, αυτή σταματά να γράφει, ώστε δύο προσπάθειες να μην πατούν η μία την άλλη.
+  const stillMine = async () => {
+    if (!genId) return true;
+    const cur = await readings.get(readingId, { type: "json" });
+    if (!cur || cur.full || (cur.genId && cur.genId !== genId)) { superseded = true; return false; }
+    return true;
+  };
   const savePartial = (force) => {
+    if (superseded) return;
     if (!force && Date.now() - lastSave < 1200) return;
     lastSave = Date.now();
     const snapshot = text;
-    saving = saving.then(() => readings.setJSON(readingId, {
-      ...reading, paidSession: sessionId, generatingSince: reading.generatingSince || Date.now(), heartbeat: Date.now(), partial: snapshot
-    })).catch(e => console.error("[full-bg] save", e));
+    if (snapshot.length !== lastLen) { lastLen = snapshot.length; progressAt = Date.now(); }
+    const pAt = progressAt;
+    saving = saving.then(async () => {
+      if (!(await stillMine())) return;
+      await readings.setJSON(readingId, {
+        ...reading, genId: genId || reading.genId, paidSession: sessionId,
+        generatingSince: reading.generatingSince || Date.now(), heartbeat: Date.now(), progressAt: pAt, partial: snapshot
+      });
+    }).catch(e => console.error("[full-bg] save", e));
   };
 
   // Σημάδι ζωής κάθε 20 δευτερόλεπτα, ακόμα κι όσο το Claude δεν έχει γράψει τίποτα.
@@ -48,6 +65,7 @@ export default async (req) => {
     );
     clearInterval(beat);
     await saving;
+    if (!(await stillMine())) return;
     await readings.setJSON(readingId, {
       ...reading, full, partial: null, paidSession: sessionId,
       paidAt: new Date().toISOString(), generatingSince: null, genError: null
@@ -57,8 +75,9 @@ export default async (req) => {
     console.error("[full-bg] failed", e);
     clearInterval(beat);
     await saving;
+    if (!(await stillMine())) return;
     await readings.setJSON(readingId, {
-      ...reading, partial: text, paidSession: sessionId, generatingSince: null, genError: String(e.message || e)
+      ...reading, genId: genId || reading.genId, partial: text, paidSession: sessionId, generatingSince: null, genError: String(e.message || e)
     });
   }
 };
