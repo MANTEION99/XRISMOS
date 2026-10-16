@@ -48,7 +48,7 @@ exports.handler = async function (event) {
     }
 
     connectLambda(event);
-    const usedSessions = getStore({ name: "used-sessions", consistency: "strong" });
+    const usedSessions = getStore({ name: "used-sessions" });
     const previous = await usedSessions.get(session_id, { type: "json" });
     if (previous && previous.reading) {
       return {
