@@ -50,7 +50,7 @@ export default async (req) => {
     charts = await computeCharts(p);
   } catch (e) {
     console.error(e);
-    return json(502, { error: "Ο ουρανός δεν απάντησε αυτή τη φορά. Δοκίμασε ξανά σε λίγο." });
+    return json(502, { error: "Τα άστρα δεν απάντησαν αυτή τη φορά. Δοκίμασε ξανά σε λίγο." });
   }
 
   if (alreadyUsed) {

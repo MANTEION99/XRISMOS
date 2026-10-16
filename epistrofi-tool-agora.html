@@ -347,7 +347,7 @@
 
   <div class="loading" id="loading">
     <div class="spinner"></div>
-    Ο ουρανός συμβουλεύεται τους χάρτες σας...
+    Τα άστρα συμβουλεύονται τους χάρτες σας...
   </div>
 
   <div class="result" id="result">
@@ -600,9 +600,9 @@ function namesNow() {
 function teaserRitualLines() {
   const { n1 } = namesNow();
   return [
-    n1 ? `Ο ουρανός ανοίγει τον χάρτη της γέννησής σου, ${n1}...` : 'Ο ουρανός ανοίγει τον χάρτη της γέννησής σου...',
+    n1 ? `Τα άστρα ανοίγουν τον χάρτη της γέννησής σου, ${n1}...` : 'Τα άστρα ανοίγουν τον χάρτη της γέννησής σου...',
     'Οι πλανήτες παίρνουν τις θέσεις που είχαν τη μέρα που γεννηθήκατε...',
-    'Αναζητούμε το αποτύπωμα του δεσμού σας στον ουρανό...',
+    'Αναζητούμε το αποτύπωμα του δεσμού σας στα άστρα...',
     'Η Αφροδίτη και η Σελήνη αρχίζουν να μιλούν...'
   ];
 }
@@ -751,7 +751,7 @@ async function submitTeaser() {
       return;
     }
     if (!res.ok) {
-      let msg = 'Κάτι διακόπηκε στη σύνδεση με τον ουρανό. Δοκίμασε ξανά σε λίγο.';
+      let msg = 'Κάτι διακόπηκε στη σύνδεση με τα άστρα. Δοκίμασε ξανά σε λίγο.';
       let raw = '';
       try { raw = await res.text(); const data = JSON.parse(raw); if (data.error) msg = data.error; } catch (e) {}
       if (location.hostname.includes('deploy-preview')) msg += ' [' + res.status + ' ' + raw.slice(0, 200) + ']';
@@ -789,7 +789,7 @@ async function submitTeaser() {
     $('restartLink').style.display = 'block';
   } catch (e) {
     stopRitual(); loading.classList.remove('show');
-    showError('Κάτι διακόπηκε στη σύνδεση με τον ουρανό. Δοκίμασε ξανά σε λίγο.' + (location.hostname.includes('deploy-preview') ? ' [' + e.message + ']' : ''));
+    showError('Κάτι διακόπηκε στη σύνδεση με τα άστρα. Δοκίμασε ξανά σε λίγο.' + (location.hostname.includes('deploy-preview') ? ' [' + e.message + ']' : ''));
   } finally {
     btn.disabled = false;
   }
@@ -951,7 +951,7 @@ async function submitPaidQuestion() {
     // Αν δεν ήρθε απάντηση, η πληρωμή ΔΕΝ έχει καταναλωθεί: μένει η φόρμα για να ξαναδοκιμάσει.
     if (!response.ok || !data.reading) {
       loading.classList.remove('show');
-      showError('Ο ουρανός δεν απάντησε αυτή τη φορά. Πάτα ξανά το κουμπί σε λίγο, η πληρωμή σου ισχύει και δεν θα χρεωθείς ξανά.' +
+      showError('Τα άστρα δεν απάντησαν αυτή τη φορά. Πάτα ξανά το κουμπί σε λίγο, η πληρωμή σου ισχύει και δεν θα χρεωθείς ξανά.' +
         (location.hostname.includes('deploy-preview') ? ' [' + response.status + ' ' + (data.error || '') + ' ' + (data.details || '') + ']' : ''));
       return;
     }
@@ -972,7 +972,7 @@ async function submitPaidQuestion() {
     renderExtraActions();
   } catch (error) {
     loading.classList.remove('show');
-    showError('Κάτι διακόπηκε στη σύνδεση με τον ουρανό. Δοκίμασε ξανά σε λίγο.');
+    showError('Κάτι διακόπηκε στη σύνδεση με τα άστρα. Δοκίμασε ξανά σε λίγο.');
   } finally {
     btn.disabled = false;
   }

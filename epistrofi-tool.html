@@ -223,7 +223,7 @@
 
   <div class="loading" id="loading">
     <div class="spinner"></div>
-    Ο ουρανός συμβουλεύεται τους χάρτες σας...
+    Τα άστρα συμβουλεύονται τους χάρτες σας...
   </div>
 
   <div class="result" id="result">
@@ -264,7 +264,7 @@ form.addEventListener('submit', async (e) => {
     usage = { month: monthKey, count: 0 };
   }
   if (usage.count >= 3) {
-    err.textContent = 'Έχεις ήδη χρησιμοποιήσει τον χρησμό 3 φορές αυτόν τον μήνα. Ο ουρανός ανανεώνεται τον επόμενο μήνα με τη συνδρομή σου.';
+    err.textContent = 'Έχεις ήδη χρησιμοποιήσει τον χρησμό 3 φορές αυτόν τον μήνα. Τα άστρα ανανεώνονται τον επόμενο μήνα με τη συνδρομή σου.';
     err.style.display = 'block';
     return;
   }
@@ -330,7 +330,7 @@ form.addEventListener('submit', async (e) => {
     result.classList.add('show');
   } catch (error) {
     loading.classList.remove('show');
-    readingtext.textContent = "Κάτι διακόπηκε στη σύνδεση με τον ουρανό. Δοκίμασε ξανά σε λίγο." + (location.hostname.includes("deploy-preview") ? " [" + error.message + "]" : "");
+    readingtext.textContent = "Κάτι διακόπηκε στη σύνδεση με τα άστρα. Δοκίμασε ξανά σε λίγο." + (location.hostname.includes("deploy-preview") ? " [" + error.message + "]" : "");
     result.classList.add('show');
   } finally {
     btn.disabled = false;
