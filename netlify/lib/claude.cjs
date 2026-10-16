@@ -19,7 +19,7 @@ async function callClaude(prompt, maxTokens = 3000) {
           "x-api-key": process.env.ANTHROPIC_API_KEY,
           "anthropic-version": "2023-06-01"
         },
-        body: JSON.stringify({ model: MODEL, max_tokens: maxTokens, messages: [{ role: "user", content: prompt }] })
+        body: JSON.stringify({ model: MODEL, max_tokens: maxTokens, thinking: { type: "disabled" }, messages: [{ role: "user", content: prompt }] })
       });
       const data = await res.json();
       if (!res.ok || !Array.isArray(data.content)) {

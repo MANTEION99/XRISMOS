@@ -275,6 +275,9 @@ async function streamClaudeOnceInner(prompt, maxTokens, onText, signal, bump) {
     body: JSON.stringify({
       model: MODEL,
       max_tokens: maxTokens,
+      // Το Claude Sonnet 5 «σκέφτεται» κρυφά από προεπιλογή και η σκέψη τρώει το όριο λέξεων.
+      // Εδώ θέλουμε μόνο το κείμενο, γρήγορα: η σκέψη απενεργοποιείται.
+      thinking: { type: "disabled" },
       stream: true,
       messages: [{ role: "user", content: prompt }]
     })
