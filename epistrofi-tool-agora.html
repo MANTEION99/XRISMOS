@@ -340,6 +340,7 @@
     <div class="field" id="questionField" style="display:none;">
       <label id="questionLabel">Η δεύτερη ερώτησή σου</label>
       <textarea id="question" placeholder="π.χ. Θα μου γράψει ξανά μέσα στο μήνα;"></textarea>
+      <div class="time-note" style="font-size:12px;opacity:0.7;margin-top:6px;line-height:1.4;">Ρώτα ό,τι σε καίει για εσάς τους δύο ή για την καρδιά σου.</div>
     </div>
     <p class="error" id="err">Συμπλήρωσε τουλάχιστον τα δύο ονόματα και τη δική σου ημερομηνία γέννησης.</p>
     <button type="submit" class="submit" id="btn">Δες τον χρησμό →</button>
@@ -951,6 +952,16 @@ async function submitPaidQuestion() {
     }
 
     try { localStorage.setItem(STORAGE_KEY, JSON.stringify(f)); } catch (e) {}
+
+    // Ερώτηση εκτός ορίων (υγεία, νομικά, ακατανόητη): δείχνουμε το μήνυμα, μένει η φόρμα, η πληρωμή ισχύει.
+    if (response.ok && data.redirect) {
+      loading.classList.remove('show');
+      showError((data.message || 'Γι\' αυτό το θέμα τα άστρα δεν παίρνουν τη θέση ειδικού.') +
+        ' Γράψε μια άλλη ερώτηση και πάτα ξανά το κουμπί, η πληρωμή σου ισχύει.');
+      $('question').value = '';
+      $('question').focus();
+      return;
+    }
 
     // Αν δεν ήρθε απάντηση, η πληρωμή ΔΕΝ έχει καταναλωθεί: μένει η φόρμα για να ξαναδοκιμάσει.
     if (!response.ok || !data.reading) {
