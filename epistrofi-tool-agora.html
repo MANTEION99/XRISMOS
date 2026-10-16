@@ -936,7 +936,8 @@ async function submitPaidQuestion() {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ ...f, question, session_id: sessionId })
     });
-    const data = await response.json();
+    let data = {};
+    try { data = await response.json(); } catch (e) { data = { error: 'μη έγκυρη απάντηση' }; }
 
     if (response.status === 402) {
       loading.classList.remove('show');
@@ -946,6 +947,14 @@ async function submitPaidQuestion() {
     }
 
     try { localStorage.setItem(STORAGE_KEY, JSON.stringify(f)); } catch (e) {}
+
+    // Αν δεν ήρθε απάντηση, η πληρωμή ΔΕΝ έχει καταναλωθεί: μένει η φόρμα για να ξαναδοκιμάσει.
+    if (!response.ok || !data.reading) {
+      loading.classList.remove('show');
+      showError('Ο ουρανός δεν απάντησε αυτή τη φορά. Πάτα ξανά το κουμπί σε λίγο, η πληρωμή σου ισχύει και δεν θα χρεωθείς ξανά.' +
+        (location.hostname.includes('deploy-preview') ? ' [' + response.status + ' ' + (data.error || '') + ' ' + (data.details || '') + ']' : ''));
+      return;
+    }
 
     const text = data.reading || '';
     const match = text.match(/\[ΠΟΣΟΣΤΟ:\s*(\d+)\]/);
