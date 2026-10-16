@@ -505,6 +505,49 @@ function renderContinuation(cont, finished) {
 }
 
 
+
+/* ---------- Γραφή με ανθρώπινο ρυθμό ----------
+   Το κείμενο έρχεται από τον server σε κομμάτια. Εδώ «γράφεται» στην οθόνη γράμμα γράμμα,
+   σαν να το γράφει κάποιος: σταθερός ρυθμός, μικρές παύσεις στα σημεία στίξης.
+   Αν μαζευτεί πολύ κείμενο που περιμένει, ο ρυθμός ανεβαίνει λίγο για να μη μένει πίσω. */
+function makeTyper(render) {
+  let target = '', shown = 0, finished = false, timer = null, pauseUntil = 0, doneCbs = [];
+  const skip = (t, i) => {   // οι ετικέτες [ΠΟΣΟΣΤΟ: NN] δεν «πληκτρολογούνται»
+    const m = t.slice(i).match(/^\s*\[ΠΟΣΟΣΤΟ:\s*\d+\]\s*/);
+    return m ? i + m[0].length : i;
+  };
+  const tick = () => {
+    const now = Date.now();
+    if (now < pauseUntil) return;
+    const backlog = target.length - shown;
+    if (backlog <= 0) {
+      if (finished) { clearInterval(timer); timer = null; render(target, true); doneCbs.splice(0).forEach(f => f()); }
+      return;
+    }
+    const cps = backlog > 2500 ? 220 : backlog > 1200 ? 110 : backlog > 500 ? 60 : 32;
+    let n = Math.max(1, Math.round(cps * 0.04));
+    shown = skip(target, shown);
+    let next = Math.min(target.length, shown + n);
+    shown = next;
+    const ch = target[shown - 1];
+    if (backlog < 1200) {
+      if (/[.!;?]/.test(ch)) pauseUntil = now + 320;
+      else if (/[,·:]/.test(ch)) pauseUntil = now + 120;
+    }
+    render(target.slice(0, shown), false);
+  };
+  return {
+    set(t, isFinished) {
+      target = t; finished = !!isFinished;
+      if (shown > target.length) shown = target.length;
+      if (!timer) timer = setInterval(tick, 40);
+    },
+    instant(t) { target = t; shown = t.length; finished = true; render(t, true); doneCbs.splice(0).forEach(f => f()); },
+    busy() { return shown < target.length; },
+    whenDone() { return new Promise(r => { if (finished && shown >= target.length && !timer) r(); else doneCbs.push(r); }); }
+  };
+}
+
 /* ---------- Τελετουργία αναμονής ---------- */
 function ritualHTML() {
   let ticks = '', stars = '';
@@ -724,16 +767,16 @@ async function submitTeaser() {
     form.style.display = 'none';
     teaserText.classList.add('typing');
 
-    const all = await readStream(res, (t) => {
-      const clean = t.replace(ERR_MARK, '');
-      if (clean.trim() && !result.classList.contains('show')) {
-        stopRitual();
+    const teaserTyper = makeTyper((txt) => {
+      if (txt.trim() && !result.classList.contains('show')) {
         stopRitual(); loading.classList.remove('show');
         result.classList.add('show');
       }
-      teaserText.textContent = clean;
+      teaserText.textContent = txt;
     });
-    stopRitual();
+    const all = await readStream(res, (t) => teaserTyper.set(t.replace(ERR_MARK, ''), false));
+    teaserTyper.set(all.replace(ERR_MARK, ''), true);
+    await teaserTyper.whenDone();
     stopRitual(); loading.classList.remove('show');
     result.classList.add('show');
     teaserText.classList.remove('typing');
@@ -769,6 +812,8 @@ async function loadFullReading() {
   let failures = 0;
   const started = Date.now();
   let lastLen = 0, lastGrow = Date.now();
+  let firstPoll = true, typerStarted = false;
+  const fullTyper = makeTyper((txt, fin) => renderContinuation(txt, fin));
   const poll = async () => {
     let data = null, status = 0;
     try {
@@ -791,15 +836,23 @@ async function loadFullReading() {
     // Αν το κείμενο σταματήσει για λίγο, η πελάτισσα βλέπει ότι συνεχίζει, για να μη νομίσει ότι κόλλησε.
     const len = (data.text || '').length;
     if (len !== lastLen) { lastLen = len; lastGrow = Date.now(); $('pauseNote').style.display = 'none'; }
-    else if (len > 0 && data.status !== 'done' && Date.now() - lastGrow > 5000) $('pauseNote').style.display = 'block';
-    if (data.status === 'done') $('pauseNote').style.display = 'none';
+    else if (len > 0 && data.status !== 'done' && Date.now() - lastGrow > 5000 && !fullTyper.busy()) $('pauseNote').style.display = 'block';
+    if (data.status === 'done' || fullTyper.busy()) $('pauseNote').style.display = 'none';
     if (data.teaser && !teaserText.textContent) teaserText.textContent = data.teaser;
     if (!data.teaser) teaserText.style.display = 'none';
-    if (data.text) renderContinuation(data.text, data.status === 'done');
+    // Αν ο χρησμός ήταν ήδη έτοιμος από πριν (π.χ. ξανάνοιξε τη σελίδα), εμφανίζεται αμέσως.
+    if (data.status === 'done' && firstPoll && !typerStarted) {
+      stopRitual();
+      fullTyper.instant(data.text);
+      renderExtraActions();
+      return;
+    }
+    firstPoll = false;
+    if (data.text) { typerStarted = true; fullTyper.set(data.text, data.status === 'done'); }
 
     if (data.status === 'done') {
+      await fullTyper.whenDone();
       stopRitual();
-      renderContinuation(data.text, true);
       renderExtraActions();
       return;
     }

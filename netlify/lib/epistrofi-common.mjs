@@ -176,6 +176,19 @@ const wordCount = (t) => (t.trim().match(/\S+/g) || []).length;
 // Αν η απάντηση σταματήσει πρόωρα (κομμένη ροή, όριο, ή λιγότερες από minWords λέξεις),
 // ζητά αυτόματα τη συνέχεια από το σημείο που σταμάτησε, έως δύο φορές, ώστε η πελάτισσα
 // να μη δει ποτέ μισό χρησμό.
+// Αν η αρχή της συνέχειας επαναλαμβάνει το τέλος του κειμένου που ήδη υπάρχει, την αφαιρεί.
+function dropOverlap(prev, next) {
+  const tail = prev.slice(-600);
+  const n = next.replace(/^\s+/, "");
+  for (let len = Math.min(tail.length, n.length); len >= 20; len--) {
+    if (tail.endsWith(n.slice(0, len))) return n.slice(len);
+  }
+  // Επανάληψη ολόκληρης πρότασης που βρίσκεται λίγο πιο πίσω στο τέλος.
+  const lastSentence = (tail.match(/[^.!;]+[.!;]\s*$/) || [""])[0].trim();
+  if (lastSentence.length >= 20 && n.startsWith(lastSentence)) return n.slice(lastSentence.length);
+  return next;
+}
+
 function cutToSentence(t) {
   const i = Math.max(t.lastIndexOf("."), t.lastIndexOf("!"), t.lastIndexOf(";"), t.lastIndexOf("]"), t.lastIndexOf("\n"));
   return i > 0 ? t.slice(0, i + 1) : "";
@@ -197,14 +210,26 @@ ${full}
 Συνέχισε ΑΚΡΙΒΩΣ από το σημείο που σταματά, με την επόμενη λέξη. Μην επαναλάβεις τίποτα από όσα γράφτηκαν, μην ξαναχαιρετήσεις, μη γράψεις εισαγωγή. Ολοκλήρωσε το κείμενο σύμφωνα με τις οδηγίες.`;
     let chunkStart = true;
     let r;
+    // Σε συνέχεια, κρατάμε τους πρώτους χαρακτήρες μέχρι να δούμε αν το Claude ξαναγράφει
+    // την τελευταία πρόταση (π.χ. «...παλιά πληγή. ...παλιά πληγή.»), και την κόβουμε.
+    const isContinuation = !!full;
+    let held = isContinuation ? "" : null;
+    const emit = (t) => {
+      if (!t) return;
+      if (chunkStart && full && !/\s$/.test(full) && !/^[\s.,;:!·»)]/.test(t)) t = " " + t;
+      chunkStart = false;
+      full += t;
+      onText(t);
+    };
+    const flushHeld = () => { if (held !== null) { const h = dropOverlap(full, held); held = null; emit(h); } };
     try {
       r = await streamClaudeOnce(p, maxTokens, (t) => {
-        if (chunkStart && full && !/\s$/.test(full) && !/^[\s.,;:!·»)]/.test(t)) t = " " + t;
-        chunkStart = false;
-        full += t;
-        onText(t);
+        if (held !== null) { held += t; if (held.length >= 400) flushHeld(); return; }
+        emit(t);
       });
+      flushHeld();
     } catch (e) {
+      flushHeld();
       if (!full) throw e;
       console.error("[claude] retry failed", e);
       break;
