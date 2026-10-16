@@ -369,6 +369,7 @@
         </div>
       </div>
     </div>
+    <p class="support-line" style="text-align:center;font-size:12.5px;color:var(--muted);margin-top:18px;line-height:1.5;">Αν κάτι δεν πάει καλά, γράψε μας στο <a href="https://m.me/61573958341176" target="_blank" rel="noopener" style="color:var(--gold);">Messenger του Μαντείου</a> και θα το λύσουμε αμέσως.</p>
     <p id="restartLink" style="display:none;text-align:center;font-size:12.5px;color:var(--muted);margin-top:16px;cursor:pointer;text-decoration:underline;">Θέλεις χρησμό για άλλο πρόσωπο; Ξεκίνα από την αρχή</p>
 
     <!-- Ο πληρωμένος χρησμός -->
@@ -857,6 +858,9 @@ async function loadFullReading() {
       stopRitual();
       renderExtraActions();
       return;
+    }
+    if (data.status === 'released') {
+      return fail('Ζητούμε συγγνώμη, ο χρησμός σου δεν μπόρεσε να γραφτεί αυτή τη φορά. Το ποσό που είχε δεσμευτεί στην κάρτα σου ακυρώθηκε, οπότε δεν χρεώθηκες τίποτα. Μπορείς να ξαναδοκιμάσεις όποτε θέλεις.');
     }
     if (data.status === 'error') {
       return fail('Ο χρησμός σου δεν ολοκληρώθηκε αυτή τη φορά. Ανανέωσε τη σελίδα σε λίγο, θα γραφτεί ξανά χωρίς νέα χρέωση.' +

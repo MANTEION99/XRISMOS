@@ -6,7 +6,7 @@
 //
 // Απάντηση: { status: "generating" | "done" | "error", teaser, text }
 
-import { readingsStore, json, verifyStripeSession } from "../lib/epistrofi-common.mjs";
+import { readingsStore, json, verifyStripeSession, releasePayment } from "../lib/epistrofi-common.mjs";
 
 // Αν η συγγραφή δεν έχει δώσει σημάδι ζωής για 45 δευτερόλεπτα, θεωρείται χαμένη και ξεκινά ξανά.
 const STALE_MS = 45 * 1000;
@@ -26,9 +26,15 @@ export default async (req) => {
   if (!reading) return json(404, { error: "Δεν βρέθηκε ο χρησμός." });
 
   // Η πληρωμή ελέγχεται στο Stripe μόνο μία φορά, μετά κρατιέται μαζί με τον χρησμό.
+  if (reading.released) {
+    return json(200, { status: "released", teaser: reading.teaser || "", text: "" });
+  }
   if (reading.paidSession !== sessionId) {
     const paid = await verifyStripeSession(sessionId, "epistrofi", readingId);
     if (!paid) return json(402, { error: "Δεν βρέθηκε έγκυρη πληρωμή για αυτόν τον χρησμό." });
+    const pi = paid.payment_intent;
+    reading.paymentIntent = pi && (pi.id || pi);
+    reading.firstPaidAt = reading.firstPaidAt || Date.now();
   }
 
   const teaser = reading.teaser || "";
@@ -42,6 +48,13 @@ export default async (req) => {
   // Μετά από 5 αποτυχημένες προσπάθειες σταματά, αλλά μετά από 10 λεπτά ξαναδοκιμάζει από την αρχή.
   if (!running && (reading.genAttempts || 0) >= MAX_ATTEMPTS) {
     // Όταν η πελάτισσα ανανεώνει η ίδια τη σελίδα (retry), ξαναδοκιμάζουμε αμέσως.
+    // Αν μετά από 30 λεπτά προσπαθειών ο χρησμός δεν έχει γραφτεί, η δέσμευση ακυρώνεται:
+    // η πελάτισσα δεν χρεώνεται και το βλέπει καθαρά.
+    if (Date.now() - (reading.firstPaidAt || Date.now()) > 30 * 60 * 1000 && reading.paymentIntent) {
+      const rel = await releasePayment(reading.paymentIntent);
+      await readings.setJSON(readingId, { ...reading, released: true, releasedOk: !!rel.ok, releasedAt: new Date().toISOString() });
+      return json(200, { status: "released", teaser, text: "" });
+    }
     if (!b.retry && Date.now() - (reading.lastAttemptAt || 0) < 10 * 60 * 1000) {
       return json(200, { status: "error", teaser, text: reading.partial || "", detail: reading.genError || "" });
     }

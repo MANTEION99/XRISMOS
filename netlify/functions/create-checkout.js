@@ -82,7 +82,10 @@ exports.handler = async function (event) {
           }
         }
       ],
-      metadata
+      metadata,
+      // Για τον πλήρη χρησμό: τα χρήματα μόνο ΔΕΣΜΕΥΟΝΤΑΙ στην κάρτα. Χρεώνονται οριστικά μόνο όταν ο
+      // χρησμός γραφτεί ολόκληρος. Αν δεν γραφτεί, η δέσμευση ακυρώνεται και η πελάτισσα δεν χρεώνεται.
+      ...(reading_id ? { payment_intent_data: { capture_method: "manual", metadata } } : {})
     });
 
     const stripeRes = await fetch("https://api.stripe.com/v1/checkout/sessions", {

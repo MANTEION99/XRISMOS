@@ -9,6 +9,8 @@ const { greeceTzone, moonChangesSign } = sky;
 export const skyBlock = sky.skyBlock;
 
 export const MODEL = "claude-sonnet-5";
+// Εφεδρικό μοντέλο, αν το βασικό είναι υπερφορτωμένο ή απαντά με σφάλμα.
+export const FALLBACK_MODEL = "claude-sonnet-4-6";
 
 // Ένα «ντουλάπι» για τους χρησμούς και ένα για τα email που πήραν ήδη δωρεάν δείγμα.
 export const readingsStore = () => getStore({ name: "epistrofi-readings", consistency: "strong" });
@@ -228,10 +230,11 @@ ${full}
     };
     const flushHeld = () => { if (held !== null) { const h = dropOverlap(full, held); held = null; emit(h); } };
     try {
+      const lastFailed = /error|σφάλμα/.test(diag[diag.length - 1] || "");
       r = await streamClaudeOnce(p, maxTokens, (t) => {
         if (held !== null) { held += t; if (held.length >= 400) flushHeld(); return; }
         emit(t);
-      });
+      }, lastFailed);
       flushHeld();
     } catch (e) {
       flushHeld();
@@ -250,20 +253,20 @@ ${full}
   return full;
 }
 
-async function streamClaudeOnce(prompt, maxTokens, onText) {
+async function streamClaudeOnce(prompt, maxTokens, onText, useFallback = false) {
   // Αν το Claude δεν στείλει τίποτα για 50 δευτερόλεπτα, η σύνδεση κόβεται και ζητάμε τη συνέχεια,
   // αντί να περιμένουμε για πάντα μια ροή που κόλλησε.
   const ctl = new AbortController();
   let idle = setTimeout(() => ctl.abort(), 50000);
   const bump = () => { clearTimeout(idle); idle = setTimeout(() => ctl.abort(), 50000); };
   try {
-    return await streamClaudeOnceInner(prompt, maxTokens, onText, ctl.signal, bump);
+    return await streamClaudeOnceInner(prompt, maxTokens, onText, ctl.signal, bump, useFallback);
   } finally {
     clearTimeout(idle);
   }
 }
 
-async function streamClaudeOnceInner(prompt, maxTokens, onText, signal, bump) {
+async function streamClaudeOnceInner(prompt, maxTokens, onText, signal, bump, useFallback) {
   const res = await fetch("https://api.anthropic.com/v1/messages", {
     signal,
     method: "POST",
@@ -273,11 +276,11 @@ async function streamClaudeOnceInner(prompt, maxTokens, onText, signal, bump) {
       "anthropic-version": "2023-06-01"
     },
     body: JSON.stringify({
-      model: MODEL,
+      model: useFallback ? FALLBACK_MODEL : MODEL,
       max_tokens: maxTokens,
       // Το Claude Sonnet 5 «σκέφτεται» κρυφά από προεπιλογή και η σκέψη τρώει το όριο λέξεων.
-      // Εδώ θέλουμε μόνο το κείμενο, γρήγορα: η σκέψη απενεργοποιείται.
-      thinking: { type: "disabled" },
+      // Εδώ θέλουμε μόνο το κείμενο, γρήγορα: η σκέψη απενεργοποιείται (το εφεδρικό δεν σκέφτεται από μόνο του).
+      ...(useFallback ? {} : { thinking: { type: "disabled" } }),
       stream: true,
       messages: [{ role: "user", content: prompt }]
     })
@@ -328,17 +331,46 @@ async function streamClaudeOnceInner(prompt, maxTokens, onText, signal, bump) {
 export async function verifyStripeSession(sessionId, tool, readingId) {
   if (!sessionId || !/^cs_[A-Za-z0-9_]+$/.test(sessionId)) return null;
   try {
-    const res = await fetch(`https://api.stripe.com/v1/checkout/sessions/${sessionId}`, {
+    const res = await fetch(`https://api.stripe.com/v1/checkout/sessions/${sessionId}?expand[]=payment_intent`, {
       headers: { Authorization: `Bearer ${process.env.STRIPE_SECRET_KEY}` }
     });
     const s = await res.json();
-    if (s.payment_status !== "paid" || !s.metadata) return null;
+    if (!s.metadata) return null;
     if (s.metadata.tool !== tool) return null;
     if (readingId && s.metadata.reading_id !== readingId) return null;
+    // Πληρωμένη: είτε χρεωμένη (paid) είτε με δεσμευμένο ποσό που περιμένει την ολοκλήρωση του χρησμού.
+    const pi = s.payment_intent && typeof s.payment_intent === "object" ? s.payment_intent : null;
+    const held = pi && pi.status === "requires_capture";
+    const captured = pi && pi.status === "succeeded";
+    if (s.payment_status !== "paid" && !held && !captured) return null;
     return s;
   } catch {
     return null;
   }
+}
+
+async function stripePost(path) {
+  const res = await fetch(`https://api.stripe.com/v1/${path}`, {
+    method: "POST",
+    headers: { Authorization: `Bearer ${process.env.STRIPE_SECRET_KEY}` }
+  });
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok) console.error(`[stripe] ${path} ${res.status} ${JSON.stringify(data.error || {}).slice(0, 200)}`);
+  return { ok: res.ok, data };
+}
+
+// Οριστική χρέωση, μόνο αφού ο χρησμός γραφτεί ολόκληρος.
+export async function capturePayment(session) {
+  const pi = session && session.payment_intent;
+  const id = pi && (typeof pi === "string" ? pi : pi.id);
+  if (!id || (typeof pi === "object" && pi.status !== "requires_capture")) return { ok: true, skipped: true };
+  return stripePost(`payment_intents/${id}/capture`);
+}
+
+// Ακύρωση της δέσμευσης αν ο χρησμός δεν μπόρεσε να γραφτεί: η πελάτισσα δεν χρεώνεται.
+export async function releasePayment(paymentIntentId) {
+  if (!paymentIntentId) return { ok: false };
+  return stripePost(`payment_intents/${paymentIntentId}/cancel`);
 }
 
 export function streamResponse(producer, headers = {}) {

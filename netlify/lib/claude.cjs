@@ -2,6 +2,7 @@
 // Ξαναδοκιμάζει μία φορά αν το Claude απαντήσει με σφάλμα ή άδειο κείμενο, και αν το κείμενο
 // κοπεί στο όριο μήκους, το κόβει στην τελευταία ολόκληρη πρόταση, ώστε να μη φαίνεται ποτέ μισή φράση.
 const MODEL = "claude-sonnet-5";
+const FALLBACK_MODEL = "claude-sonnet-4-6";   // αν το βασικό απαντήσει με σφάλμα
 
 function trimToSentence(text) {
   const i = Math.max(text.lastIndexOf("."), text.lastIndexOf("!"), text.lastIndexOf(";"), text.lastIndexOf("»"));
@@ -19,7 +20,9 @@ async function callClaude(prompt, maxTokens = 3000) {
           "x-api-key": process.env.ANTHROPIC_API_KEY,
           "anthropic-version": "2023-06-01"
         },
-        body: JSON.stringify({ model: MODEL, max_tokens: maxTokens, thinking: { type: "disabled" }, messages: [{ role: "user", content: prompt }] })
+        body: JSON.stringify(attempt === 0
+          ? { model: MODEL, max_tokens: maxTokens, thinking: { type: "disabled" }, messages: [{ role: "user", content: prompt }] }
+          : { model: FALLBACK_MODEL, max_tokens: maxTokens, messages: [{ role: "user", content: prompt }] })
       });
       const data = await res.json();
       if (!res.ok || !Array.isArray(data.content)) {

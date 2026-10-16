@@ -3,7 +3,7 @@
 // Ξαναελέγχει την πληρωμή, γιατί η διεύθυνση είναι δημόσια.
 
 import {
-  readingsStore, verifyStripeSession, fullPrompt, skyBlock, streamClaude
+  readingsStore, verifyStripeSession, capturePayment, fullPrompt, skyBlock, streamClaude
 } from "../lib/epistrofi-common.mjs";
 
 export default async (req) => {
@@ -18,7 +18,9 @@ export default async (req) => {
   const reading = await readings.get(readingId, { type: "json" });
   if (!reading || reading.full) return;
   if (genId && reading.genId && reading.genId !== genId) return;   // έχει ήδη ξεκινήσει νεότερη προσπάθεια
-  if (!(await verifyStripeSession(sessionId, "epistrofi", readingId))) return;
+  const session = await verifyStripeSession(sessionId, "epistrofi", readingId);
+  if (!session) return;
+  const piId = session.payment_intent && (session.payment_intent.id || session.payment_intent);
 
   // Αν μια προηγούμενη προσπάθεια κόπηκε, συνεχίζουμε από όσα είχαν ήδη γραφτεί.
   // Κόβεται στην τελευταία ολόκληρη πρόταση, ώστε η συνέχεια να μη «κολλήσει» σε μισή λέξη.
@@ -71,6 +73,11 @@ export default async (req) => {
       paidAt: new Date().toISOString(), generatingSince: null, genError: null
     });
     console.log(`[full-bg] done words=${full.split(/\s+/).length}`);
+    // Τώρα που ο χρησμός παραδόθηκε, η δέσμευση γίνεται οριστική χρέωση.
+    const cap = await capturePayment(session);
+    await readings.setJSON(readingId, {
+      ...(await readings.get(readingId, { type: "json" })), paymentIntent: piId, captured: !!cap.ok, capturedAt: new Date().toISOString()
+    });
   } catch (e) {
     console.error("[full-bg] failed", e);
     clearInterval(beat);
