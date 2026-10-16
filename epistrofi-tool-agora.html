@@ -806,6 +806,8 @@ async function loadFullReading() {
   $('pctWrap').style.display = 'none';
   startRitual($('ritualFull'), fullRitualLines());
   const waitUI = addWaitProgress($('ritualFull'));
+  // Μετά την πληρωμή, η σελίδα κατεβαίνει ομαλά εκεί που γράφεται η συνέχεια.
+  setTimeout(() => { try { $('ritualFull').scrollIntoView({ behavior: 'smooth', block: 'center' }); } catch (e) {} }, 700);
 
   // Ο χρησμός γράφεται στον server και η σελίδα τον «διαβάζει» κάθε 1,5 δευτερόλεπτο,
   // ώστε να εμφανίζεται ζωντανά χωρίς να εξαρτάται από τη σύνδεση να μένει ανοιχτή.
