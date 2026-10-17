@@ -1,3 +1,4 @@
+const { oncePerPayment } = require("../lib/once.cjs");
 const { callClaude } = require("../lib/claude.cjs");
 const astro = require("../lib/astro.cjs");
 // Αρχείο: netlify/functions/oikonomika.js
@@ -20,7 +21,7 @@ async function verifyPaidSession(sessionId, expectedTool) {
   }
 }
 
-exports.handler = async function (event) {
+async function handle(event) {
   if (event.httpMethod !== "POST") {
     return { statusCode: 405, body: "Method Not Allowed" };
   }
@@ -101,4 +102,6 @@ ${astro.forPrompt(astroData1, tob1, name1, dob1, pl1.tzName)}
       body: JSON.stringify({ error: "Κάτι πήγε στραβά.", details: error.message })
     };
   }
-};
+}
+
+exports.handler = oncePerPayment(handle, "oikonomika");

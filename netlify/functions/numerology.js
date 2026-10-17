@@ -10,6 +10,13 @@ const GREEK_MAP = {
   "Τ":1,"Υ":2,"Φ":3,"Χ":4,"Ψ":5,"Ω":6
 };
 
+// Αν το όνομα είναι γραμμένο με λατινικά (π.χ. «Maria»), η κλασική πυθαγόρεια αντιστοίχιση,
+// ώστε ο αριθμός να μη βγαίνει λάθος.
+const LATIN_MAP = {
+  A:1,B:2,C:3,D:4,E:5,F:6,G:7,H:8,I:9,J:1,K:2,L:3,M:4,N:5,O:6,P:7,Q:8,R:9,
+  S:1,T:2,U:3,V:4,W:5,X:6,Y:7,Z:8
+};
+
 function stripAccents(str) {
   return str.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
 }
@@ -34,11 +41,17 @@ function calcNameNumber(name) {
   let total = 0;
   for (const ch of upper) {
     if (GREEK_MAP[ch]) total += GREEK_MAP[ch];
+    else if (LATIN_MAP[ch]) total += LATIN_MAP[ch];
   }
   return reduceNumber(total || 1);
 }
 
 exports.handler = async function (event) {
+  // Η δωρεάν εκδοχή είναι για τη συνδρομή, που δεν έχει ξεκινήσει. Μέχρι τότε μένει κλειστή,
+  // αλλιώς ο καθένας θα έπαιρνε δωρεάν ολόκληρο χρησμό από εδώ χωρίς να πληρώσει.
+  if (process.env.FREE_TOOLS_ENABLED !== "1") {
+    return { statusCode: 404, body: JSON.stringify({ error: "Not found" }) };
+  }
   if (event.httpMethod !== "POST") {
     return { statusCode: 405, body: "Method Not Allowed" };
   }

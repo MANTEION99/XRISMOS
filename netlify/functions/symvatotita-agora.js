@@ -1,3 +1,4 @@
+const { oncePerPayment } = require("../lib/once.cjs");
 const { callClaude } = require("../lib/claude.cjs");
 const astro = require("../lib/astro.cjs");
 // Αρχείο: netlify/functions/symvatotita-agora.js
@@ -20,7 +21,7 @@ async function verifyPaidSession(sessionId, expectedTool) {
   }
 }
 
-exports.handler = async function (event) {
+async function handle(event) {
   if (event.httpMethod !== "POST") {
     return { statusCode: 405, body: "Method Not Allowed" };
   }
@@ -116,4 +117,6 @@ ${question
       body: JSON.stringify({ error: "Κάτι πήγε στραβά.", details: error.message })
     };
   }
-};
+}
+
+exports.handler = oncePerPayment(handle, "symvatotita");

@@ -37,6 +37,11 @@ function drawThreeCards() {
 }
 
 exports.handler = async function (event) {
+  // Η δωρεάν εκδοχή είναι για τη συνδρομή, που δεν έχει ξεκινήσει. Μέχρι τότε μένει κλειστή,
+  // αλλιώς ο καθένας θα έπαιρνε δωρεάν ολόκληρο χρησμό από εδώ χωρίς να πληρώσει.
+  if (process.env.FREE_TOOLS_ENABLED !== "1") {
+    return { statusCode: 404, body: JSON.stringify({ error: "Not found" }) };
+  }
   if (event.httpMethod !== "POST") {
     return { statusCode: 405, body: "Method Not Allowed" };
   }

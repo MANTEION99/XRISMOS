@@ -1,3 +1,4 @@
+const { oncePerPayment } = require("../lib/once.cjs");
 const { callClaude } = require("../lib/claude.cjs");
 // Αρχείο: netlify/functions/taro-agora.js
 // Η ΕΠΙ ΠΛΗΡΩΜΗ εκδοχή, ξεχωριστή από το taro.js που μένει δωρεάν μέσα στη συνδρομή.
@@ -56,7 +57,7 @@ async function verifyPaidSession(sessionId, expectedTool) {
   }
 }
 
-exports.handler = async function (event) {
+async function handle(event) {
   if (event.httpMethod !== "POST") {
     return { statusCode: 405, body: "Method Not Allowed" };
   }
@@ -126,4 +127,6 @@ ${cardLine("ΜΕΛΛΟΝ", future)}
       body: JSON.stringify({ error: "Κάτι πήγε στραβά.", details: error.message })
     };
   }
-};
+}
+
+exports.handler = oncePerPayment(handle, "taro");

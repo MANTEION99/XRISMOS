@@ -1,3 +1,4 @@
+const { oncePerPayment } = require("../lib/once.cjs");
 const { callClaude } = require("../lib/claude.cjs");
 // Αρχείο: netlify/functions/numerology-agora.js
 // Η ΕΠΙ ΠΛΗΡΩΜΗ εκδοχή, ξεχωριστή από το numerology.js που μένει δωρεάν μέσα στη συνδρομή.
@@ -8,6 +9,13 @@ const GREEK_MAP = {
   "Α":1,"Β":2,"Γ":3,"Δ":4,"Ε":5,"Ζ":6,"Η":7,"Θ":8,"Ι":9,
   "Κ":1,"Λ":2,"Μ":3,"Ν":4,"Ξ":5,"Ο":6,"Π":7,"Ρ":8,"Σ":9,
   "Τ":1,"Υ":2,"Φ":3,"Χ":4,"Ψ":5,"Ω":6
+};
+
+// Αν το όνομα είναι γραμμένο με λατινικά (π.χ. «Maria»), η κλασική πυθαγόρεια αντιστοίχιση,
+// ώστε ο αριθμός να μη βγαίνει λάθος.
+const LATIN_MAP = {
+  A:1,B:2,C:3,D:4,E:5,F:6,G:7,H:8,I:9,J:1,K:2,L:3,M:4,N:5,O:6,P:7,Q:8,R:9,
+  S:1,T:2,U:3,V:4,W:5,X:6,Y:7,Z:8
 };
 
 function stripAccents(str) {
@@ -32,6 +40,7 @@ function calcNameNumber(name) {
   let total = 0;
   for (const ch of upper) {
     if (GREEK_MAP[ch]) total += GREEK_MAP[ch];
+    else if (LATIN_MAP[ch]) total += LATIN_MAP[ch];
   }
   return reduceNumber(total || 1);
 }
@@ -51,7 +60,7 @@ async function verifyPaidSession(sessionId, expectedTool) {
   }
 }
 
-exports.handler = async function (event) {
+async function handle(event) {
   if (event.httpMethod !== "POST") {
     return { statusCode: 405, body: "Method Not Allowed" };
   }
@@ -106,4 +115,6 @@ ${mainInstruction}
       body: JSON.stringify({ error: "Κάτι πήγε στραβά.", details: error.message })
     };
   }
-};
+}
+
+exports.handler = oncePerPayment(handle, "numerology");

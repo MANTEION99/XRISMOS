@@ -509,7 +509,7 @@ form.addEventListener('submit', async (e) => {
     renderExtraActions();
   } catch (error) {
     loading.classList.remove('show');
-    readingtext.textContent = "Κάτι διακόπηκε στη σύνδεση με τα άστρα. Δοκίμασε ξανά σε λίγο." + (location.hostname.includes("deploy-preview") ? " [" + e.message + "]" : "");
+    readingtext.textContent = "Κάτι διακόπηκε στη σύνδεση με τα άστρα. Δοκίμασε ξανά σε λίγο." + (location.hostname.includes("deploy-preview") ? " [" + (error && error.message) + "]" : "");
     result.classList.add('show');
   } finally {
     btn.disabled = false;
