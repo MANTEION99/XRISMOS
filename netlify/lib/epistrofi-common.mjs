@@ -5,7 +5,8 @@ import { getStore } from "@netlify/blobs";
 import Astronomy from "./vendor/astronomy.cjs";
 import makeSky from "./sky.cjs";
 const sky = makeSky(Astronomy);
-const { greeceTzone, moonChangesSign } = sky;
+const { zoneOffset, moonChangesSign } = sky;
+import placeLib from "./place.cjs";
 export const skyBlock = sky.skyBlock;
 
 export const MODEL = "claude-sonnet-5";
@@ -31,18 +32,26 @@ export function isValidEmail(email) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email);
 }
 
+// Τόπος γέννησης: πραγματικές συντεταγμένες και ζώνη ώρας. Αν δεν βρεθεί, Αθήνα και ώρα Ελλάδας.
+async function birthPlace(pob) {
+  const found = pob ? await placeLib.resolvePlace(pob).catch(() => null) : null;
+  return found
+    ? { lat: found.lat, lon: found.lon, tzName: found.tzName, label: `${found.name} ${found.country}`, found: true }
+    : { lat: 37.9838, lon: 23.7275, tzName: "Europe/Athens", label: "Αθήνα (προεπιλογή)", found: false };
+}
+
 // Το input type="date" στέλνει πάντα YYYY-MM-DD.
-function chartBody(dob, tob, lat, lon, tzone) {
+function chartBody(dob, tob, place) {
   const [year, month, day] = String(dob).split("-").map(n => parseInt(n, 10));
   let [hour, min] = String(tob || "12:00").split(":").map(n => parseInt(n, 10));
   if (!Number.isFinite(hour)) hour = 12;
   if (!Number.isFinite(min)) min = 0;
   return {
     day, month, year, hour, min,
-    lat: lat || 37.9838,   // αν δεν δόθηκαν συντεταγμένες, Αθήνα
-    lon: lon || 23.7275,
-    // Σωστή ώρα Ελλάδας για εκείνη τη μέρα: +3 με θερινή ώρα, +2 τον χειμώνα.
-    tzone: tzone || greeceTzone(year, month, day, hour, min),
+    lat: place.lat,
+    lon: place.lon,
+    // Σωστή διαφορά ώρας για τον τόπο και την ημερομηνία γέννησης (θερινή ώρα, ιστορικές αλλαγές).
+    tzone: zoneOffset(place.tzName, year, month, day, hour, min),
     house_type: "placidus"
   };
 }
@@ -72,11 +81,13 @@ async function fetchChart(body) {
 // Υπολογίζει τους δύο χάρτες μία φορά. Το αποτέλεσμα αποθηκεύεται μαζί με τον χρησμό,
 // ώστε η πληρωμένη συνέχεια να μη χρειάζεται νέα κλήση στο AstrologyAPI.
 export async function computeCharts(p) {
+  const [place1, place2] = await Promise.all([birthPlace(p.pob1), birthPlace(p.pob2)]);
   const [chart1, chart2] = await Promise.all([
-    fetchChart(chartBody(p.dob1, p.tob1, p.lat1, p.lon1, p.tzone1)),
-    p.dob2 ? fetchChart(chartBody(p.dob2, p.tob2, p.lat2, p.lon2, p.tzone2)) : Promise.resolve(null)
+    fetchChart(chartBody(p.dob1, p.tob1, place1)),
+    p.dob2 ? fetchChart(chartBody(p.dob2, p.tob2, place2)) : Promise.resolve(null)
   ]);
-  return { chart1, chart2 };
+  console.log(`[place] 1="${p.pob1 || ""}" -> ${place1.label} | 2="${p.pob2 || ""}" -> ${place2.label}`);
+  return { chart1, chart2, tz1: place1.tzName, tz2: place2.tzName, place1: place1.label, place2: place2.label };
 }
 
 // Χωρίς ώρα γέννησης οι οίκοι και ο Ωροσκόπος βγαίνουν λάθος (υπολογίζονται για τις 12:00),
@@ -102,8 +113,8 @@ const timeNote = (name, hasTime, moonUnsure) => hasTime
 export function chartsBlock(p, charts) {
   const t1 = /^\d{2}:\d{2}$/.test(p.tob1 || "");
   const t2 = /^\d{2}:\d{2}$/.test(p.tob2 || "");
-  const m1 = !t1 && moonChangesSign(p.dob1);
-  const m2 = !t2 && moonChangesSign(p.dob2);
+  const m1 = !t1 && moonChangesSign(p.dob1, charts.tz1);
+  const m2 = !t2 && moonChangesSign(p.dob2, charts.tz2);
   return `Στοιχεία ${p.name1}:${timeNote(p.name1, t1, m1)}
 ${JSON.stringify(chartForPrompt(charts.chart1, t1, m1))}
 

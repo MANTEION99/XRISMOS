@@ -48,7 +48,10 @@ async function capturePayment(session) {
   }
 }
 
-async function generate({ name1, dob1, tob1, lat1, lon1, tzone1, name2, dob2, tob2, lat2, lon2, tzone2, question }) {
+async function generate({ name1, dob1, tob1, pob1, name2, dob2, tob2, pob2, question }) {
+  // Πραγματικός τόπος γέννησης (συντεταγμένες και ζώνη ώρας). Αν δεν βρεθεί: Αθήνα.
+  const [pl1, pl2] = await Promise.all([astro.place(pob1, dob1, tob1), astro.place(pob2, dob2, tob2)]);
+
   // --- Βήμα 1: πραγματικά αστρολογικά δεδομένα, παράλληλα για ταχύτητα ---
   const [d1, m1, y1] = dob1.split("-").reverse();
   const [hour1, min1] = (tob1 || "12:00").split(":");
@@ -59,9 +62,9 @@ async function generate({ name1, dob1, tob1, lat1, lon1, tzone1, name2, dob2, to
     year: parseInt(y1 || dob1.split("-")[0]),
     hour: parseInt(hour1),
     min: parseInt(min1),
-    lat: lat1 || 37.9838,
-    lon: lon1 || 23.7275,
-    tzone: tzone1 || astro.tz(dob1, tob1),
+    lat: pl1.lat,
+    lon: pl1.lon,
+    tzone: pl1.tzone,
     house_type: "placidus"
   };
 
@@ -85,9 +88,9 @@ async function generate({ name1, dob1, tob1, lat1, lon1, tzone1, name2, dob2, to
       year: parseInt(y2 || dob2.split("-")[0]),
       hour: parseInt(hour2),
       min: parseInt(min2),
-      lat: lat2 || 37.9838,
-      lon: lon2 || 23.7275,
-      tzone: tzone2 || astro.tz(dob2, tob2),
+      lat: pl2.lat,
+      lon: pl2.lon,
+      tzone: pl2.tzone,
       house_type: "placidus"
     };
   }
@@ -113,10 +116,10 @@ async function generate({ name1, dob1, tob1, lat1, lon1, tzone1, name2, dob2, to
   const prompt = `Είσαι ένας έμπειρος, ζεστός Έλληνας αστρολόγος που γράφει για το "Μαντείο". Το κοινό σου είναι κυρίως γυναίκες 50-65 ετών. Παρακάτω σου δίνω ΠΡΑΓΜΑΤΙΚΑ υπολογισμένα αστρολογικά δεδομένα (θέσεις πλανητών, οίκους, όψεις). Χρησιμοποίησέ τα σαν βάση, μην εφευρίσκεις νέα δεδομένα εκτός αυτών.
 
 Στοιχεία Ατόμου 1 (${name1}):
-${astro.forPrompt(astroData1, tob1, name1, dob1)}
+${astro.forPrompt(astroData1, tob1, name1, dob1, pl1.tzName)}
 
 Στοιχεία Ατόμου 2 (${name2}):
-${astroData2 ? astro.forPrompt(astroData2, tob2, name2, dob2) : "Δεν δόθηκαν, μίλα πιο γενικά γι' αυτό το πρόσωπο."}
+${astroData2 ? astro.forPrompt(astroData2, tob2, name2, dob2, pl2.tzName) : "Δεν δόθηκαν, μίλα πιο γενικά γι' αυτό το πρόσωπο."}
 
 ${mainInstruction}
 
@@ -167,7 +170,7 @@ exports.handler = async function (event) {
       };
     }
 
-    const text = await generate({ name1, dob1, tob1, lat1, lon1, tzone1, name2, dob2, tob2, lat2, lon2, tzone2, question });
+    const text = await generate({ name1, dob1, tob1, pob1, name2, dob2, tob2, pob2, question });
 
     // Ερώτηση που δεν απαντιέται (υγεία, νομικά, ακατανόητη): η πληρωμή ΔΕΝ καταναλώνεται.
     if (question && /\[\s*ΑΝΑΚΑΤΕΥΘΥΝΣΗ\s*\]/.test(text)) {

@@ -16,6 +16,10 @@ exports.handler = async function (event) {
       return { statusCode: 400, body: JSON.stringify({ error: "Λείπουν απαραίτητα στοιχεία." }) };
     }
 
+    // Πραγματικός τόπος γέννησης (συντεταγμένες και ζώνη ώρας). Αν δεν βρεθεί: Αθήνα.
+    const pl1 = await astro.place(pob1, dob1, tob1);
+
+
     // --- Βήμα 1: πραγματικά αστρολογικά δεδομένα ---
     const [d1, m1, y1] = dob1.split("-").reverse(); // dob1 έρχεται σαν YYYY-MM-DD
     const [hour1, min1] = (tob1 || "12:00").split(":");
@@ -26,9 +30,9 @@ exports.handler = async function (event) {
       year: parseInt(y1 || dob1.split("-")[0]),
       hour: parseInt(hour1),
       min: parseInt(min1),
-      lat: 37.9838,
-      lon: 23.7275,
-      tzone: astro.tz(dob1, tob1),
+      lat: pl1.lat,
+      lon: pl1.lon,
+      tzone: pl1.tzone,
       house_type: "placidus"
     };
 
@@ -47,7 +51,7 @@ exports.handler = async function (event) {
     const prompt = `Είσαι ένας έμπειρος, ζεστός Έλληνας αστρολόγος που γράφει για το "Μαντείο". Το κοινό σου είναι κυρίως γυναίκες 50-65 ετών. Παρακάτω σου δίνω ΠΡΑΓΜΑΤΙΚΑ υπολογισμένα αστρολογικά δεδομένα (θέσεις πλανητών, οίκους, όψεις) για το άτομο. Χρησιμοποίησέ τα σαν βάση, μην εφευρίσκεις νέα δεδομένα εκτός αυτών.
 
 Στοιχεία (${name1}):
-${astro.forPrompt(astroData1, tob1, name1, dob1)}
+${astro.forPrompt(astroData1, tob1, name1, dob1, pl1.tzName)}
 
 Η ερώτηση που έθεσε το άτομο: "${question}"
 

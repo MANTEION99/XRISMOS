@@ -9,31 +9,45 @@ let Astronomy = null;
 
 /* ---------- 1. Διαφορά ώρας ---------- */
 
-const athensFmt = new Intl.DateTimeFormat("en-US", {
-  timeZone: "Europe/Athens", hourCycle: "h23",
-  year: "numeric", month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit", second: "2-digit"
-});
+const fmtCache = new Map();
+function fmtFor(tzName) {
+  if (!fmtCache.has(tzName)) {
+    fmtCache.set(tzName, new Intl.DateTimeFormat("en-US", {
+      timeZone: tzName, hourCycle: "h23",
+      year: "numeric", month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit", second: "2-digit"
+    }));
+  }
+  return fmtCache.get(tzName);
+}
 
-function offsetAt(ts) {
-  const parts = Object.fromEntries(athensFmt.formatToParts(new Date(ts)).map(x => [x.type, x.value]));
+function offsetAt(ts, tzName = "Europe/Athens") {
+  const parts = Object.fromEntries(fmtFor(tzName).formatToParts(new Date(ts)).map(x => [x.type, x.value]));
   const asUtc = Date.UTC(+parts.year, +parts.month - 1, +parts.day, +parts.hour, +parts.minute, +parts.second);
   return (asUtc - ts) / 3600000;
 }
 
-// Επιστρέφει τη διαφορά από UTC (π.χ. 2 ή 3) για τοπική ώρα Ελλάδας στη συγκεκριμένη ημερομηνία.
-function greeceTzone(year, month, day, hour, min) {
+// Διαφορά από UTC για τοπική ώρα σε οποιαδήποτε ζώνη ώρας (π.χ. "Europe/Athens", "America/New_York"),
+// με θερινή ώρα και ιστορικές αλλαγές. Αν η ζώνη δεν αναγνωρίζεται, γυρίζει στην Ελλάδα.
+function zoneOffset(tzName, year, month, day, hour, min) {
+  let zone = tzName || "Europe/Athens";
+  try { fmtFor(zone); } catch { zone = "Europe/Athens"; }
   const local = Date.UTC(year, month - 1, day, hour, min);
   let off = 2;
-  for (let i = 0; i < 3; i++) off = offsetAt(local - off * 3600000);
+  for (let i = 0; i < 3; i++) off = offsetAt(local - off * 3600000, zone);
   return off;
+}
+
+// Επιστρέφει τη διαφορά από UTC (π.χ. 2 ή 3) για τοπική ώρα Ελλάδας στη συγκεκριμένη ημερομηνία.
+function greeceTzone(year, month, day, hour, min) {
+  return zoneOffset("Europe/Athens", year, month, day, hour, min);
 }
 
 // Χωρίς ώρα γέννησης: αλλάζει ζώδιο η Σελήνη μέσα σε εκείνη τη μέρα (ώρα Ελλάδας);
 // Αν ναι, το ζώδιο της Σελήνης είναι αβέβαιο και δεν πρέπει να αναφερθεί.
-function moonChangesSign(dob) {
+function moonChangesSign(dob, tzName) {
   const [y, m, d] = String(dob || "").split("-").map(n => parseInt(n, 10));
   if (!y || !m || !d) return false;
-  const at = (h, mi) => new Date(Date.UTC(y, m - 1, d, h, mi) - greeceTzone(y, m, d, h, mi) * 3600000);
+  const at = (h, mi) => new Date(Date.UTC(y, m - 1, d, h, mi) - zoneOffset(tzName, y, m, d, h, mi) * 3600000);
   const sign = (date) => Math.floor(lonOf("Moon", date) / 30);
   return sign(at(0, 0)) !== sign(at(23, 59));
 }
@@ -161,5 +175,5 @@ ${s.personal.length ? s.personal.map(x => "• " + x).join("\n") : "• (καμ�
 
 module.exports = function makeSky(astronomyEngine) {
   Astronomy = astronomyEngine;
-  return { greeceTzone, upcomingSky, skyBlock, moonChangesSign };
+  return { greeceTzone, zoneOffset, upcomingSky, skyBlock, moonChangesSign };
 };

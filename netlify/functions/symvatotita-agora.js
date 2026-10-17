@@ -41,8 +41,12 @@ exports.handler = async function (event) {
       return { statusCode: 402, body: JSON.stringify({ error: "Δεν βρέθηκε έγκυρη πληρωμή για αυτό το εργαλείο." }) };
     }
 
+    // Πραγματικός τόπος γέννησης (συντεταγμένες και ζώνη ώρας). Αν δεν βρεθεί: Αθήνα.
+    const [pl1, pl2] = await Promise.all([astro.place(pob1, dob1, tob1), astro.place(pob2, dob2, tob2)]);
+
+
     // --- Βήμα 1: πραγματικά αστρολογικά δεδομένα, παράλληλα για ταχύτητα ---
-    const buildChartBody = (dob, tob) => {
+    const buildChartBody = (dob, tob, pl) => {
       const [d, m, y] = dob.split("-").reverse(); // dob έρχεται σαν YYYY-MM-DD
       const [hour, min] = (tob || "12:00").split(":");
       return {
@@ -51,9 +55,9 @@ exports.handler = async function (event) {
         year: parseInt(y || dob.split("-")[0]),
         hour: parseInt(hour),
         min: parseInt(min),
-        lat: 37.9838,
-        lon: 23.7275,
-        tzone: astro.tz(dob, tob),
+        lat: pl.lat,
+        lon: pl.lon,
+        tzone: pl.tzone,
         house_type: "placidus"
       };
     };
@@ -69,18 +73,18 @@ exports.handler = async function (event) {
     }).then(r => r.json());
 
     const [astroData1, astroData2] = await Promise.all([
-      fetchChart(buildChartBody(dob1, tob1)),
-      fetchChart(buildChartBody(dob2, tob2))
+      fetchChart(buildChartBody(dob1, tob1, pl1)),
+      fetchChart(buildChartBody(dob2, tob2, pl2))
     ]);
 
     // --- Βήμα 2: δίνουμε τα πραγματικά δεδομένα στο Claude για να γράψει το κείμενο ---
     const prompt = `Είσαι ένας έμπειρος, ζεστός Έλληνας αστρολόγος που γράφει για το "Μαντείο". Το κοινό σου είναι κυρίως γυναίκες 50-65 ετών. Παρακάτω σου δίνω ΠΡΑΓΜΑΤΙΚΑ υπολογισμένα αστρολογικά δεδομένα (θέσεις πλανητών, οίκους, όψεις) για δύο άτομα. Χρησιμοποίησέ τα σαν βάση, μην εφευρίσκεις νέα δεδομένα εκτός αυτών.
 
 Στοιχεία Ατόμου 1 (${name1}):
-${astro.forPrompt(astroData1, tob1, name1, dob1)}
+${astro.forPrompt(astroData1, tob1, name1, dob1, pl1.tzName)}
 
 Στοιχεία Ατόμου 2 (${name2}):
-${astro.forPrompt(astroData2, tob2, name2, dob2)}
+${astro.forPrompt(astroData2, tob2, name2, dob2, pl2.tzName)}
 
 ΠΟΛΥ ΣΗΜΑΝΤΙΚΟ: Τα παραπάνω στοιχεία είναι πλήρη και επαρκή για ανάλυση. ΜΗΝ αναφέρεις πουθενά ότι λείπουν στοιχεία, ότι τα δεδομένα είναι ελλιπή, ή οτιδήποτε παρόμοιο. Γράψε την ανάλυση με σιγουριά, σαν να έχεις όλα όσα χρειάζεσαι, γιατί πράγματι τα έχεις.
 

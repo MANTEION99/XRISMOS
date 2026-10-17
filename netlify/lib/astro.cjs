@@ -5,7 +5,8 @@
 //  - χωρίς ώρα γέννησης δεν δίνονται οίκοι και Ωροσκόπος,
 //  - οι πλανήτες της γενιάς δεν παρουσιάζονται ως προσωπικοί,
 //  - πραγματικές ημερομηνίες για τις ερωτήσεις «πότε».
-const { greeceTzone, skyBlock, moonChangesSign } = require("./sky.cjs")(require("./vendor/astronomy.cjs"));
+const { greeceTzone, zoneOffset, skyBlock, moonChangesSign } = require("./sky.cjs")(require("./vendor/astronomy.cjs"));
+const { resolvePlace } = require("./place.cjs");
 
 const hasTime = (tob) => /^\d{2}:\d{2}$/.test(String(tob || ""));
 
@@ -19,6 +20,24 @@ function tz(dob, tob) {
   return greeceTzone(y, m, d, h, mi);
 }
 
+// Συντεταγμένες και διαφορά ώρας για τον τόπο γέννησης. Αν ο τόπος δεν βρεθεί: Αθήνα, ώρα Ελλάδας.
+async function place(pob, dob, tob) {
+  const found = pob ? await resolvePlace(pob).catch(() => null) : null;
+  const [y, m, d] = String(dob || "").split("-").map(n => parseInt(n, 10));
+  let [h, mi] = String(tob || "12:00").split(":").map(n => parseInt(n, 10));
+  if (!Number.isFinite(h)) h = 12;
+  if (!Number.isFinite(mi)) mi = 0;
+  const tzName = found ? found.tzName : "Europe/Athens";
+  return {
+    lat: found ? found.lat : 37.9838,
+    lon: found ? found.lon : 23.7275,
+    tzName,
+    tzone: (y && m && d) ? zoneOffset(tzName, y, m, d, h, mi) : 2,
+    found: !!found,
+    label: found ? `${found.name} ${found.country}` : "Αθήνα (προεπιλογή)"
+  };
+}
+
 function check(chart) {
   if (!chart || !Array.isArray(chart.planets) || chart.planets.length === 0) {
     console.error("[astrologyapi] λάθος απάντηση: " + JSON.stringify(chart).slice(0, 300));
@@ -28,10 +47,10 @@ function check(chart) {
 }
 
 // Τα δεδομένα του χάρτη όπως τα βλέπει το Claude, με σημείωση αν λείπει η ώρα.
-function forPrompt(chart, tob, name, dob) {
+function forPrompt(chart, tob, name, dob, tzName) {
   check(chart);
   if (hasTime(tob)) return JSON.stringify(chart);
-  const moonUnsure = moonChangesSign(dob);
+  const moonUnsure = moonChangesSign(dob, tzName);
   const { houses, ascendant, midheaven, vertex, aspects, ...rest } = chart;
   const clean = {
     ...rest,
@@ -60,4 +79,4 @@ function sky(p, chart1, chart2) {
 Αν η απάντηση χρειάζεται χρόνο («πότε»), δώσε περίοδο ΜΟΝΟ με ημερομηνίες από την παραπάνω λίστα και πες ποια κίνηση την ανοίγει. Μη γράψεις καμία ημερομηνία ή κίνηση πλανήτη που δεν υπάρχει στη λίστα.`;
 }
 
-module.exports = { tz, check, forPrompt, RULES, sky, hasTime, moonChangesSign };
+module.exports = { tz, place, check, forPrompt, RULES, sky, hasTime, moonChangesSign };
