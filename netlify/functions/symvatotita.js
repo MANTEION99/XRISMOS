@@ -1,8 +1,15 @@
+const { callClaude } = require("../lib/claude.cjs");
+const astro = require("../lib/astro.cjs");
 // Αρχείο: netlify/functions/symvatotita.js
 // Ανέβασέ το ακριβώς σε αυτόν τον φάκελο μέσα στο repo σου: netlify/functions/symvatotita.js
 // Χρησιμοποιεί τα ΙΔΙΑ environment variables με τα υπόλοιπα (ASTROLOGY_API_KEY, ANTHROPIC_API_KEY), δεν χρειάζεται τίποτα νέο.
 
 exports.handler = async function (event) {
+  // Η δωρεάν εκδοχή είναι για τη συνδρομή, που δεν έχει ξεκινήσει. Μέχρι τότε μένει κλειστή,
+  // αλλιώς ο καθένας θα έπαιρνε δωρεάν ολόκληρο χρησμό από εδώ χωρίς να πληρώσει.
+  if (process.env.FREE_TOOLS_ENABLED !== "1") {
+    return { statusCode: 404, body: JSON.stringify({ error: "Not found" }) };
+  }
   if (event.httpMethod !== "POST") {
     return { statusCode: 405, body: "Method Not Allowed" };
   }
@@ -17,9 +24,13 @@ exports.handler = async function (event) {
       return { statusCode: 400, body: JSON.stringify({ error: "Λείπουν απαραίτητα στοιχεία." }) };
     }
 
+    // Πραγματικός τόπος γέννησης (συντεταγμένες και ζώνη ώρας). Αν δεν βρεθεί: Αθήνα.
+    const [pl1, pl2] = await Promise.all([astro.place(pob1, dob1, tob1), astro.place(pob2, dob2, tob2)]);
+
+
     // --- Βήμα 1: πραγματικά αστρολογικά δεδομένα, παράλληλα για ταχύτητα ---
-    const buildChartBody = (dob, tob) => {
-      const [d, m, y] = dob.split("-");
+    const buildChartBody = (dob, tob, pl) => {
+      const [d, m, y] = dob.split("-").reverse(); // dob έρχεται σαν YYYY-MM-DD
       const [hour, min] = (tob || "12:00").split(":");
       return {
         day: parseInt(d || dob.split("-")[2]),
@@ -27,9 +38,9 @@ exports.handler = async function (event) {
         year: parseInt(y || dob.split("-")[0]),
         hour: parseInt(hour),
         min: parseInt(min),
-        lat: 37.9838,
-        lon: 23.7275,
-        tzone: 2,
+        lat: pl.lat,
+        lon: pl.lon,
+        tzone: pl.tzone,
         house_type: "placidus"
       };
     };
@@ -38,24 +49,25 @@ exports.handler = async function (event) {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
+        "Accept-Language": "en",
         "x-astrologyapi-key": process.env.ASTROLOGY_API_KEY
       },
       body: JSON.stringify(body)
     }).then(r => r.json());
 
     const [astroData1, astroData2] = await Promise.all([
-      fetchChart(buildChartBody(dob1, tob1)),
-      fetchChart(buildChartBody(dob2, tob2))
+      fetchChart(buildChartBody(dob1, tob1, pl1)),
+      fetchChart(buildChartBody(dob2, tob2, pl2))
     ]);
 
     // --- Βήμα 2: δίνουμε τα πραγματικά δεδομένα στο Claude για να γράψει το κείμενο ---
     const prompt = `Είσαι ένας έμπειρος, ζεστός Έλληνας αστρολόγος που γράφει για το "Μαντείο". Το κοινό σου είναι κυρίως γυναίκες 50-65 ετών. Παρακάτω σου δίνω ΠΡΑΓΜΑΤΙΚΑ υπολογισμένα αστρολογικά δεδομένα (θέσεις πλανητών, οίκους, όψεις) για δύο άτομα. Χρησιμοποίησέ τα σαν βάση, μην εφευρίσκεις νέα δεδομένα εκτός αυτών.
 
 Στοιχεία Ατόμου 1 (${name1}):
-${JSON.stringify(astroData1)}
+${astro.forPrompt(astroData1, tob1, name1, dob1, pl1.tzName)}
 
 Στοιχεία Ατόμου 2 (${name2}):
-${JSON.stringify(astroData2)}
+${astro.forPrompt(astroData2, tob2, name2, dob2, pl2.tzName)}
 
 ΠΟΛΥ ΣΗΜΑΝΤΙΚΟ: Τα παραπάνω στοιχεία είναι πλήρη και επαρκή για ανάλυση. ΜΗΝ αναφέρεις πουθενά ότι λείπουν στοιχεία, ότι τα δεδομένα είναι ελλιπή, ή οτιδήποτε παρόμοιο. Γράψε την ανάλυση με σιγουριά, σαν να έχεις όλα όσα χρειάζεσαι, γιατί πράγματι τα έχεις.
 
@@ -66,25 +78,11 @@ ${JSON.stringify(astroData2)}
 Ξεκίνα την απάντησή σου ΜΟΝΟ με έναν αριθμό ποσοστού σε αυτή τη μορφή: [ΠΟΣΟΣΤΟ: 67]
 Μετά γράψε το κείμενο, μιλώντας απευθείας στο άτομο 1, με ζεστασιά και μυστήριο. Κλείσε υπενθυμίζοντας ότι η τελική έκβαση εξαρτάται από τις επιλογές και των δύο, όχι μόνο τον ουρανό.
 
-ΥΠΟΧΡΕΩΤΙΚΟ: Μετά, σε νέα γραμμή, γράψε ΑΚΡΙΒΩΣ [ΣΥΜΒΟΥΛΗ] και αμέσως μετά 2-3 προτάσεις πρακτικής συμβουλής. Η συμβουλή ΔΕΝ επιτρέπεται να είναι γενική ή κοινότοπη φράση όπως "μίλα ανοιχτά", "δώσε χρόνο", "να είστε ειλικρινείς" χωρίς περαιτέρω εξειδίκευση. Πρέπει να αναφέρεται σε κάτι συγκεκριμένο που προκύπτει από την ίδια την αστρολογική ανάλυση που μόλις έγραψες (π.χ. ένα μικρό, χειροπιαστό βήμα σχετικό με τη συγκεκριμένη δυναμική/ένταση που εντόπισες, όχι γενική αρχή επικοινωνίας). Κλείσε με μία σύντομη πρόταση ότι ο ουρανός αλλάζει κάθε μήνα και η εικόνα μπορεί να είναι διαφορετική, πιο θετική, τον επόμενο μήνα. Μην αναφέρεις τίποτα για συνδρομή ή πληρωμή.
+ΥΠΟΧΡΕΩΤΙΚΟ: Μετά, σε νέα γραμμή, γράψε ΑΚΡΙΒΩΣ [ΣΥΜΒΟΥΛΗ] και αμέσως μετά 2-3 προτάσεις πρακτικής συμβουλής. Η συμβουλή ΔΕΝ επιτρέπεται να είναι γενική ή κοινότοπη φράση όπως "μίλα ανοιχτά", "δώσε χρόνο", "να είστε ειλικρινείς" χωρίς περαιτέρω εξειδίκευση. Πρέπει να αναφέρεται σε κάτι συγκεκριμένο που προκύπτει από την ίδια την αστρολογική ανάλυση που μόλις έγραψες (π.χ. ένα μικρό, χειροπιαστό βήμα σχετικό με τη συγκεκριμένη δυναμική/ένταση που εντόπισες, όχι γενική αρχή επικοινωνίας). Κλείσε με μία σύντομη πρόταση ότι τα άστρα αλλάζουν κάθε μήνα και η εικόνα μπορεί να είναι διαφορετική, πιο θετική, τον επόμενο μήνα. Μην αναφέρεις τίποτα για συνδρομή ή πληρωμή.
 
 ΠΟΛΥ ΣΗΜΑΝΤΙΚΟ: Πρέπει να ολοκληρώσεις πάντα κάθε πρόταση και ολόκληρο το κείμενο κανονικά, ποτέ να μην κοπεί στη μέση λέξης ή πρότασης. Αν πλησιάζεις στο όριο μήκους, συντόμευσε νωρίτερα αλλά πάντα κλείσε το κείμενο ολοκληρωμένο, με τελεία στο τέλος.`;
 
-    const claudeRes = await fetch("https://api.anthropic.com/v1/messages", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "x-api-key": process.env.ANTHROPIC_API_KEY,
-        "anthropic-version": "2023-06-01"
-      },
-      body: JSON.stringify({
-        model: "claude-sonnet-5",
-        max_tokens: 1400,
-        messages: [{ role: "user", content: prompt }]
-      })
-    });
-    const claudeData = await claudeRes.json();
-    const text = claudeData.content.map(b => b.text || "").join("").trim();
+    const text = await callClaude(prompt + astro.RULES, 3000);
 
     return {
       statusCode: 200,

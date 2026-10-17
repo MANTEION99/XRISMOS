@@ -217,6 +217,7 @@
     <div class="field">
       <label>Ώρα γέννησής σου (αν την ξέρεις)</label>
       <input type="time" id="tob1" />
+<div class="time-note" style="font-size:12px;opacity:0.7;margin-top:6px;line-height:1.4;">Αν δεν ξέρεις την ώρα, ο χρησμός θα βγει από τους πλανήτες σου.</div>
     </div>
     <div class="field">
       <label>Πόλη γέννησής σου</label>
@@ -234,6 +235,7 @@
     <div class="field">
       <label>Ώρα γέννησής του/της (αν την ξέρεις)</label>
       <input type="time" id="tob2" />
+<div class="time-note" style="font-size:12px;opacity:0.7;margin-top:6px;line-height:1.4;">Αν δεν την ξέρεις, ο χρησμός θα βγει από τους πλανήτες.</div>
     </div>
     <div class="field">
       <label>Πόλη γέννησής του/της (αν την ξέρεις)</label>
@@ -245,7 +247,7 @@
 
   <div class="loading" id="loading">
     <div class="spinner"></div>
-    Ο ουρανός συμβουλεύεται τους χάρτες σας...
+    Τα άστρα συμβουλεύονται τους χάρτες σας...
   </div>
 
   <div class="result" id="result">
@@ -285,7 +287,7 @@ form.addEventListener('submit', async (e) => {
     usage = { month: monthKey, count: 0 };
   }
   if (usage.count >= 3) {
-    err.textContent = 'Έχεις ήδη χρησιμοποιήσει τον χρησμό 3 φορές αυτόν τον μήνα. Ο ουρανός ανανεώνεται τον επόμενο μήνα με τη συνδρομή σου.';
+    err.textContent = 'Έχεις ήδη χρησιμοποιήσει τον χρησμό 3 φορές αυτόν τον μήνα. Τα άστρα ανανεώνονται τον επόμενο μήνα με τη συνδρομή σου.';
     err.style.display = 'block';
     return;
   }
@@ -319,6 +321,7 @@ form.addEventListener('submit', async (e) => {
     });
     const data = await response.json();
     const text = data.reading || "";
+    if (!text) throw new Error((data.error || "κενή απάντηση") + (data.details ? " | " + data.details : ""));
     const match = text.match(/\[ΠΟΣΟΣΤΟ:\s*(\d+)\]/);
     const pct = match ? match[1] : "—";
     let body = text.replace(/\[ΠΟΣΟΣΤΟ:\s*\d+\]/, "").trim();
@@ -349,7 +352,7 @@ form.addEventListener('submit', async (e) => {
     result.classList.add('show');
   } catch (error) {
     loading.classList.remove('show');
-    readingtext.textContent = "Κάτι διακόπηκε στη σύνδεση με τον ουρανό. Δοκίμασε ξανά σε λίγο.";
+    readingtext.textContent = "Κάτι διακόπηκε στη σύνδεση με τα άστρα. Δοκίμασε ξανά σε λίγο." + (location.hostname.includes("deploy-preview") ? " [" + error.message + "]" : "");
     result.classList.add('show');
   } finally {
     btn.disabled = false;

@@ -1,3 +1,4 @@
+const { callClaude } = require("../lib/claude.cjs");
 // Αρχείο: netlify/functions/taro.js
 // Ανέβασέ το στο netlify/functions/taro.js
 // Χρησιμοποιεί το ΙΔΙΟ environment variable με τα υπόλοιπα: ANTHROPIC_API_KEY (δεν χρειάζεται ASTROLOGY_API_KEY εδώ)
@@ -36,6 +37,11 @@ function drawThreeCards() {
 }
 
 exports.handler = async function (event) {
+  // Η δωρεάν εκδοχή είναι για τη συνδρομή, που δεν έχει ξεκινήσει. Μέχρι τότε μένει κλειστή,
+  // αλλιώς ο καθένας θα έπαιρνε δωρεάν ολόκληρο χρησμό από εδώ χωρίς να πληρώσει.
+  if (process.env.FREE_TOOLS_ENABLED !== "1") {
+    return { statusCode: 404, body: JSON.stringify({ error: "Not found" }) };
+  }
   if (event.httpMethod !== "POST") {
     return { statusCode: 405, body: "Method Not Allowed" };
   }
@@ -68,21 +74,7 @@ ${cardLine("ΜΕΛΛΟΝ", future)}
 
 ΠΟΛΥ ΣΗΜΑΝΤΙΚΟ: Πρέπει να ολοκληρώσεις πάντα κάθε πρόταση και ολόκληρο το κείμενο κανονικά, ποτέ να μην κοπεί στη μέση λέξης ή πρότασης. Αν πλησιάζεις στο όριο μήκους, συντόμευσε νωρίτερα αλλά πάντα κλείσε το κείμενο ολοκληρωμένο, με τελεία στο τέλος.`;
 
-    const claudeRes = await fetch("https://api.anthropic.com/v1/messages", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "x-api-key": process.env.ANTHROPIC_API_KEY,
-        "anthropic-version": "2023-06-01"
-      },
-      body: JSON.stringify({
-        model: "claude-sonnet-5",
-        max_tokens: 1300,
-        messages: [{ role: "user", content: prompt }]
-      })
-    });
-    const claudeData = await claudeRes.json();
-    const text = claudeData.content.map(b => b.text || "").join("").trim();
+    const text = await callClaude(prompt, 3000);
 
     return {
       statusCode: 200,

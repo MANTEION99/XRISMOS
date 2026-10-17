@@ -222,7 +222,8 @@
     </svg>
 
     <p class="sub">Σε σκέφτεται ακόμα με τον ίδιο τρόπο; Η θέση της Αφροδίτης του δεν αλλάζει ανάλογα με το τι θα ήθελες να ακούσεις.</p>
-    <p class="price-line">4,99€ — μία ανάλυση</p>
+    <p class="price-line">4,99€ μία ανάλυση</p>
+    <p class="value-note" style="font-size:12.5px;line-height:1.55;color:var(--muted);max-width:320px;margin:10px auto 18px;text-align:center;">Μια τέτοια πρόβλεψη κοστίζει περίπου 100€. Εδώ οι χάρτες σας υπολογίζονται με ακρίβεια και ο χρησμός γράφεται μόνο για σένα, με 4,99€.</p>
     <p class="trust-line"><svg viewBox="0 0 24 24" fill="none"><path d="M12 2l2.4 6.6L21 10l-5 4.4 1.5 6.6L12 17.8 6.5 21l1.5-6.6L3 10l6.6-1.4z" stroke="currentColor" stroke-width="1.4"/></svg>Εμπιστεύονται ήδη πάνω από 33.000 άνθρωποι στο Facebook</p>
     <div class="enter-btn" id="enterBtn">Αγόρασε τον χρησμό σου →</div>
     <div class="secure-note">
@@ -257,6 +258,7 @@
       <div class="field">
         <label>Ώρα γέννησής σου (αν την ξέρεις)</label>
         <input type="time" id="tob1" />
+<div class="time-note" style="font-size:12px;opacity:0.7;margin-top:6px;line-height:1.4;">Αν δεν ξέρεις την ώρα, ο χρησμός θα βγει από τους πλανήτες σου.</div>
       </div>
       <div class="field">
         <label>Πόλη γέννησής σου</label>
@@ -274,6 +276,7 @@
       <div class="field">
         <label>Ώρα γέννησής του/της (αν την ξέρεις)</label>
         <input type="time" id="tob2" />
+<div class="time-note" style="font-size:12px;opacity:0.7;margin-top:6px;line-height:1.4;">Αν δεν την ξέρεις, ο χρησμός θα βγει από τους πλανήτες.</div>
       </div>
       <div class="field">
         <label>Πόλη γέννησής του/της (αν την ξέρεις)</label>
@@ -290,7 +293,7 @@
 
   <div class="loading" id="loading">
     <div class="spinner"></div>
-    Ο ουρανός συμβουλεύεται τους χάρτες σας...
+    Τα άστρα συμβουλεύονται τους χάρτες σας...
   </div>
 
   <div class="result" id="result">
@@ -302,7 +305,7 @@
     <div id="extraActions" style="margin-top:22px; text-align:center;"></div>
   </div>
 
-  <p class="note">Το περιεχόμενο έχει ψυχαγωγικό χαρακτήρα.</p>
+  <p class="note" style="line-height:1.55;">Το περιεχόμενο του Μαντείου έχει αποκλειστικά ψυχαγωγικό χαρακτήρα και απευθύνεται σε ενήλικες. Δεν αποτελεί πρόβλεψη με επιστημονική βάση και δεν υποκαθιστά τη γνώμη ή τη συμβουλή γιατρού, ψυχολόγου, δικηγόρου, οικονομικού συμβούλου ή άλλου επαγγελματία. Μην παίρνεις σημαντικές αποφάσεις για την υγεία, τα οικονομικά, τις σχέσεις ή τη ζωή σου βασισμένη μόνο σε αυτό. Αν περνάς μια δύσκολη περίοδο, μίλησε με έναν ειδικό ή με έναν άνθρωπο που εμπιστεύεσαι.</p>
   </div>
 </div>
 
@@ -414,6 +417,10 @@ function renderExtraActions() {
   button.textContent = `Κάνε ${nextLabel} — ${priceLabel}`;
   button.addEventListener('click', () => startExtraCheckout(nextStage, button));
   extraActions.appendChild(button);
+  const valueNote = document.createElement('p');
+  valueNote.style.cssText = 'font-size:12.5px;line-height:1.55;color:var(--muted);max-width:320px;margin:10px auto 18px;text-align:center;';
+  valueNote.textContent = 'Μια τέτοια πρόβλεψη, για κάθε νέα ερώτηση, κοστίζει κανονικά όσο μια νέα συνεδρία. Εδώ, με τους ίδιους χάρτες, μόνο ' + priceLabel + '.';
+  extraActions.appendChild(valueNote);
 }
 
 const form = document.getElementById('form');
@@ -470,6 +477,7 @@ form.addEventListener('submit', async (e) => {
     localStorage.setItem(STORAGE_KEY, JSON.stringify({ name1, dob1, tob1, pob1, name2, dob2, tob2, pob2 }));
 
     const text = data.reading || "";
+    if (!text) throw new Error((data.error || "κενή απάντηση") + (data.details ? " | " + data.details : ""));
     const match = text.match(/\[ΠΟΣΟΣΤΟ:\s*(\d+)\]/);
     const pct = match ? match[1] : "—";
     let body = text.replace(/\[ΠΟΣΟΣΤΟ:\s*\d+\]/, "").trim();
@@ -499,7 +507,7 @@ form.addEventListener('submit', async (e) => {
     renderExtraActions();
   } catch (error) {
     loading.classList.remove('show');
-    readingtext.textContent = "Κάτι διακόπηκε στη σύνδεση με τον ουρανό. Δοκίμασε ξανά σε λίγο.";
+    readingtext.textContent = "Κάτι διακόπηκε στη σύνδεση με τα άστρα. Δοκίμασε ξανά σε λίγο." + (location.hostname.includes("deploy-preview") ? " [" + (error && error.message) + "]" : "");
     result.classList.add('show');
   } finally {
     btn.disabled = false;
