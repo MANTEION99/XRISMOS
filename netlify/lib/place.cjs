@@ -83,10 +83,7 @@ async function geo(place) {
   }
 }
 
-// Το κοινό είναι κυρίως ελληνικό: αν υπάρχει αποτέλεσμα στην Ελλάδα, το προτιμάμε.
-function pick(list) {
-  if (!list.length) return null;
-  const g = list.find(x => String(x.country_code || "").toUpperCase() === "GR") || list[0];
+function toPlace(g) {
   return {
     name: g.place_name || "",
     country: String(g.country_code || "").toUpperCase(),
@@ -107,9 +104,32 @@ function looksLike(result, query) {
   return a.includes(q1) || q.includes(a1) || a1.slice(0, 4) === q1.slice(0, 4);
 }
 
+// Κατάταξη: πρώτα το ακριβές όνομα (London και όχι Londonderry), μετά όνομα που ξεκινά με αυτό
+// σαν ξεχωριστή λέξη (Stuttgart Feuerbach), και ανάμεσα σε ισοβαθμίες προτιμάμε την Ελλάδα.
+function score(g, query) {
+  const a = ascii(g.place_name), q = ascii(query);
+  let s = 0;
+  if (a === q) s += 100;
+  else if (a.startsWith(q + " ") || q.startsWith(a + " ")) s += 50;
+  else if (a.startsWith(q)) s += 20;
+  if (String(g.country_code || "").toUpperCase() === "GR") s += 30;
+  return s;
+}
+
 async function lookup(query) {
   const list = (await geo(query)).filter(g => looksLike(g, query));
-  return pick(list);
+  if (!list.length) return null;
+  list.sort((x, y) => score(y, query) - score(x, query));
+  return toPlace(list[0]);
+}
+
+// Η ξένη βάση γράφει τα ελληνικά ονόματα με διάφορους τρόπους (Anogeia ή Anogia, Kifisia ή Kifissia).
+// Αν δεν βρεθεί με την πρώτη μεταγραφή, δοκιμάζουμε και την απλή φωνητική.
+function simpler(latin) {
+  return latin
+    .replace(/eia\b/g, "ia").replace(/ei/g, "i").replace(/oi/g, "i")
+    .replace(/ai/g, "e").replace(/y/g, "i").replace(/ou/g, "u")
+    .replace(/([bcdfgklmnprstvxz])\1/g, "$1");
 }
 
 async function resolvePlace(pob) {
@@ -132,6 +152,7 @@ async function resolvePlace(pob) {
   const PREFIX = new Set(["νέα", "νεα", "νέο", "νεο", "νέος", "νεος", "άγιος", "αγιος", "αγία", "αγια", "άγιοι", "άνω", "ανω", "κάτω", "κατω", "παλαιά", "παλαια", "μεγάλη", "μικρή", "πάνω", "new", "san", "los", "st", "saint"]);
   if (words.length > 1 && words[0].length >= 4 && !PREFIX.has(words[0].toLowerCase())) tries.push(translit(words[0]));
   tries.push(translit(text));
+  for (const t of [...tries]) { const v = simpler(t); if (v !== t) tries.push(v); }
   const uniq = [...new Set(tries.map(t => t.trim()))].filter(t => t.length >= 2 && /^[a-z .'-]+$/i.test(t));
 
   let found = null;
