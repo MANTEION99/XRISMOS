@@ -90,7 +90,10 @@ function sampleYear(bodies, start) {
 }
 
 // Τα σημεία των χαρτών που μας ενδιαφέρουν για την αγάπη.
-function natalTargets(p, charts, hasTime1) {
+// Ποια σημεία των χαρτών κοιτάμε. Χωρίς spec: τα σημεία της αγάπης (για την Επιστροφή).
+// spec: { p1: {Venus:"την Αφροδίτη",...}, desc1, mc1, p2: {...}, who1, who2 }
+function natalTargets(p, charts, hasTime1, spec) {
+  if (spec) return natalTargetsSpec(p, charts, hasTime1, spec);
   const out = [];
   const moonUnsure = !hasTime1 && moonChangesSign(p.dob1);
   const pick = (chart, who, names) => {
@@ -110,7 +113,32 @@ function natalTargets(p, charts, hasTime1) {
   return out;
 }
 
-function upcomingSky(p, charts, hasTime1, start = new Date()) {
+function natalTargetsSpec(p, charts, hasTime1, spec) {
+  const out = [];
+  const moonUnsure = !hasTime1 && moonChangesSign(p.dob1);
+  const pick = (chart, who, names, isFirst) => {
+    for (const pl of (chart && chart.planets) || []) {
+      if (pl.name === "Moon" && moonUnsure && isFirst) continue;
+      if (names && names[pl.name] && Number.isFinite(+pl.full_degree)) {
+        out.push({ label: `${names[pl.name]} ${who} (${signOf(+pl.full_degree)})`, lon: +pl.full_degree });
+      }
+    }
+  };
+  const who1 = spec.who1 || `του/της ${p.name1}`;
+  pick(charts.chart1, who1, spec.p1, true);
+  if (hasTime1 && charts.chart1 && spec.desc1 && Number.isFinite(+charts.chart1.ascendant)) {
+    const desc = (+charts.chart1.ascendant + 180) % 360;
+    out.push({ label: `τον Δύοντα ${who1}, την πόρτα του 7ου οίκου των σχέσεων (${signOf(desc)})`, lon: desc });
+  }
+  if (hasTime1 && charts.chart1 && spec.mc1 && Number.isFinite(+charts.chart1.midheaven)) {
+    const mc = +charts.chart1.midheaven;
+    out.push({ label: `το Μεσουράνημα ${who1}, το σημείο της καριέρας και της επαγγελματικής τύχης (${signOf(mc)})`, lon: mc });
+  }
+  if (charts.chart2 && spec.p2) pick(charts.chart2, spec.who2 || `του/της ${p.name2}`, spec.p2, false);
+  return out;
+}
+
+function upcomingSky(p, charts, hasTime1, start = new Date(), spec = null) {
   const bodies = ["Mercury", "Venus", "Mars", "Jupiter", "Saturn"];
   const days = sampleYear(bodies, start);
   const general = [];
@@ -139,7 +167,7 @@ function upcomingSky(p, charts, hasTime1, start = new Date()) {
   }
 
   // Ακριβείς επαφές των Αφροδίτης, Άρη, Δία με τα σημεία των δύο χαρτών.
-  const targets = natalTargets(p, charts, hasTime1);
+  const targets = natalTargets(p, charts, hasTime1, spec);
   const allowed = { Venus: [0, 60, 120, 180], Jupiter: [0, 60, 120, 180], Mars: [0, 120] };
   for (const b of ["Venus", "Mars", "Jupiter"]) {
     for (const tg of targets) {
@@ -162,14 +190,14 @@ function upcomingSky(p, charts, hasTime1, start = new Date()) {
   return { general: general.map(x => x.text), personal: personal.map(x => x.text) };
 }
 
-function skyBlock(p, charts, hasTime1, start = new Date()) {
-  const s = upcomingSky(p, charts, hasTime1, start);
+function skyBlock(p, charts, hasTime1, start = new Date(), spec = null) {
+  const s = upcomingSky(p, charts, hasTime1, start, spec);
   return `ΠΡΑΓΜΑΤΙΚΟΣ ΟΥΡΑΝΟΣ ΤΩΝ ΕΠΟΜΕΝΩΝ 12 ΜΗΝΩΝ (σήμερα είναι ${fmtDate(start)}). Υπολογισμένες ημερομηνίες, οι ΜΟΝΕΣ που επιτρέπεται να χρησιμοποιήσεις:
 (Είναι κινήσεις των πλανητών του σημερινού ουρανού, όχι πλανήτες των χαρτών τους. Γράψε π.χ. «η Αφροδίτη του ουρανού ενώνεται με την Αφροδίτη του», ποτέ «η Αφροδίτη του» για πλανήτη που περνά.)
 Γενικές κινήσεις:
 ${s.general.map(x => "• " + x).join("\n")}
 
-Επαφές με τα σημεία των δύο χαρτών:
+Επαφές με τα σημεία ${charts.chart2 ? "των δύο χαρτών" : "του χάρτη"}:
 ${s.personal.length ? s.personal.map(x => "• " + x).join("\n") : "• (καμία ακριβής επαφή)"}`;
 }
 

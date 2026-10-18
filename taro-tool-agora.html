@@ -4,30 +4,25 @@
 <meta charset="UTF-8">
 <link rel="icon" type="image/svg+xml" href="favicon.svg">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Το Τρίφυλλο Ταρώ — Μαντείο</title>
+<title>Το Τρίφυλλο Ταρώ | Μαντείο</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700;800&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,500&family=Inter:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,500&family=Inter:wght@400;500&display=swap" rel="stylesheet">
+<!-- ΠΑΡΑΓΕΤΑΙ ΑΥΤΟΜΑΤΑ από tools/build-oracle-pages.py. Μην το αλλάζεις με το χέρι. -->
 <style>
   :root{
-    --bg:#030309;
-    --bg-panel:#100c26;
-    --bg-deep:#08061a;
-    --gold:#d4af37;
-    --gold-bright:#f6dd8a;
-    --gold-deep:#8C6420;
+    --navy:#0B0A16;
+    --navy-2:#171528;
     --paper:#F5F1E8;
-    --muted:#a9a2c4;
-    --ruby:#c9607a;
-    --line:rgba(212,175,55,0.4);
-    --glow:rgba(212,175,55,0.3);
+    --muted:#9C96AE;
+    --gold:#D9B25C;
+    --gold-deep:#8C6420;
+    --violet:#7A6BB0;
+    --ruby:#B4576B;
+    --line:rgba(217,178,92,0.35);
   }
   *{ box-sizing:border-box; }
   body{
-    margin:0;
-    background:
-      radial-gradient(ellipse 80% 50% at 50% -10%, rgba(74,61,122,0.4), transparent 60%),
-      radial-gradient(ellipse 60% 40% at 90% 80%, rgba(74,61,122,0.25), transparent 60%),
-      var(--bg);
+    margin:0; background:radial-gradient(ellipse at 50% 20%, #1a1730 0%, #0B0A16 65%);
     font-family:'Inter',sans-serif; color:var(--paper);
     min-height:100vh; display:flex; align-items:center; justify-content:center;
     padding:40px 20px; overflow-x:hidden;
@@ -35,85 +30,52 @@
   .stars{
     position:fixed; inset:0; pointer-events:none; z-index:0;
     background-image:
-      radial-gradient(1.5px 1.5px at 15% 25%, #fff, transparent),
-      radial-gradient(1px 1px at 65% 55%, #fff, transparent),
-      radial-gradient(2px 2px at 35% 78%, rgba(255,255,255,0.95), transparent),
-      radial-gradient(1px 1px at 85% 15%, #fff, transparent),
-      radial-gradient(1.5px 1.5px at 50% 40%, #fff, transparent),
-      radial-gradient(1px 1px at 5% 60%, #fff, transparent),
-      radial-gradient(2px 2px at 92% 70%, rgba(255,255,255,0.9), transparent),
-      radial-gradient(1px 1px at 25% 90%, #fff, transparent),
-      radial-gradient(1.5px 1.5px at 75% 85%, #fff, transparent);
-    opacity:0.75;
-    animation: twinkle 5s ease-in-out infinite alternate;
+      radial-gradient(1px 1px at 10% 20%, rgba(255,255,255,0.5), transparent),
+      radial-gradient(1px 1px at 80% 15%, rgba(255,255,255,0.4), transparent),
+      radial-gradient(1px 1px at 30% 70%, rgba(255,255,255,0.5), transparent),
+      radial-gradient(1px 1px at 60% 85%, rgba(255,255,255,0.3), transparent),
+      radial-gradient(1px 1px at 90% 60%, rgba(255,255,255,0.4), transparent),
+      radial-gradient(1px 1px at 45% 35%, rgba(255,255,255,0.4), transparent);
   }
-  @keyframes twinkle{ from{ opacity:0.5; } to{ opacity:0.9; } }
 
-  .cover, .card{
+  /* COVER */
+  .cover{
     max-width:400px; width:100%; position:relative; z-index:1;
-    border:1.5px solid var(--gold); border-radius:16px;
+    border:1.5px solid var(--gold); border-radius:22px;
     padding:3px;
-    animation: pulseGlow 4.5s ease-in-out infinite;
+    box-shadow:0 0 50px rgba(217,178,92,0.12);
   }
-  @keyframes pulseGlow{
-    0%, 100%{ box-shadow:0 20px 50px rgba(0,0,0,0.55), 0 0 22px rgba(212,175,55,0.15); }
-    50%{ box-shadow:0 20px 50px rgba(0,0,0,0.55), 0 0 46px rgba(212,175,55,0.35); }
-  }
-  .card{ max-width:460px; display:none; }
-  .card.show{ display:block; animation:fadein 0.5s ease, pulseGlow 4.5s ease-in-out infinite; }
-
-  .cover-inner, .card-inner{
-    border:1px solid rgba(212,175,55,0.5); border-radius:13px;
+  .cover-inner{
+    border:1px solid rgba(217,178,92,0.5); border-radius:19px;
     padding:38px 30px 32px; text-align:center;
-    background:linear-gradient(180deg, #14122388, #0B0A1688);
+    background:linear-gradient(180deg, #14122380, #0B0A1680);
     position:relative;
   }
-  .card-inner{ text-align:left; padding:38px 32px 32px; }
-
-  .corner{ position:absolute; width:26px; height:26px; opacity:0.85; }
+  .corner{ position:absolute; width:22px; height:22px; opacity:0.7; }
   .corner svg{ width:100%; height:100%; }
-  .corner.tl{ top:12px; left:12px; }
-  .corner.tr{ top:12px; right:12px; transform:scaleX(-1); }
-  .corner.bl{ bottom:12px; left:12px; transform:scaleY(-1); }
-  .corner.br{ bottom:12px; right:12px; transform:scale(-1,-1); }
+  .corner.tl{ top:10px; left:10px; }
+  .corner.tr{ top:10px; right:10px; transform:scaleX(-1); }
+  .corner.bl{ bottom:10px; left:10px; transform:scaleY(-1); }
+  .corner.br{ bottom:10px; right:10px; transform:scale(-1,-1); }
 
-  .eyebrow{
-    font-family:'Cinzel', serif;
-    text-align:center; letter-spacing:4px; font-size:12px;
-    color:var(--gold); text-transform:uppercase; margin-bottom:10px;
+  .cover h1{
+    font-family:'Cormorant Garamond',serif; font-weight:600;
+    font-size:26px; line-height:1.25; letter-spacing:0.5px;
+    color:var(--gold); text-transform:uppercase; margin:0 0 22px;
   }
-  .paid-badge{
-    display:block; text-align:center; font-size:12px; color:var(--muted);
-    margin-bottom:20px; font-family:'Cormorant Garamond',serif; font-style:italic;
-  }
-
-  .cover h1, .card h2{
-    font-family:'Cinzel',serif; font-weight:700;
-    text-align:center;
-    letter-spacing:0.5px;
-    background:linear-gradient(180deg, var(--gold-bright) 0%, var(--gold) 60%, var(--gold-deep) 100%);
-    -webkit-background-clip:text; background-clip:text; color:transparent;
-    filter:drop-shadow(0 0 20px var(--glow));
-  }
-  .cover h1{ font-size:26px; line-height:1.3; margin:0 0 22px; }
-  .card h2{ font-size:22px; line-height:1.3; margin:0 0 26px; }
-
   .illus{
     width:100%; max-width:220px; aspect-ratio:4/5; object-fit:cover; object-position:center top;
     margin:0 auto 24px; display:block; border-radius:12px;
     border:1px solid var(--gold);
-    box-shadow:0 0 0 4px rgba(212,175,55,0.08), 0 18px 40px rgba(0,0,0,0.5), 0 0 30px rgba(212,175,55,0.15);
+    box-shadow:0 0 0 4px rgba(217,178,92,0.08), 0 18px 40px rgba(0,0,0,0.45), 0 0 30px rgba(217,178,92,0.15);
   }
   .illus-fallback{ width:100%; max-width:260px; margin:0 auto 22px; display:block; }
   .cover p.sub{
-    font-family:'Cormorant Garamond',serif; font-style:italic;
-    font-size:15.5px; line-height:1.6; color:var(--muted);
-    margin:0 0 20px;
+    font-size:14px; line-height:1.6; color:var(--muted);
+    margin:0 0 20px; font-family:'Inter',sans-serif;
   }
   .price-line{
-    font-family:'Cinzel',serif; font-size:18px;
-    background:linear-gradient(180deg, var(--gold-bright), var(--gold));
-    -webkit-background-clip:text; background-clip:text; color:transparent;
+    font-family:'Cormorant Garamond',serif; font-size:20px; color:var(--gold);
     margin:0 0 22px;
   }
   .trust-line{
@@ -122,87 +84,186 @@
   }
   .trust-line svg{ width:13px; height:13px; flex-shrink:0; color:var(--gold); }
   .enter-btn{
-    display:inline-flex; align-items:center; gap:8px;
-    padding:13px 40px;
-    background:linear-gradient(135deg, var(--gold-bright), var(--gold-deep));
-    color:#1a1408; border:none; border-radius:2px;
-    font-family:'Cinzel',serif; font-weight:600; font-size:14px;
+    display:inline-block; padding:12px 38px;
+    background:transparent; border:1px solid var(--gold);
+    border-radius:24px; color:var(--gold);
+    font-family:'Cormorant Garamond',serif; font-size:16px;
     letter-spacing:2px; text-transform:uppercase;
-    cursor:pointer; transition:transform 0.25s ease, box-shadow 0.25s ease;
-    box-shadow:0 0 30px var(--glow), 0 6px 18px rgba(0,0,0,0.5);
+    cursor:pointer; transition:all 0.25s;
   }
-  .enter-btn:hover{ transform:translateY(-2px); box-shadow:0 0 45px var(--glow), 0 8px 22px rgba(0,0,0,0.6); }
+  .enter-btn:hover{ background:var(--gold); color:#241A08; }
   .secure-note{
-    margin-top:18px; font-size:11.5px; color:var(--muted);
+    margin-top:16px; font-size:11.5px; color:var(--muted);
     display:flex; align-items:center; justify-content:center; gap:6px;
   }
   .secure-note svg{ width:12px; height:12px; flex-shrink:0; }
   .pay-error{ color:var(--ruby); font-size:13px; margin-top:14px; display:none; }
 
+  /* FORM CARD */
+  .card{
+    max-width:460px; width:100%; position:relative; z-index:1;
+    border:1.5px solid var(--gold); border-radius:22px; padding:3px;
+    box-shadow:0 0 50px rgba(217,178,92,0.12);
+    display:none;
+  }
+  .card.show{ display:block; animation:fadein 0.5s ease; }
+  .card-inner{
+    border:1px solid rgba(217,178,92,0.5); border-radius:19px;
+    padding:38px 32px 32px;
+    background:linear-gradient(180deg, #14122380, #0B0A1680);
+    position:relative;
+  }
+  .eyebrow{
+    text-align:center; letter-spacing:3px; font-size:12px;
+    color:var(--gold); text-transform:uppercase; margin-bottom:10px;
+  }
+  .paid-badge{
+    display:block; text-align:center; font-size:12px; color:var(--muted);
+    margin-bottom:18px;
+  }
+  .card h2{
+    font-family:'Cormorant Garamond',serif; font-weight:500;
+    text-align:center; font-size:24px; line-height:1.25; margin:0 0 28px;
+    color:var(--gold); text-transform:uppercase; letter-spacing:0.5px;
+  }
   .field{ margin-bottom:16px; }
   .field label{
-    display:block; font-family:'Cinzel',serif; font-size:11.5px; color:var(--gold);
-    letter-spacing:1px; margin-bottom:7px; text-transform:uppercase;
+    display:block; font-size:12.5px; color:var(--gold);
+    letter-spacing:0.5px; margin-bottom:6px;
   }
   .field input{
     width:100%; background:rgba(255,255,255,0.03);
-    border:1px solid var(--line); border-radius:6px;
+    border:1px solid var(--line); border-radius:9px;
     padding:11px 13px; color:var(--paper); font-size:15px;
     font-family:'Inter',sans-serif;
   }
-  .field input:focus{ outline:none; border-color:var(--gold-bright); box-shadow:0 0 12px var(--glow); }
+  .field input:focus{ outline:none; border-color:var(--gold); }
   .field textarea{
     width:100%; background:rgba(255,255,255,0.03);
-    border:1px solid var(--line); border-radius:6px;
+    border:1px solid var(--line); border-radius:9px;
     padding:11px 13px; color:var(--paper); font-size:15px;
     font-family:'Inter',sans-serif; min-height:70px; resize:vertical;
   }
-  .field textarea:focus{ outline:none; border-color:var(--gold-bright); box-shadow:0 0 12px var(--glow); }
+  .field textarea:focus{ outline:none; border-color:var(--gold); }
+  .divider{
+    display:flex; align-items:center; gap:12px; margin:22px 0 18px;
+    color:var(--muted); font-size:12px; letter-spacing:1px;
+  }
+  .divider::before, .divider::after{ content:''; flex:1; height:1px; background:var(--line); }
   .error{ color:var(--ruby); font-size:13px; margin-top:-6px; margin-bottom:14px; display:none; }
   button.submit{
-    width:100%; padding:16px; margin-top:8px;
-    background:linear-gradient(135deg, var(--gold-bright), var(--gold-deep));
-    color:#1a1408; border:none; border-radius:6px;
-    font-family:'Cinzel',serif; font-weight:600;
-    font-size:15px; letter-spacing:1.5px; text-transform:uppercase; cursor:pointer;
-    box-shadow:0 0 30px var(--glow), 0 6px 18px rgba(0,0,0,0.5);
-    transition:transform 0.25s ease;
+    width:100%; padding:15px; margin-top:6px;
+    background:linear-gradient(135deg, var(--gold), var(--gold-deep));
+    color:#241A08; border:none; border-radius:9px;
+    font-family:'Cormorant Garamond',serif; font-weight:600;
+    font-size:18px; letter-spacing:0.5px; cursor:pointer;
   }
-  button.submit:hover{ transform:translateY(-2px); }
-  button.submit:disabled{ opacity:0.55; transform:none; }
+  button.submit:hover{ opacity:0.92; }
+  button.submit:disabled{ opacity:0.55; }
 
   .loading{ display:none; text-align:center; padding:30px 0; color:var(--muted); font-size:14px; font-style:italic; font-family:'Cormorant Garamond',serif; }
   .loading.show{ display:block; }
-  .spinner{ width:28px; height:28px; margin:0 auto 14px; border:2px solid var(--line); border-top-color:var(--gold-bright); border-radius:50%; animation:spin 1s linear infinite; }
+  .spinner{ width:26px; height:26px; margin:0 auto 14px; border:2px solid var(--line); border-top-color:var(--gold); border-radius:50%; animation:spin 1s linear infinite; }
   @keyframes spin{ to{ transform:rotate(360deg); } }
+  /* Τελετουργία αναμονής: ο ουρανός «γυρίζει» μέχρι να εμφανιστούν οι πρώτες λέξεις */
+  .ritual{ text-align:center; padding:26px 0 10px; animation:fadein 0.8s ease; }
+  .ritual-orb{ position:relative; width:150px; height:150px; margin:0 auto 22px; }
+  .ritual-orb svg{ position:absolute; inset:0; width:100%; height:100%; }
+  .ritual-ring{ animation:spin 40s linear infinite; transform-origin:50% 50%; }
+  .ritual-ring2{ animation:spin 26s linear infinite reverse; transform-origin:50% 50%; }
+  .ritual-core{ position:absolute; left:50%; top:50%; width:46px; height:46px; margin:-23px 0 0 -23px; border-radius:50%;
+    background:radial-gradient(circle at 35% 30%, #f3d98b, #b8862f 60%, #6d4a14); box-shadow:0 0 22px rgba(232,192,104,0.55), 0 0 60px rgba(232,192,104,0.25);
+    display:flex; align-items:center; justify-content:center; font-family:'Cormorant Garamond',serif; font-size:22px; color:#2a1c06; animation:orbpulse 3.2s ease-in-out infinite; }
+  @keyframes orbpulse{ 0%,100%{ transform:scale(1); box-shadow:0 0 22px rgba(232,192,104,0.5), 0 0 60px rgba(232,192,104,0.2);} 50%{ transform:scale(1.07); box-shadow:0 0 32px rgba(232,192,104,0.8), 0 0 90px rgba(232,192,104,0.35);} }
+  .ritual-star{ animation:twinkle 2.6s ease-in-out infinite; }
+  @keyframes twinkle{ 0%,100%{ opacity:0.25; } 50%{ opacity:1; } }
+  .ritual-line{ font-family:'Cormorant Garamond',serif; font-style:italic; font-size:18px; line-height:1.5; color:var(--gold); min-height:56px; max-width:330px; margin:0 auto; transition:opacity 0.7s ease; }
+  .pct.counting{ transition:none; }
+  .pause-note{ margin:14px 0 0; font-family:'Cormorant Garamond',serif; font-style:italic; font-size:16px; color:var(--gold); text-align:center; animation:fadein 0.6s ease; }
+  .pause-note .dots i{ font-style:normal; animation:twinkle 1.4s infinite; }
+  .pause-note .dots i:nth-child(2){ animation-delay:0.25s; } .pause-note .dots i:nth-child(3){ animation-delay:0.5s; }
+  .wait-bar{ width:100%; max-width:300px; height:4px; margin:18px auto 0; background:rgba(217,180,95,0.15); border-radius:4px; overflow:hidden; }
+  .wait-bar span{ display:block; height:100%; width:0; background:linear-gradient(90deg,#b8862f,#f3d98b); border-radius:4px; transition:width 1s ease; }
+  .wait-steps{ list-style:none; padding:0; margin:18px auto 0; max-width:300px; text-align:left; font-size:13.5px; line-height:1.5; color:var(--muted); }
+  .wait-steps li{ display:flex; gap:10px; align-items:flex-start; margin:7px 0; transition:color 0.5s; }
+  .wait-steps li .dot{ flex:0 0 16px; height:16px; margin-top:2px; border-radius:50%; border:1px solid rgba(217,180,95,0.5); display:flex; align-items:center; justify-content:center; font-size:10px; color:#1a1206; }
+  .wait-steps li.done{ color:var(--paper); }
+  .wait-steps li.done .dot{ background:#d9b45f; border-color:#d9b45f; }
+  .wait-steps li.active{ color:var(--gold); }
+  .wait-steps li.active .dot{ border-color:#f3d98b; animation:orbpulse 1.6s ease-in-out infinite; }
+  .wait-note{ font-size:12.5px; line-height:1.55; color:var(--muted); max-width:310px; margin:16px auto 0; text-align:center; }
+
+
   @keyframes fadein{ from{opacity:0; transform:translateY(6px);} to{opacity:1; transform:translateY(0);} }
 
   .result{ margin-top:26px; padding-top:24px; border-top:1px solid var(--line); display:none; }
   .result.show{ display:block; animation:fadein 0.6s ease; }
-  .spread{ display:flex; gap:10px; justify-content:center; margin-bottom:22px; flex-wrap:nowrap; }
-  .spread-card{ width:min(100px, 27vw); text-align:center; }
-  .spread-card .frame{
-    border:1.5px solid var(--gold); border-radius:8px; overflow:hidden;
-    box-shadow:0 0 14px rgba(217,178,92,0.2); margin-bottom:8px;
-    background:#0B0A16;
-  }
-  .spread-card img{ width:100%; display:block; }
-  .spread-card img.reversed{ transform:rotate(180deg); }
-  .spread-card .slot-label{ font-size:10.5px; letter-spacing:1.5px; color:var(--gold); text-transform:uppercase; margin-bottom:2px; }
-  .spread-card .card-name{ font-family:'Cormorant Garamond',serif; font-size:14px; color:var(--paper); line-height:1.3; }
-  .spread-card .orientation{ font-size:10px; color:var(--muted); }
+  .pct-wrap{ text-align:center; margin-bottom:18px; }
+  .pct{ font-family:'Cormorant Garamond',serif; font-size:52px; font-weight:600; color:var(--gold); line-height:1; }
+  .pct-label{ font-size:12px; color:var(--muted); letter-spacing:1px; margin-top:4px; }
+  .reading{ font-family:'Cormorant Garamond',serif; font-size:17px; line-height:1.7; color:var(--paper); white-space:pre-wrap; }
+  .note{ text-align:center; font-size:11px; color:var(--muted); margin-top:20px; line-height:1.5; }
+  .done-note{ text-align:center; font-size:12.5px; color:var(--muted); margin-top:22px; }
 
-  .numbers-wrap{ display:flex; justify-content:center; gap:36px; margin-bottom:22px; }
-  .number-block{ text-align:center; }
-  .num{
-    font-family:'Cinzel',serif; font-size:46px; font-weight:700; line-height:1;
-    background:linear-gradient(180deg, var(--gold-bright), var(--gold));
-    -webkit-background-clip:text; background-clip:text; color:transparent;
-    filter:drop-shadow(0 0 18px var(--glow));
+  /* Δωρεάν χρησμός και σφραγισμένη συνέχεια */
+  .field.consent{ display:flex; gap:10px; align-items:flex-start; }
+  .field.consent input{ width:auto; margin-top:3px; accent-color:var(--gold); }
+  .field.consent label{ color:var(--muted); font-size:12.5px; line-height:1.5; margin:0; letter-spacing:0; }
+  .typing::after{ content:'▍'; color:var(--gold); animation:blink 1s steps(2) infinite; margin-left:2px; }
+  @keyframes blink{ 50%{ opacity:0; } }
+  .seal-wrap{ position:relative; margin-top:18px; border-radius:12px; overflow:hidden; display:none; }
+  .seal-wrap.show{ display:block; animation:fadein 0.6s ease; }
+  .seal-blur{
+    font-family:'Cormorant Garamond',serif; font-size:17px; line-height:1.7; color:var(--paper);
+    filter:blur(6px); opacity:0.55; user-select:none; pointer-events:none; padding:4px 2px 90px;
   }
-  .num-label{ font-family:'Cinzel',serif; font-size:10px; color:var(--muted); letter-spacing:1.5px; margin-top:6px; }
-  .reading{ font-family:'Cormorant Garamond',serif; font-size:17.5px; line-height:1.75; color:var(--paper); white-space:pre-wrap; }
-  .note{ text-align:center; font-size:11px; color:var(--muted); margin-top:22px; line-height:1.6; }
+  .seal-overlay{
+    position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center;
+    gap:12px; text-align:center; padding:20px;
+    background:linear-gradient(180deg, rgba(11,10,22,0) 0%, rgba(11,10,22,0.85) 45%, rgba(11,10,22,0.95) 100%);
+  }
+  .wax{
+    width:74px; height:74px; border-radius:50%;
+    background:radial-gradient(circle at 35% 30%, #c4596b, #7d2234 70%);
+    box-shadow:0 6px 18px rgba(0,0,0,0.5), inset 0 -4px 8px rgba(0,0,0,0.35);
+    display:flex; align-items:center; justify-content:center;
+    color:#f3d9a0; font-family:'Cormorant Garamond',serif; font-size:28px;
+  }
+  .seal-title{ font-family:'Cormorant Garamond',serif; font-size:20px; color:var(--gold); }
+  .seal-sub{ font-size:13px; color:var(--muted); max-width:300px; line-height:1.5; }
+  .full-wrap{ display:none; margin-top:22px; padding-top:22px; border-top:1px solid var(--line); }
+  .full-wrap.show{ display:block; animation:fadein 0.6s ease; }
+  #unlockBtn{ padding:12px 26px; font-size:15px; letter-spacing:1px; white-space:nowrap; }
+  .info{ text-align:center; font-size:13.5px; color:var(--paper); line-height:1.6; margin:4px 0 6px; }
+
+
+  .spread{ display:none; gap:10px; justify-content:center; margin:0 0 22px; flex-wrap:nowrap; }
+  .spread-card{ width:min(100px, 27vw); text-align:center; }
+  .spread-card .frame{ border:1px solid var(--gold); border-radius:8px; overflow:hidden; aspect-ratio:7/12; margin-bottom:8px; box-shadow:0 8px 20px rgba(0,0,0,0.4); background:#120f22; }
+  .spread-card img{ width:100%; height:100%; object-fit:cover; display:block; }
+  .spread-card img.reversed{ transform:rotate(180deg); }
+  .card-back{ width:100%; height:100%; display:flex; align-items:center; justify-content:center;
+    background:repeating-linear-gradient(45deg, rgba(217,178,92,0.10) 0 6px, transparent 6px 12px), radial-gradient(circle at 50% 45%, #2a2147, #120f22 70%); }
+  .card-back span{ width:38px; height:38px; border-radius:50%; border:1px solid var(--gold); color:var(--gold); display:flex; align-items:center; justify-content:center; font-family:'Cormorant Garamond',serif; font-size:20px; }
+  .spread-card .slot-label{ font-size:10.5px; letter-spacing:1.5px; color:var(--gold); margin-bottom:4px; }
+  .spread-card .card-name{ font-family:'Cormorant Garamond',serif; font-size:14px; color:var(--paper); line-height:1.3; }
+  .spread-card.closed .card-name{ color:var(--muted); font-style:italic; }
+  .spread-card .orientation{ font-size:10px; color:var(--muted); }
+  .numbers{ display:none; justify-content:center; gap:14px; flex-wrap:wrap; margin:0 0 22px; }
+  .number-block{ text-align:center; min-width:70px; }
+  .number-block .num{ font-family:'Cormorant Garamond',serif; font-size:40px; font-weight:600; color:var(--gold); line-height:1; }
+  .number-block.closed .num{ color:var(--muted); opacity:0.6; }
+  .number-block .num-label{ font-size:9.5px; color:var(--muted); letter-spacing:1px; margin-top:6px; max-width:90px; }
+  .question-head{ display:none; text-align:center; margin:0 0 18px; }
+  .question-head .ql{ font-size:11.5px; letter-spacing:2px; color:var(--gold); margin-bottom:6px; }
+  .question-head .qt{ font-family:'Cormorant Garamond',serif; font-style:italic; font-size:19px; color:var(--paper); line-height:1.4; }
+  .ask-title{ font-family:'Cormorant Garamond',serif; font-size:20px; color:var(--gold); margin:6px 0 14px; }
+  .ask-box{ max-width:380px; margin:0 auto; }
+  .ask-box .enter-btn{ padding:11px 28px; font-size:14px; }
+  .seal-blur{ min-height:360px; }
+  .value-note-q{ font-size:12.5px; line-height:1.55; color:var(--muted); max-width:320px; margin:12px auto 18px; text-align:center; }
+
+  .time-note{ font-size:12px; opacity:0.7; margin-top:6px; line-height:1.4; }
 </style>
 <script type="text/javascript">
     (function(c,l,a,r,i,t,y){
@@ -217,67 +278,92 @@
 
 <div class="cover" id="cover">
   <div class="cover-inner">
-    <div class="corner tl"><svg viewBox="0 0 26 26" fill="none"><path d="M2,2 L2,16 M2,2 L16,2" stroke="#d4af37" stroke-width="1.2"/></svg></div>
-    <div class="corner tr"><svg viewBox="0 0 26 26" fill="none"><path d="M2,2 L2,16 M2,2 L16,2" stroke="#d4af37" stroke-width="1.2"/></svg></div>
-    <div class="corner bl"><svg viewBox="0 0 26 26" fill="none"><path d="M2,2 L2,16 M2,2 L16,2" stroke="#d4af37" stroke-width="1.2"/></svg></div>
-    <div class="corner br"><svg viewBox="0 0 26 26" fill="none"><path d="M2,2 L2,16 M2,2 L16,2" stroke="#d4af37" stroke-width="1.2"/></svg></div>
+    <div class="corner tl"><svg viewBox="0 0 22 22"><path d="M2,2 L2,14 M2,2 L14,2" stroke="#D9B25C" stroke-width="1.2" fill="none"/></svg></div>
+    <div class="corner tr"><svg viewBox="0 0 22 22"><path d="M2,2 L2,14 M2,2 L14,2" stroke="#D9B25C" stroke-width="1.2" fill="none"/></svg></div>
+    <div class="corner bl"><svg viewBox="0 0 22 22"><path d="M2,2 L2,14 M2,2 L14,2" stroke="#D9B25C" stroke-width="1.2" fill="none"/></svg></div>
+    <div class="corner br"><svg viewBox="0 0 22 22"><path d="M2,2 L2,14 M2,2 L14,2" stroke="#D9B25C" stroke-width="1.2" fill="none"/></svg></div>
 
-    <div class="eyebrow">Μαντείο</div>
     <h1>Το Τρίφυλλο<br>Ταρώ</h1>
-
-    <img class="illus" src="images/taro.jpg" alt="Το Τρίφυλλο Ταρώ" onerror="this.style.display='none'; document.querySelector('.illus-fallback').style.display='block';">
-    <svg class="illus-fallback" viewBox="0 0 260 200" fill="none" style="display:none">
-      <circle cx="130" cy="100" r="50" fill="none" stroke="#d4af37" stroke-width="0.8" opacity="0.5"/>
-      <text x="130" y="112" text-anchor="middle" font-size="36" fill="#d4af37" font-family="serif">7</text>
-    </svg>
-
+    <img class="illus" src="images/taro.jpg" alt="Το Τρίφυλλο Ταρώ" onerror="this.style.display='none'">
     <p class="sub">Τρία χαρτιά πάνω στο δικό σου ερώτημα: τι σε έφερε ως εδώ, τι ζεις τώρα και τι έρχεται.</p>
-    <p class="price-line">4,99€ μία ανάλυση</p>
-    <p class="value-note" style="font-size:12.5px;line-height:1.55;color:var(--muted);max-width:320px;margin:10px auto 18px;text-align:center;">Μια τέτοια πρόβλεψη κοστίζει περίπου 100€. Εδώ τα χαρτιά τραβιούνται μόνο για σένα και η ανάγνωση γράφεται πάνω στο δικό σου ερώτημα, με 4,99€.</p>
+    <p class="price-line" style="margin-bottom:10px;">Η αρχή του χρησμού σου δωρεάν</p>
+    <p class="ask-line" style="font-size:15px;line-height:1.5;color:var(--muted);margin:0 auto 22px;max-width:340px;">Και μετά την ανάγνωσή σου, μπορείς να ρωτήσεις κι άλλα πάνω στα ίδια χαρτιά.</p>
     <p class="trust-line"><svg viewBox="0 0 24 24" fill="none"><path d="M12 2l2.4 6.6L21 10l-5 4.4 1.5 6.6L12 17.8 6.5 21l1.5-6.6L3 10l6.6-1.4z" stroke="currentColor" stroke-width="1.4"/></svg>Εμπιστεύονται ήδη πάνω από 33.000 άνθρωποι στο Facebook</p>
-    <div class="enter-btn" id="enterBtn">Τράβηξε τα χαρτιά σου →</div>
-    <div class="secure-note">
-      <svg viewBox="0 0 24 24" fill="none"><rect x="5" y="11" width="14" height="10" rx="2" stroke="currentColor" stroke-width="1.6"/><path d="M8 11V7a4 4 0 0 1 8 0v4" stroke="currentColor" stroke-width="1.6"/></svg>
-      Ασφαλής πληρωμή μέσω Stripe
-    </div>
-    <p class="pay-error" id="payError">Κάτι πήγε στραβά με την πληρωμή, δοκίμασε ξανά.</p>
+    <div class="enter-btn" id="enterBtn">Δες τον χρησμό σου</div>
+    <div class="secure-note"><svg viewBox="0 0 24 24" fill="none"><rect x="5" y="11" width="14" height="10" rx="2" stroke="currentColor" stroke-width="1.6"/><path d="M8 11V7a4 4 0 0 1 8 0v4" stroke="currentColor" stroke-width="1.6"/></svg> Χωρίς κάρτα για το δωρεάν άνοιγμα</div>
   </div>
 </div>
 
 <div class="card" id="card">
   <div class="card-inner">
-    <div class="corner tl"><svg viewBox="0 0 26 26" fill="none"><path d="M2,2 L2,16 M2,2 L16,2" stroke="#d4af37" stroke-width="1.2"/></svg></div>
-    <div class="corner tr"><svg viewBox="0 0 26 26" fill="none"><path d="M2,2 L2,16 M2,2 L16,2" stroke="#d4af37" stroke-width="1.2"/></svg></div>
-    <div class="corner bl"><svg viewBox="0 0 26 26" fill="none"><path d="M2,2 L2,16 M2,2 L16,2" stroke="#d4af37" stroke-width="1.2"/></svg></div>
-    <div class="corner br"><svg viewBox="0 0 26 26" fill="none"><path d="M2,2 L2,16 M2,2 L16,2" stroke="#d4af37" stroke-width="1.2"/></svg></div>
+    <div class="corner tl"><svg viewBox="0 0 22 22"><path d="M2,2 L2,14 M2,2 L14,2" stroke="#D9B25C" stroke-width="1.2" fill="none"/></svg></div>
+    <div class="corner tr"><svg viewBox="0 0 22 22"><path d="M2,2 L2,14 M2,2 L14,2" stroke="#D9B25C" stroke-width="1.2" fill="none"/></svg></div>
+    <div class="corner bl"><svg viewBox="0 0 22 22"><path d="M2,2 L2,14 M2,2 L14,2" stroke="#D9B25C" stroke-width="1.2" fill="none"/></svg></div>
+    <div class="corner br"><svg viewBox="0 0 22 22"><path d="M2,2 L2,14 M2,2 L14,2" stroke="#D9B25C" stroke-width="1.2" fill="none"/></svg></div>
 
-    <div class="eyebrow" style="text-align:center;">Μαντείο</div>
-    <div class="paid-badge">Η πληρωμή σου επιβεβαιώθηκε ✓</div>
-  <h2 id="cardTitle">Το Τρίφυλλο Ταρώ</h2>
+    <div class="eyebrow">Μαντείο</div>
+    <div class="paid-badge" id="paidBadge" style="display:none;">Η πληρωμή σου επιβεβαιώθηκε ✓</div>
+    <h2 id="cardTitle">Το Τρίφυλλο Ταρώ</h2>
 
   <form id="form">
-    <div id="personalFields">
       <div class="field">
-        <label>Το όνομά σου</label>
+        <label for="name1">Το όνομά σου</label>
         <input type="text" id="name1" placeholder="π.χ. Μαρία" />
+        
       </div>
-    </div>
-    <div class="field" id="questionField">
-      <label id="questionLabel">Ποιο είναι το ερώτημά σου;</label>
-      <textarea id="question" placeholder="π.χ. Τι πρέπει να ξέρω για τη σχέση μου τους επόμενους μήνες;"></textarea>
-    </div>
-    <p class="error" id="err">Συμπλήρωσε το όνομά σου και το ερώτημά σου.</p>
-    <button type="submit" class="submit" id="btn">Δες τον χρησμό →</button>
+      <div class="field">
+        <label for="question">Ποιο είναι το ερώτημά σου;</label>
+        <textarea id="question" placeholder="π.χ. Τι πρέπει να ξέρω για τη σχέση μου τους επόμενους μήνες;"></textarea>
+        <div class="time-note">Σκέψου το ερώτημα καθαρά πριν το γράψεις. Τα χαρτιά απαντούν σε αυτό που ρωτάς.</div>
+      </div>
+
+      <div id="emailFields">
+        <div class="divider">ΠΟΥ ΝΑ ΣΟΥ ΤΟΝ ΚΡΑΤΗΣΟΥΜΕ</div>
+        <div class="field">
+          <label for="email">Το email σου</label>
+          <input type="email" id="email" placeholder="π.χ. maria@gmail.com" autocomplete="email" />
+        </div>
+        <div class="field consent">
+          <input type="checkbox" id="consent" />
+          <label for="consent">Θέλω να λαμβάνω τους χρησμούς και τα νέα του Μαντείου στο email μου. Μπορώ να διαγραφώ όποτε θέλω.</label>
+        </div>
+      </div>
+    <p class="error" id="err"></p>
+    <button type="submit" class="submit" id="btn">Δες δωρεάν τον χρησμό σου</button>
   </form>
 
-  <div class="loading" id="loading">
-    <div class="spinner"></div>
-    Τα χαρτιά ανακατεύονται...
-  </div>
+  <div class="loading" id="loading"></div>
 
   <div class="result" id="result">
     <div class="spread" id="spread"></div>
-    <div class="reading" id="readingtext"></div>
+    <div class="numbers" id="numbers"></div>
+    <div class="reading" id="teaserText"></div>
+    <p class="info" id="infoLine" style="display:none;"></p>
+
+    <div class="seal-wrap" id="seal">
+      <div class="seal-blur" aria-hidden="true">Το χαρτί του Παρόντος δείχνει αυτό που ζεις τώρα και δεν το βλέπεις ακόμα καθαρά. Το χαρτί του Μέλλοντος δείχνει πού οδηγούν τα πράγματα τους επόμενους μήνες, και μαζί δίνουν καθαρή απάντηση στο ερώτημά σου.</div>
+      <div class="seal-overlay">
+        <div class="wax">Μ</div>
+        <div class="seal-title">Ο χρησμός σου συνεχίζεται</div>
+        <div class="seal-sub">Το Παρόν, το Μέλλον και η καθαρή απάντηση στο ερώτημά σου.</div>
+        <div class="enter-btn" id="unlockBtn">Δες τη συνέχεια · 4,99€</div>
+        <p class="value-note" style="font-size:12.5px;line-height:1.55;color:var(--muted);max-width:320px;margin:10px auto 18px;text-align:center;">Μια τέτοια πρόβλεψη κοστίζει περίπου 100€. Εδώ γράφεται μόνο για σένα, με 4,99€. Χρεώνεσαι μόνο όταν ολοκληρωθεί ο χρησμός σου.</p>
+        <div class="secure-note"><svg viewBox="0 0 24 24" fill="none"><rect x="5" y="11" width="14" height="10" rx="2" stroke="currentColor" stroke-width="1.6"/><path d="M8 11V7a4 4 0 0 1 8 0v4" stroke="currentColor" stroke-width="1.6"/></svg> Ασφαλής πληρωμή μέσω Stripe</div>
+      </div>
+    </div>
+    <p class="support-line" style="text-align:center;font-size:12.5px;color:var(--muted);margin-top:18px;line-height:1.5;">Αν κάτι δεν πάει καλά, γράψε μας στο <a href="https://m.me/61573958341176" target="_blank" rel="noopener" style="color:var(--gold);">Messenger του Μαντείου</a> και θα το λύσουμε αμέσως.</p>
+    <p id="restartLink" style="display:none;text-align:center;font-size:12.5px;color:var(--muted);margin-top:16px;cursor:pointer;text-decoration:underline;">Θέλεις νέο χρησμό; Ξεκίνα από την αρχή</p>
+
+    <div class="full-wrap" id="fullWrap">
+      <div class="question-head" id="questionHead"><div class="ql">Η ΕΡΩΤΗΣΗ ΣΟΥ</div><div class="qt" id="questionShown"></div></div>
+      <div id="ritualFull"></div>
+      <div class="reading" id="readingtext"></div>
+      <p id="pauseNote" class="pause-note" style="display:none;">Ο χρησμός σου συνεχίζει να γράφεται, μείνε εδώ<span class="dots"><i>.</i><i>.</i><i>.</i></span></p>
+      <div id="adviceWrap" style="display:none; margin-top:20px; padding-top:18px; border-top:1px solid var(--line);">
+        <div style="font-size:11.5px; letter-spacing:2px; color:var(--gold); text-transform:uppercase; margin-bottom:8px;">Πρακτική συμβουλή</div>
+        <div id="adviceText" style="font-family:'Inter',sans-serif; font-size:14.5px; line-height:1.65; color:var(--paper); white-space:pre-wrap;"></div>
+      </div>
+    </div>
     <div id="extraActions" style="margin-top:22px; text-align:center;"></div>
   </div>
 
@@ -286,205 +372,627 @@
 </div>
 
 <script>
-const STORAGE_KEY = 'manteio_taro_fields';
+const CFG = {"tool": "taro", "kind": "taro", "title": "Το Τρίφυλλο Ταρώ", "needDob2": false, "needQuestion": true, "pctLabel": null, "teaserRitual": ["Τα χαρτιά ανακατεύονται{name}...", "Τρία χαρτιά βγαίνουν από την τράπουλα...", "Το πρώτο χαρτί γυρίζει..."], "fullRitual": ["Το Παρόν και το Μέλλον γυρίζουν...", "Τα χαρτιά δένονται με το ερώτημά σου...", "Η ανάγνωσή σου γράφεται{name}..."], "questionRitual": ["Η ερώτησή σου φτάνει στα άστρα{name}...", "Αναζητούμε την απάντηση στους ίδιους χάρτες...", "Η απάντησή σου γράφεται..."], "waitSteps": ["Η πληρωμή σου επιβεβαιώθηκε", "Τα δύο σφραγισμένα χαρτιά γυρίζουν", "Τα χαρτιά δένονται με το ερώτημά σου", "Η ανάγνωσή σου γράφεται ειδικά για σένα"], "questionSteps": ["Η πληρωμή σου επιβεβαιώθηκε", "Η ερώτησή σου διαβάζεται", "Αναζητούμε την απάντηση", "Η απάντηση γράφεται ειδικά για σένα"], "questionPlaceholder": "π.χ. Τι να κάνω για να πάει καλά;", "questionHint": "Ρώτα ό,τι σε καίει, πάνω στα ίδια τρία χαρτιά.", "sameData": "με τα ίδια χαρτιά"};
+/* Κοινή λογική σελίδας για τα εργαλεία του κοινού μηχανισμού.
+   Η σελίδα κάθε εργαλείου ορίζει πριν από αυτό το script το αντικείμενο CFG (δες build-oracle-pages.py).
+   Ροή: δωρεάν άνοιγμα με email, σφραγισμένη συνέχεια, πληρωμή (δέσμευση), χρησμός που γράφεται
+   στο παρασκήνιο και εμφανίζεται σαν πληκτρολόγηση, 2η και 3η ερώτηση με τον ίδιο τρόπο. */
+
+const TOOL = CFG.tool;
+const KEY = (k) => `manteio_${TOOL}_${k}`;
+const STORAGE_KEY = KEY('fields');
+const TEASER_KEY = KEY('teaser');
+const ENTERED_KEY = KEY('entered');
+const EMAIL_KEY = 'manteio_email';
+const ERR_MARK = '<<<ΣΦΑΛΜΑ>>>';
+const FIELD_IDS = ['name1', 'dob1', 'tob1', 'pob1', 'name2', 'dob2', 'tob2', 'pob2', 'question'];
 const params = new URLSearchParams(window.location.search);
 const sessionId = params.get('session_id');
-const stage = params.get('stage') || 'q1';
+const readingIdParam = params.get('rid');
+const PREVIEW = location.hostname.includes('deploy-preview');
 
-const STAGE_INFO = {
-  q1: { title: 'Το Τρίφυλλο Ταρώ', label: 'Ποιο είναι το ερώτημά σου;', btn: 'Τράβηξε τα χαρτιά →' },
-  q2: { title: 'Το Τρίφυλλο Ταρώ, 2η ερώτηση', label: 'Η δεύτερη ερώτησή σου, στα ίδια χαρτιά', btn: 'Δες τη 2η απάντηση →' },
-  q3: { title: 'Το Τρίφυλλο Ταρώ, 3η ερώτηση', label: 'Η τρίτη ερώτησή σου, στα ίδια χαρτιά', btn: 'Δες τη 3η απάντηση →' }
-};
-
-const personalFields = document.getElementById('personalFields');
-const questionField = document.getElementById('questionField');
-const questionLabel = document.getElementById('questionLabel');
-const cardTitle = document.getElementById('cardTitle');
-const btnEl = document.getElementById('btn');
+const $ = (id) => document.getElementById(id);
+const cover = $('cover'), card = $('card');
+const form = $('form'), btn = $('btn'), err = $('err');
+const loading = $('loading'), result = $('result');
+const teaserText = $('teaserText'), infoLine = $('infoLine'), seal = $('seal');
+const fullWrap = $('fullWrap'), pctnum = $('pctnum'), readingtext = $('readingtext');
+const adviceWrap = $('adviceWrap'), adviceText = $('adviceText');
 
 let savedFields = null;
 try { savedFields = JSON.parse(localStorage.getItem(STORAGE_KEY) || 'null'); } catch (e) {}
+let currentReadingId = null;
+let currentData = {};
 
-if (sessionId) {
-  document.getElementById('cover').style.display = 'none';
-  document.getElementById('card').classList.add('show');
-
-  cardTitle.textContent = STAGE_INFO[stage].title;
-  btnEl.textContent = STAGE_INFO[stage].btn;
-
-  questionLabel.textContent = STAGE_INFO[stage].label;
-  if (savedFields) document.getElementById('name1').value = savedFields.name1 || '';
-  if (stage !== 'q1' && savedFields && savedFields.name1) personalFields.style.display = 'none';
+const nameCase = (s) => String(s || '').replace(/(^|\s)(\S)/g, (m, sp, c) => sp + c.toLocaleUpperCase('el'));
+function showCard() { cover.style.display = 'none'; card.classList.add('show'); }
+function showError(t) { err.textContent = t; err.style.display = 'block'; }
+function saveTeaserState(rid, text, info, data) {
+  try { localStorage.setItem(TEASER_KEY, JSON.stringify({ rid, text, info, data, ts: Date.now() })); } catch (e) {}
+}
+function clearTeaserState() {
+  try { localStorage.removeItem(TEASER_KEY); localStorage.removeItem(ENTERED_KEY); } catch (e) {}
+}
+function fillSavedFields() {
+  if (!savedFields) return;
+  FIELD_IDS.forEach(k => { if ($(k) && savedFields[k]) $(k).value = savedFields[k]; });
+}
+function readFields() {
+  const v = (id) => ($(id) ? $(id).value.trim() : '');
+  const f = {};
+  FIELD_IDS.forEach(k => { f[k] = v(k); });
+  return f;
 }
 
-document.getElementById('enterBtn').addEventListener('click', async () => {
-  const enterBtn = document.getElementById('enterBtn');
-  const payError = document.getElementById('payError');
-  payError.style.display = 'none';
-  enterBtn.textContent = 'Μεταφορά στην ασφαλή πληρωμή...';
+/* ---------- Χαρτιά ταρώ και αριθμοί ---------- */
+
+const SLOT_LABELS = ['ΠΑΡΕΛΘΟΝ', 'ΠΑΡΟΝ', 'ΜΕΛΛΟΝ'];
+function renderCards(cards, revealAll) {
+  const box = $('spread');
+  if (!box || !Array.isArray(cards) || cards.length !== 3) return;
+  box.innerHTML = '';
+  box.style.display = 'flex';
+  cards.forEach((c, i) => {
+    const open = revealAll || i === 0;
+    const div = document.createElement('div');
+    div.className = 'spread-card' + (open ? '' : ' closed');
+    div.innerHTML = `<div class="slot-label">${SLOT_LABELS[i]}</div>
+      <div class="frame">${open ? `<img src="tarot-cards/${c.file}" class="${c.reversed ? 'reversed' : ''}" alt="">` : '<div class="card-back"><span>Μ</span></div>'}</div>
+      <div class="card-name"></div><div class="orientation"></div>`;
+    if (open) {
+      div.querySelector('img').alt = c.name;
+      div.querySelector('.card-name').textContent = c.name;
+      div.querySelector('.orientation').textContent = c.reversed ? 'Ανάστροφο' : 'Όρθιο';
+    } else {
+      div.querySelector('.card-name').textContent = 'Σφραγισμένο';
+    }
+    box.appendChild(div);
+  });
+}
+function renderNumbers(n, revealAll) {
+  const box = $('numbers');
+  if (!box || !n) return;
+  box.style.display = 'flex';
+  const items = [['ΑΡΙΘΜΟΣ ΖΩΗΣ', n.lifePath, true], ['ΑΡΙΘΜΟΣ ΟΝΟΜΑΤΟΣ', n.nameNumber, revealAll], ['ΑΡΙΘΜΟΣ ΨΥΧΗΣ', n.soulNumber, revealAll], ['ΠΡΟΣΩΠΙΚΟ ΕΤΟΣ ' + n.year, n.personalYear, revealAll]];
+  box.innerHTML = items.map(([label, val, open]) =>
+    `<div class="number-block${open ? '' : ' closed'}"><div class="num">${open ? val : '?'}</div><div class="num-label">${label}</div></div>`).join('');
+}
+function renderData(data, revealAll) {
+  if (!data) return;
+  currentData = data;
+  if (data.cards) renderCards(data.cards, revealAll);
+  if (data.numbers) renderNumbers(data.numbers, revealAll);
+}
+
+/* ---------- Streaming και κείμενο ---------- */
+
+async function readStream(response, onText) {
+  const reader = response.body.getReader();
+  const decoder = new TextDecoder();
+  let all = '';
+  while (true) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    all += decoder.decode(value, { stream: true });
+    onText(all);
+  }
+  all += decoder.decode();
+  onText(all);
+  return all;
+}
+
+function renderContinuation(cont, finished) {
+  let text = cont.replace(ERR_MARK, '');
+  let pct = null;
+  const m = text.match(/^\s*\[ΠΟΣΟΣΤΟ:\s*(\d+)\]\s*/);
+  if (m) { pct = m[1]; text = text.slice(m[0].length); }
+  else if (/^\s*\[/.test(text) && !text.includes(']')) { text = ''; }
+  if (pct && CFG.pctLabel) { stopRitual(); revealPercent(pct); }
+  if (text.trim()) stopRitual();
+  const parts = text.split(/\[?\s*ΣΥΜΒΟΥΛΗ\s*\]?\s*:?/);
+  readingtext.textContent = parts[0].trim();
+  if (parts[1] !== undefined) {
+    adviceWrap.style.display = 'block';
+    adviceText.textContent = parts[1].trim();
+    readingtext.classList.remove('typing');
+    adviceText.classList.toggle('typing', !finished);
+  } else {
+    readingtext.classList.toggle('typing', !finished);
+  }
+}
+
+/* Γραφή με ανθρώπινο ρυθμό: σταθερός ρυθμός, μικρές παύσεις στα σημεία στίξης. */
+function makeTyper(render) {
+  let target = '', shown = 0, finished = false, timer = null, pauseUntil = 0, doneCbs = [];
+  const skip = (t, i) => {
+    const m = t.slice(i).match(/^\s*\[ΠΟΣΟΣΤΟ:\s*\d+\]\s*/);
+    return m ? i + m[0].length : i;
+  };
+  const tick = () => {
+    const now = Date.now();
+    if (now < pauseUntil) return;
+    const backlog = target.length - shown;
+    if (backlog <= 0) {
+      if (finished) { clearInterval(timer); timer = null; render(target, true); doneCbs.splice(0).forEach(f => f()); }
+      return;
+    }
+    const cps = backlog > 2500 ? 220 : backlog > 1200 ? 110 : backlog > 500 ? 60 : 32;
+    const n = Math.max(1, Math.round(cps * 0.04));
+    shown = skip(target, shown);
+    shown = Math.min(target.length, shown + n);
+    const ch = target[shown - 1];
+    if (backlog < 1200) {
+      if (/[.!;?]/.test(ch)) pauseUntil = now + 320;
+      else if (/[,·:]/.test(ch)) pauseUntil = now + 120;
+    }
+    render(target.slice(0, shown), false);
+  };
+  return {
+    set(t, isFinished) {
+      target = t; finished = !!isFinished;
+      if (shown > target.length) shown = target.length;
+      if (!timer) timer = setInterval(tick, 40);
+    },
+    instant(t) { target = t; shown = t.length; finished = true; render(t, true); doneCbs.splice(0).forEach(f => f()); },
+    busy() { return shown < target.length; },
+    whenDone() { return new Promise(r => { if (finished && shown >= target.length && !timer) r(); else doneCbs.push(r); }); }
+  };
+}
+
+/* ---------- Τελετουργία αναμονής ---------- */
+
+function ritualHTML() {
+  let ticks = '', stars = '';
+  for (let i = 0; i < 12; i++) {
+    const a = i * Math.PI / 6, x1 = 75 + 62 * Math.cos(a), y1 = 75 + 62 * Math.sin(a), x2 = 75 + 70 * Math.cos(a), y2 = 75 + 70 * Math.sin(a);
+    ticks += `<line x1="${x1.toFixed(1)}" y1="${y1.toFixed(1)}" x2="${x2.toFixed(1)}" y2="${y2.toFixed(1)}" stroke="#d9b45f" stroke-width="1.2" opacity="0.8"/>`;
+    const b = a + Math.PI / 12, r = 50 + (i % 3) * 5;
+    stars += `<circle class="ritual-star" style="animation-delay:${(i * 0.37).toFixed(2)}s" cx="${(75 + r * Math.cos(b)).toFixed(1)}" cy="${(75 + r * Math.sin(b)).toFixed(1)}" r="${i % 4 === 0 ? 1.8 : 1.1}" fill="#f3d98b"/>`;
+  }
+  return `<div class="ritual">
+    <div class="ritual-orb">
+      <svg viewBox="0 0 150 150" aria-hidden="true"><g class="ritual-ring">
+        <circle cx="75" cy="75" r="70" fill="none" stroke="#d9b45f" stroke-width="0.8" opacity="0.7"/>
+        <circle cx="75" cy="75" r="62" fill="none" stroke="#d9b45f" stroke-width="0.5" opacity="0.5"/>${ticks}</g></svg>
+      <svg viewBox="0 0 150 150" aria-hidden="true"><g class="ritual-ring2">
+        <circle cx="75" cy="75" r="40" fill="none" stroke="#d9b45f" stroke-width="0.6" stroke-dasharray="2 6" opacity="0.8"/>${stars}</g></svg>
+      <div class="ritual-core">Μ</div>
+    </div>
+    <p class="ritual-line"></p>
+  </div>`;
+}
+let ritualTimer = null, ritualBox = null;
+function startRitual(container, lines) {
+  stopRitual();
+  container.innerHTML = ritualHTML();
+  container.style.display = 'block';
+  const line = container.querySelector('.ritual-line');
+  let i = 0;
+  const show = () => {
+    line.style.opacity = 0;
+    setTimeout(() => { line.textContent = lines[i % lines.length]; line.style.opacity = 1; i++; }, 700);
+  };
+  show();
+  ritualTimer = setInterval(show, 3600);
+  ritualBox = container;
+}
+function stopRitual() {
+  if (!ritualTimer) return;
+  const c = ritualBox;
+  clearInterval(ritualTimer);
+  ritualTimer = null; ritualBox = null;
+  if (c) { c.style.display = 'none'; c.innerHTML = ''; }
+}
+function firstName() {
+  const f = readFields();
+  return nameCase((f.name1 || (savedFields && savedFields.name1) || '').split(' ')[0]);
+}
+function withName(lines) {
+  const n = firstName();
+  return lines.map(l => l.replace('{name}', n ? ', ' + n : ''));
+}
+
+function addWaitProgress(container, steps) {
+  const box = container.querySelector('.ritual');
+  if (!box) return { finish() {} };
+  box.insertAdjacentHTML('beforeend',
+    '<div class="wait-bar"><span></span></div>' +
+    '<ul class="wait-steps">' + steps.map(t => '<li><span class="dot"></span><span>' + t + '</span></li>').join('') + '</ul>' +
+    '<p class="wait-note">Συνήθως χρειάζεται 1 με 2 λεπτά. Μείνε σε αυτή τη σελίδα. Κι αν την κλείσεις, ο χρησμός σου θα σε περιμένει εδώ, χωρίς νέα χρέωση.</p>');
+  const bar = box.querySelector('.wait-bar span');
+  const lis = box.querySelectorAll('.wait-steps li');
+  const note = box.querySelector('.wait-note');
+  const t0 = Date.now();
+  const setStep = (k) => lis.forEach((li, i) => {
+    li.className = i < k ? 'done' : (i === k ? 'active' : '');
+    li.querySelector('.dot').textContent = i < k ? '✓' : '';
+  });
+  const tick = () => {
+    if (!box.isConnected) return clearInterval(timer);
+    const t = (Date.now() - t0) / 1000;
+    setStep(t < 5 ? 1 : (t < 14 ? 2 : 3));
+    bar.style.width = Math.min(92, 100 * (1 - Math.exp(-t / 55))) + '%';
+    if (t > 150 && !note.dataset.long) {
+      note.dataset.long = '1';
+      note.textContent = 'Παίρνει λίγο περισσότερο από το συνηθισμένο, αλλά προχωρά κανονικά. Ο χρησμός σου θα εμφανιστεί εδώ μόλις ολοκληρωθεί.';
+    }
+  };
+  tick();
+  const timer = setInterval(tick, 1000);
+  return { finish() { clearInterval(timer); bar.style.width = '100%'; setStep(steps.length); } };
+}
+
+function revealPercent(target) {
+  const pctWrap = $('pctWrap');
+  if (!pctWrap || pctWrap.dataset.done) return;
+  pctWrap.dataset.done = '1';
+  pctWrap.style.display = 'block';
+  const n = parseInt(target, 10) || 0, start = performance.now(), dur = 1800;
+  const step = (now) => {
+    const k = Math.min(1, (now - start) / dur), eased = 1 - Math.pow(1 - k, 3);
+    pctnum.textContent = Math.round(n * eased) + '%';
+    if (k < 1) requestAnimationFrame(step);
+  };
+  requestAnimationFrame(step);
+}
+
+/* ---------- 1. Δωρεάν άνοιγμα ---------- */
+
+function restoreTeaser() {
+  let st = null;
+  try { st = JSON.parse(localStorage.getItem(TEASER_KEY) || 'null'); } catch (e) {}
+  if (!st || !st.rid || Date.now() - st.ts > 7 * 86400000) return false;
+  currentReadingId = st.rid;
+  showCard();
+  form.style.display = 'none';
+  result.classList.add('show');
+  renderData(st.data, false);
+  teaserText.textContent = st.text || '';
+  if (!st.text) teaserText.style.display = 'none';
+  if (st.info) { infoLine.textContent = st.info; infoLine.style.display = 'block'; }
+  seal.classList.add('show');
+  $('restartLink').style.display = 'block';
+  return true;
+}
+
+$('enterBtn').addEventListener('click', () => {
+  showCard();
+  fillSavedFields();
+  try { const em = localStorage.getItem(EMAIL_KEY); if (em) $('email').value = em; } catch (e) {}
+  try { localStorage.setItem(ENTERED_KEY, '1'); } catch (e) {}
+});
+FIELD_IDS.forEach(k => {
+  const el = $(k);
+  if (el) el.addEventListener('input', () => { try { localStorage.setItem(STORAGE_KEY, JSON.stringify(readFields())); } catch (e) {} });
+});
+$('email').addEventListener('input', () => { try { localStorage.setItem(EMAIL_KEY, $('email').value); } catch (e) {} });
+
+function validate(f) {
+  if (!f.name1) return 'Γράψε ' + (CFG.kind === 'numerology' ? 'το ονοματεπώνυμό σου.' : 'το όνομά σου.');
+  if (CFG.kind !== 'taro' && !f.dob1) return 'Γράψε την ημερομηνία γέννησής σου.';
+  if (CFG.kind === 'astro2' && !f.name2) return 'Γράψε και το όνομα του άλλου προσώπου.';
+  if (CFG.needDob2 && !f.dob2) return 'Χρειάζεται και η ημερομηνία γέννησης του άλλου προσώπου.';
+  if (CFG.needQuestion && f.question.length < 3) return 'Γράψε την ερώτησή σου.';
+  return '';
+}
+
+async function startCheckout(buttonEl, readingId, tool, stage) {
+  const original = buttonEl.textContent;
+  buttonEl.textContent = 'Μεταφορά στην ασφαλή πληρωμή...';
+  buttonEl.style.pointerEvents = 'none';
   try {
-    const returnUrl = window.location.origin + window.location.pathname;
+    const returnUrl = window.location.origin + window.location.pathname + '?rid=' + encodeURIComponent(readingId) + (stage ? '&stage=' + stage : '');
     const res = await fetch('/.netlify/functions/create-checkout', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ tool: 'taro', returnUrl })
+      body: JSON.stringify({ tool, reading_id: readingId, returnUrl })
     });
     const data = await res.json();
-    if (data.url) {
-      window.location.href = data.url;
-    } else {
-      throw new Error('no url');
-    }
+    if (!data.url) throw new Error('no url');
+    window.location.href = data.url;
   } catch (e) {
-    enterBtn.textContent = 'Τράβηξε τα χαρτιά σου →';
-    payError.style.display = 'block';
+    buttonEl.textContent = original;
+    buttonEl.style.pointerEvents = 'auto';
+    infoLine.textContent = 'Κάτι πήγε στραβά με την πληρωμή, δοκίμασε ξανά.';
+    infoLine.style.display = 'block';
   }
+}
+
+$('unlockBtn').addEventListener('click', () => {
+  if (currentReadingId) startCheckout($('unlockBtn'), currentReadingId, TOOL, '');
 });
 
-function startExtraCheckout(nextStage, buttonEl) {
-  const priceLabel = nextStage === 'q2' ? '2,99€' : '1,99€';
-  buttonEl.textContent = 'Μεταφορά στην ασφαλή πληρωμή...';
-  buttonEl.style.pointerEvents = 'none';
-  const baseUrl = window.location.origin + window.location.pathname;
-  const returnUrl = `${baseUrl}?stage=${nextStage}`;
-  fetch('/.netlify/functions/create-checkout', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ tool: `taro_${nextStage}`, returnUrl })
-  })
-    .then(res => res.json())
-    .then(data => {
-      if (data.url) {
-        window.location.href = data.url;
-      } else {
-        throw new Error('no url');
-      }
-    })
-    .catch(() => {
-      buttonEl.textContent = `Δοκίμασε ξανά — ${priceLabel}`;
-      buttonEl.style.pointerEvents = 'auto';
-    });
-}
-
-function renderExtraActions() {
-  const extraActions = document.getElementById('extraActions');
-  extraActions.innerHTML = '';
-  const nextStage = stage === 'q1' ? 'q2' : (stage === 'q2' ? 'q3' : null);
-  if (!nextStage) return;
-  const priceLabel = nextStage === 'q2' ? '2,99€' : '1,99€';
-  const nextLabel = nextStage === 'q2' ? '2η ερώτηση' : '3η ερώτηση';
-  const button = document.createElement('div');
-  button.className = 'enter-btn';
-  button.style.padding = '10px 26px';
-  button.style.fontSize = '13px';
-  button.textContent = `Κάνε ${nextLabel} — ${priceLabel}`;
-  button.addEventListener('click', () => startExtraCheckout(nextStage, button));
-  extraActions.appendChild(button);
-  const valueNote = document.createElement('p');
-  valueNote.style.cssText = 'font-size:12.5px;line-height:1.55;color:var(--muted);max-width:320px;margin:10px auto 18px;text-align:center;';
-  valueNote.textContent = 'Μια τέτοια πρόβλεψη, για κάθε νέα ερώτηση, κοστίζει κανονικά όσο μια νέα συνεδρία. Εδώ, με τα ίδια χαρτιά, μόνο ' + priceLabel + '.';
-  extraActions.appendChild(valueNote);
-}
-
-const form = document.getElementById('form');
-const btn = document.getElementById('btn');
-const err = document.getElementById('err');
-const loading = document.getElementById('loading');
-const result = document.getElementById('result');
-const spread = document.getElementById('spread');
-const SLOT_LABELS = ['ΠΑΡΕΛΘΟΝ', 'ΠΑΡΟΝ', 'ΜΕΛΛΟΝ'];
-const readingtext = document.getElementById('readingtext');
-
-form.addEventListener('submit', async (e) => {
-  e.preventDefault();
-
-  const name1 = document.getElementById('name1').value.trim();
-  const question = document.getElementById('question').value.trim();
-
-  if (!name1 || !question) {
-    err.style.display = 'block';
-    return;
-  }
+async function submitTeaser() {
+  const f = readFields();
+  const email = $('email').value.trim();
+  const problem = validate(f);
+  if (problem) { showError(problem); return; }
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)) { showError('Γράψε ένα σωστό email, για να σου κρατήσουμε τον χρησμό.'); return; }
   err.style.display = 'none';
   btn.disabled = true;
-  result.classList.remove('show');
+  loading.innerHTML = '';
   loading.classList.add('show');
-
-  // Στη 2η και 3η ερώτηση η ανάγνωση γίνεται στα ίδια τρία χαρτιά.
-  const existing_cards = (stage !== 'q1' && savedFields && Array.isArray(savedFields.cards)) ? savedFields.cards : undefined;
+  startRitual(loading, withName(CFG.teaserRitual));
+  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(f)); } catch (e) {}
 
   try {
-    const response = await fetch("/.netlify/functions/taro-agora", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ name1, question, existing_cards, session_id: sessionId })
+    const res = await fetch('/api/oracle-teaser', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ tool: TOOL, ...f, email, consent: $('consent').checked })
     });
-    let data = {};
-    try { data = await response.json(); } catch (x) { data = { error: 'μη έγκυρη απάντηση' }; }
 
-    if (response.status === 402) {
-      loading.classList.remove('show');
-      err.textContent = 'Δεν βρέθηκε έγκυρη πληρωμή. Ξεκίνα ξανά από το κουμπί αγοράς.';
-      err.style.display = 'block';
+    if (res.status === 409) {
+      const data = await res.json();
+      currentReadingId = data.reading_id;
+      stopRitual(); loading.classList.remove('show');
+      form.style.display = 'none';
+      result.classList.add('show');
+      renderData(data.data, false);
+      infoLine.textContent = 'Το δωρεάν άνοιγμα αυτού του χρησμού δίνεται μία φορά σε κάθε email, και το έχεις ήδη πάρει. Ο πλήρης χρησμός σου είναι έτοιμος να γραφτεί.';
+      infoLine.style.display = 'block';
+      teaserText.style.display = 'none';
+      seal.classList.add('show');
+      saveTeaserState(currentReadingId, '', infoLine.textContent, data.data);
+      $('restartLink').style.display = 'block';
+      return;
+    }
+    if (!res.ok) {
+      let msg = 'Κάτι διακόπηκε στη σύνδεση με τα άστρα. Δοκίμασε ξανά σε λίγο.';
+      let raw = '';
+      try { raw = await res.text(); const data = JSON.parse(raw); if (data.error) msg = data.error; } catch (e) {}
+      if (PREVIEW) msg += ' [' + res.status + ' ' + raw.slice(0, 200) + ']';
+      if (res.status === 429) msg = 'Πολλές προσπάθειες μαζί. Περίμενε ένα λεπτό και δοκίμασε ξανά.';
+      stopRitual(); loading.classList.remove('show');
+      showError(msg);
       btn.disabled = false;
       return;
     }
 
-    const text = data.reading || "";
-    if (!text) throw new Error((data.error || "κενή απάντηση") + (data.details ? " | " + data.details : ""));
-
-    const cards = Array.isArray(data.cards) ? data.cards : [];
-    try { localStorage.setItem(STORAGE_KEY, JSON.stringify({ name1, cards: cards.length === 3 ? cards : (existing_cards || []) })); } catch (x) {}
-    savedFields = { name1, cards };
-
-    spread.innerHTML = '';
-    cards.forEach((c, i) => {
-      const div = document.createElement('div');
-      div.className = 'spread-card';
-      div.innerHTML = `
-        <div class="slot-label">${SLOT_LABELS[i] || ''}</div>
-        <div class="frame"><img src="tarot-cards/${c.file}" class="${c.reversed ? 'reversed' : ''}" alt=""></div>
-        <div class="card-name"></div>
-        <div class="orientation">${c.reversed ? 'Ανάστροφο' : 'Όρθιο'}</div>
-      `;
-      div.querySelector('img').alt = c.name || '';
-      div.querySelector('.card-name').textContent = c.name || '';
-      spread.appendChild(div);
-    });
-
-    let body = text.trim();
-
-    const adviceMatch = body.split(/\[?\s*ΣΥΜΒΟΥΛΗ\s*\]?\s*:?/);
-    const readingPart = adviceMatch[0].trim();
-    const advicePart = adviceMatch[1] ? adviceMatch[1].trim() : "";
-
-    readingtext.textContent = readingPart;
-
-    const existingAdvice = document.getElementById('advice-block');
-    if (existingAdvice) existingAdvice.remove();
-
-    if (advicePart) {
-      readingtext.insertAdjacentHTML('afterend',
-        '<div id="advice-block" style="margin-top:20px; padding-top:18px; border-top:1px solid var(--line);">' +
-        '<div style="font-family:\'Cinzel\',serif; font-size:11px; letter-spacing:2px; color:var(--gold); text-transform:uppercase; margin-bottom:8px;">Πρακτική συμβουλή</div>' +
-        '<div style="font-family:\'Inter\',sans-serif; font-size:14.5px; line-height:1.65; color:var(--paper);">' +
-        advicePart.replace(/</g,'&lt;') + '</div></div>'
-      );
-    }
-
-    loading.classList.remove('show');
-    result.classList.add('show');
+    currentReadingId = res.headers.get('X-Reading-Id');
+    let pub = {};
+    try { pub = JSON.parse(decodeURIComponent(escape(atob(res.headers.get('X-Oracle-Data') || 'e30=')))); } catch (e) {}
     form.style.display = 'none';
-    renderExtraActions();
-  } catch (error) {
-    loading.classList.remove('show');
-    readingtext.textContent = "Κάτι διακόπηκε στη σύνδεση με τα άστρα. Δοκίμασε ξανά σε λίγο." + (location.hostname.includes("deploy-preview") ? " [" + (error && error.message) + "]" : "");
+    teaserText.classList.add('typing');
+
+    const teaserTyper = makeTyper((txt) => {
+      if (txt.trim() && !result.classList.contains('show')) {
+        stopRitual(); loading.classList.remove('show');
+        result.classList.add('show');
+        renderData(pub, false);
+      }
+      teaserText.textContent = txt;
+    });
+    const all = await readStream(res, (t) => teaserTyper.set(t.replace(ERR_MARK, ''), false));
+    teaserTyper.set(all.replace(ERR_MARK, ''), true);
+    await teaserTyper.whenDone();
+    stopRitual(); loading.classList.remove('show');
     result.classList.add('show');
+    renderData(pub, false);
+    teaserText.classList.remove('typing');
+    if (all.includes(ERR_MARK)) {
+      infoLine.textContent = 'Η σύνδεση διακόπηκε. Μπορείς να δεις ολόκληρο τον χρησμό σου παρακάτω.';
+      infoLine.style.display = 'block';
+    }
+    seal.classList.add('show');
+    saveTeaserState(currentReadingId, teaserText.textContent, all.includes(ERR_MARK) ? infoLine.textContent : '', pub);
+    $('restartLink').style.display = 'block';
+  } catch (e) {
+    stopRitual(); loading.classList.remove('show');
+    showError('Κάτι διακόπηκε στη σύνδεση με τα άστρα. Δοκίμασε ξανά σε λίγο.' + (PREVIEW ? ' [' + (e && e.message) + ']' : ''));
   } finally {
     btn.disabled = false;
   }
+}
+
+/* ---------- 2. Ο πληρωμένος χρησμός ή η απάντηση στην ερώτηση ---------- */
+
+function loadFullReading() {
+  showCard();
+  form.style.display = 'none';
+  $('paidBadge').style.display = 'block';
+  result.classList.add('show');
+  fullWrap.classList.add('show');
+  if ($('pctWrap')) $('pctWrap').style.display = 'none';
+  const isQuestionPage = !!params.get('stage');
+  startRitual($('ritualFull'), withName(isQuestionPage ? CFG.questionRitual : CFG.fullRitual));
+  addWaitProgress($('ritualFull'), isQuestionPage ? CFG.questionSteps : CFG.waitSteps);
+  setTimeout(() => { try { $('ritualFull').scrollIntoView({ behavior: 'smooth', block: 'center' }); } catch (e) {} }, 700);
+
+  let failures = 0, lastLen = 0, lastGrow = Date.now(), firstPoll = true, typerStarted = false, metaShown = false;
+  const fullTyper = makeTyper((txt, fin) => renderContinuation(txt, fin));
+  const showMeta = (data) => {
+    if (metaShown) return;
+    metaShown = true;
+    if (data.stage && data.stage !== 'q1') {
+      $('cardTitle').textContent = CFG.title + (data.stage === 'q2' ? ', 2η ερώτηση' : ', 3η ερώτηση');
+      teaserText.style.display = 'none';
+      if (data.question) { $('questionShown').textContent = '«' + data.question + '»'; $('questionHead').style.display = 'block'; }
+      renderData(data.data, true);
+    } else {
+      if (data.teaser) teaserText.textContent = data.teaser; else teaserText.style.display = 'none';
+      renderData(data.data, true);
+    }
+  };
+  const fail = (msg) => {
+    stopRitual();
+    $('pauseNote').style.display = 'none';
+    if (!readingtext.textContent.trim()) fullWrap.classList.remove('show');
+    infoLine.textContent = msg;
+    infoLine.style.display = 'block';
+  };
+  const poll = async () => {
+    let data = null, status = 0;
+    try {
+      const res = await fetch('/api/oracle-full', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ reading_id: readingIdParam, session_id: sessionId, retry: firstPoll })
+      });
+      status = res.status;
+      data = await res.json();
+    } catch (e) { data = null; }
+
+    if (!data || (status !== 200 && status !== 402 && status !== 404)) {
+      if (++failures < 40) return setTimeout(poll, 3000);
+      return fail('Κάτι διακόπηκε στη σύνδεση. Ανανέωσε τη σελίδα, ο χρησμός σου σε περιμένει χωρίς νέα χρέωση.');
+    }
+    if (status !== 200) return fail(data.error || 'Δεν βρέθηκε έγκυρη πληρωμή για αυτόν τον χρησμό.');
+    failures = 0;
+    showMeta(data);
+
+    if (data.status === 'redirect') {
+      stopRitual();
+      firstPoll = false;
+      return showRedirect(data.message, () => { $('ritualFull').style.display = 'block'; startRitual($('ritualFull'), withName(CFG.questionRitual)); setTimeout(poll, 1500); });
+    }
+
+    const len = (data.text || '').length;
+    if (len !== lastLen) { lastLen = len; lastGrow = Date.now(); $('pauseNote').style.display = 'none'; }
+    else if (len > 0 && data.status !== 'done' && Date.now() - lastGrow > 5000 && !fullTyper.busy()) $('pauseNote').style.display = 'block';
+    if (data.status === 'done' || fullTyper.busy()) $('pauseNote').style.display = 'none';
+
+    if (data.status === 'done' && firstPoll && !typerStarted) {
+      stopRitual();
+      fullTyper.instant(data.text);
+      renderExtraActions(data);
+      return;
+    }
+    firstPoll = false;
+    if (data.text) { typerStarted = true; fullTyper.set(data.text, data.status === 'done'); }
+
+    if (data.status === 'done') {
+      await fullTyper.whenDone();
+      stopRitual();
+      renderExtraActions(data);
+      return;
+    }
+    if (data.status === 'released') {
+      return fail('Ζητούμε συγγνώμη, ο χρησμός σου δεν μπόρεσε να γραφτεί αυτή τη φορά. Το ποσό που είχε δεσμευτεί στην κάρτα σου ακυρώθηκε, οπότε δεν χρεώθηκες τίποτα. Μπορείς να ξαναδοκιμάσεις όποτε θέλεις.');
+    }
+    if (data.status === 'error') {
+      return fail('Ο χρησμός σου δεν ολοκληρώθηκε αυτή τη φορά. Ανανέωσε τη σελίδα σε λίγο, θα γραφτεί ξανά χωρίς νέα χρέωση.' + (PREVIEW ? ' [' + (data.detail || '') + ']' : ''));
+    }
+    setTimeout(poll, 1500);
+  };
+  poll();
+}
+
+// Ερώτηση εκτός ορίων: μήνυμα, νέα ερώτηση με την ίδια πληρωμή, χωρίς χρέωση αν δεν ρωτήσει.
+function showRedirect(message, resume) {
+  const box = $('extraActions');
+  box.innerHTML = '';
+  const msg = document.createElement('p');
+  msg.className = 'info';
+  msg.textContent = (message || '') + ' Μπορείς να γράψεις τώρα μια άλλη ερώτηση με την ίδια πληρωμή. Αν δεν κάνεις άλλη ερώτηση, δεν θα χρεωθείς: το ποσό είναι απλώς δεσμευμένο στην κάρτα σου και αποδεσμεύεται αυτόματα μέσα σε λίγες ημέρες.';
+  box.appendChild(msg);
+  const q = askBox('Η νέα σου ερώτηση', 'Ρώτα ξανά', async (question, b) => {
+    b.textContent = 'Στέλνεται...'; b.style.pointerEvents = 'none';
+    try {
+      const res = await fetch('/api/oracle-question', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ reading_id: readingIdParam, question })
+      });
+      if (!res.ok) throw new Error(String(res.status));
+      box.innerHTML = '';
+      $('questionShown').textContent = '«' + question + '»';
+      $('questionHead').style.display = 'block';
+      readingtext.textContent = '';
+      resume();
+    } catch (e) {
+      b.textContent = 'Δοκίμασε ξανά'; b.style.pointerEvents = 'auto';
+    }
+  });
+  box.appendChild(q);
+}
+
+/* ---------- 3. 2η και 3η ερώτηση ---------- */
+
+function askBox(label, buttonText, onAsk) {
+  const wrap = document.createElement('div');
+  wrap.className = 'ask-box';
+  wrap.innerHTML = `<div class="field" style="text-align:left;"><label></label><textarea></textarea>
+    <div class="time-note" style="font-size:12px;opacity:0.7;margin-top:6px;line-height:1.4;"></div></div>
+    <p class="error" style="display:none;"></p><div class="enter-btn ask-btn"></div>`;
+  wrap.querySelector('label').textContent = label;
+  wrap.querySelector('textarea').placeholder = CFG.questionPlaceholder;
+  wrap.querySelector('.time-note').textContent = CFG.questionHint;
+  const b = wrap.querySelector('.ask-btn');
+  b.textContent = buttonText;
+  b.addEventListener('click', () => {
+    const question = wrap.querySelector('textarea').value.trim();
+    const e = wrap.querySelector('.error');
+    if (question.length < 3) { e.textContent = 'Γράψε την ερώτησή σου.'; e.style.display = 'block'; return; }
+    e.style.display = 'none';
+    onAsk(question, b);
+  });
+  return wrap;
+}
+
+function renderExtraActions(data) {
+  const box = $('extraActions');
+  box.innerHTML = '';
+  const stage = data.stage || 'q1';
+  const nextStage = stage === 'q1' ? 'q2' : (stage === 'q2' ? 'q3' : null);
+  if (!nextStage) return;
+  const priceLabel = nextStage === 'q2' ? '2,99€' : '1,99€';
+  const title = document.createElement('p');
+  title.className = 'ask-title';
+  title.textContent = nextStage === 'q2' ? 'Θέλεις να ρωτήσεις κάτι ακόμα;' : 'Μια τελευταία ερώτηση;';
+  box.appendChild(title);
+  const q = askBox(nextStage === 'q2' ? 'Η δεύτερη ερώτησή σου' : 'Η τρίτη ερώτησή σου', `Ρώτα · ${priceLabel}`, async (question, b) => {
+    const original = b.textContent;
+    b.textContent = 'Μεταφορά στην ασφαλή πληρωμή...'; b.style.pointerEvents = 'none';
+    try {
+      const res = await fetch('/api/oracle-question', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ parent_id: readingIdParam, question })
+      });
+      const d = await res.json();
+      if (!res.ok || !d.reading_id) throw new Error(d.error || 'σφάλμα');
+      b.textContent = original;
+      startCheckout(b, d.reading_id, `${TOOL}_${d.stage}`, d.stage);
+    } catch (e) {
+      b.textContent = original; b.style.pointerEvents = 'auto';
+      const er = box.querySelector('.error');
+      er.textContent = 'Κάτι πήγε στραβά, δοκίμασε ξανά.' + (PREVIEW ? ' [' + e.message + ']' : '');
+      er.style.display = 'block';
+    }
+  });
+  box.appendChild(q);
+  const valueNote = document.createElement('p');
+  valueNote.className = 'value-note-q';
+  valueNote.textContent = 'Μια τέτοια πρόβλεψη, για κάθε νέα ερώτηση, κοστίζει κανονικά όσο μια νέα συνεδρία. Εδώ, ' + CFG.sameData + ', μόνο ' + priceLabel + '.';
+  box.appendChild(valueNote);
+}
+
+/* ---------- Ποια εκδοχή της σελίδας δείχνουμε ---------- */
+
+if (sessionId && readingIdParam) {
+  loadFullReading();
+} else {
+  btn.textContent = 'Δες δωρεάν τον χρησμό σου';
+  if (!restoreTeaser()) {
+    let entered = null;
+    try { entered = localStorage.getItem(ENTERED_KEY); } catch (e) {}
+    if (entered) {
+      showCard();
+      fillSavedFields();
+      try { const em = localStorage.getItem(EMAIL_KEY); if (em) $('email').value = em; } catch (e) {}
+    }
+  }
+}
+
+$('restartLink').addEventListener('click', () => {
+  clearTeaserState();
+  window.location.href = window.location.pathname;
 });
+
+form.addEventListener('submit', (e) => {
+  e.preventDefault();
+  submitTeaser();
+});
+
 </script>
 </body>
 </html>

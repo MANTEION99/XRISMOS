@@ -92,7 +92,7 @@ export async function computeCharts(p) {
 
 // Χωρίς ώρα γέννησης οι οίκοι και ο Ωροσκόπος βγαίνουν λάθος (υπολογίζονται για τις 12:00),
 // οπότε τους αφαιρούμε εντελώς για να μην τους χρησιμοποιήσει ο χρησμός.
-function chartForPrompt(chart, hasTime, moonUnsure) {
+export function chartForPrompt(chart, hasTime, moonUnsure) {
   if (!chart || hasTime) return chart;
   const { houses, ascendant, midheaven, vertex, aspects, ...rest } = chart;
   return {
@@ -105,7 +105,7 @@ function chartForPrompt(chart, hasTime, moonUnsure) {
   };
 }
 
-const timeNote = (name, hasTime, moonUnsure) => hasTime
+export const timeNote = (name, hasTime, moonUnsure) => hasTime
   ? ""
   : `\n(Για ${name} δεν δόθηκε ώρα γέννησης: ΜΗΝ αναφέρεις οίκους ούτε Ωροσκόπο. Μίλα μόνο για πλανήτες σε ζώδια και τις όψεις τους.` +
     (moonUnsure ? ` Η Σελήνη άλλαξε ζώδιο τη μέρα που γεννήθηκε, οπότε ΜΗΝ αναφέρεις καθόλου τη Σελήνη για ${name}.` : "") + `)`;
@@ -409,3 +409,4 @@ export function streamResponse(producer, headers = {}) {
     }
   });
 }
+export { moonChangesSign };
