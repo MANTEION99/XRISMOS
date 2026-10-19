@@ -236,6 +236,20 @@
   #unlockBtn{ padding:12px 26px; font-size:15px; letter-spacing:1px; white-space:nowrap; }
   .info{ text-align:center; font-size:13.5px; color:var(--paper); line-height:1.6; margin:4px 0 6px; }
 
+  .dt-row{ display:flex; gap:6px; }
+  .dt-select{
+    flex:1 1 0; min-width:0; appearance:none; -webkit-appearance:none;
+    background:rgba(255,255,255,0.03) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%23D9B25C' stroke-width='1.4' fill='none'/%3E%3C/svg%3E") no-repeat right 8px center;
+    border:1px solid var(--line); border-radius:9px;
+    padding:11px 20px 11px 9px; color:var(--paper); font-size:15px; font-family:'Inter',sans-serif;
+  }
+  .dt-select:focus{ outline:none; border-color:var(--gold); }
+  .dt-select option{ background:#15122a; color:#F4EEDF; }
+  .dt-day{ flex:1 1 0; }
+  .dt-month{ flex:2 1 0; }
+  .dt-year{ flex:1.15 1 0; }
+  .dt-time .dt-select{ max-width:120px; }
+
 
   .spread{ display:none; gap:10px; justify-content:center; margin:0 0 22px; flex-wrap:nowrap; }
   .spread-card{ width:min(100px, 27vw); text-align:center; }
@@ -396,6 +410,87 @@
 </div>
 
 <script>
+/* Ημερομηνία και ώρα με απλές λίστες (μέρα, μήνας, έτος / ώρα, λεπτά) αντί για το ημερολόγιο του κινητού.
+   Το ημερολόγιο του κινητού κολλάει συχνά μέσα στον browser του Facebook και στα Android, και για ημερομηνία
+   γέννησης θέλει δεκάδες χρόνια κύλισμα. Το αρχικό πεδίο μένει κρυφό με το ίδιο id και την ίδια μορφή
+   (ΕΕΕΕ-ΜΜ-ΗΗ και ΩΩ:ΛΛ), οπότε η υπόλοιπη σελίδα δεν αλλάζει. Μετά από αλλαγή της τιμής του κρυφού
+   πεδίου από κώδικα, καλείται window.syncDateFields(). */
+(function () {
+  const MONTHS = ['Ιαν', 'Φεβ', 'Μαρ', 'Απρ', 'Μάιος', 'Ιούνιος', 'Ιούλιος', 'Αύγ', 'Σεπτ', 'Οκτ', 'Νοέμ', 'Δεκ'];
+  const pad = (n) => String(n).padStart(2, '0');
+  const opt = (value, label) => { const o = document.createElement('option'); o.value = value; o.textContent = label; return o; };
+  const makeSelect = (placeholder, items, cls) => {
+    const s = document.createElement('select');
+    s.className = 'dt-select ' + cls;
+    s.appendChild(opt('', placeholder));
+    items.forEach(([v, l]) => s.appendChild(opt(v, l)));
+    return s;
+  };
+  const syncers = [];
+
+  function upgradeDate(input) {
+    const thisYear = new Date().getFullYear();
+    const days = Array.from({ length: 31 }, (_, i) => [pad(i + 1), String(i + 1)]);
+    const months = MONTHS.map((m, i) => [pad(i + 1), m]);
+    const years = Array.from({ length: thisYear - 1920 + 1 }, (_, i) => { const y = thisYear - i; return [String(y), String(y)]; });
+    const d = makeSelect('Μέρα', days, 'dt-day');
+    const m = makeSelect('Μήνας', months, 'dt-month');
+    const y = makeSelect('Έτος', years, 'dt-year');
+    const row = document.createElement('div');
+    row.className = 'dt-row';
+    row.append(d, m, y);
+    const write = () => {
+      if (d.value && m.value && y.value) {
+        // Αν η μέρα δεν υπάρχει σε αυτόν τον μήνα (π.χ. 31 Απριλίου), πάει στην τελευταία του μήνα.
+        const last = new Date(+y.value, +m.value, 0).getDate();
+        if (+d.value > last) d.value = pad(last);
+        input.value = `${y.value}-${m.value}-${d.value}`;
+      } else input.value = '';
+      input.dispatchEvent(new Event('change', { bubbles: true }));
+    };
+    [d, m, y].forEach(s => s.addEventListener('change', write));
+    const read = () => {
+      const v = /^(\d{4})-(\d{2})-(\d{2})$/.exec(input.value || '');
+      y.value = v ? v[1] : ''; m.value = v ? v[2] : ''; d.value = v ? v[3] : '';
+    };
+    input.type = 'hidden';
+    input.insertAdjacentElement('afterend', row);
+    read();
+    syncers.push(read);
+  }
+
+  function upgradeTime(input) {
+    const hours = Array.from({ length: 24 }, (_, i) => [pad(i), pad(i)]);
+    const mins = Array.from({ length: 60 }, (_, i) => [pad(i), pad(i)]);
+    const h = makeSelect('Ώρα', hours, 'dt-hour');
+    const mi = makeSelect('Λεπτά', mins, 'dt-min');
+    const row = document.createElement('div');
+    row.className = 'dt-row dt-time';
+    row.append(h, mi);
+    const write = () => {
+      // Αν διάλεξε μόνο ώρα, τα λεπτά θεωρούνται 00.
+      if (h.value && !mi.value) mi.value = '00';
+      input.value = h.value ? `${h.value}:${mi.value || '00'}` : '';
+      input.dispatchEvent(new Event('change', { bubbles: true }));
+    };
+    [h, mi].forEach(s => s.addEventListener('change', write));
+    const read = () => {
+      const v = /^(\d{2}):(\d{2})$/.exec(input.value || '');
+      h.value = v ? v[1] : ''; mi.value = v ? v[2] : '';
+    };
+    input.type = 'hidden';
+    input.insertAdjacentElement('afterend', row);
+    read();
+    syncers.push(read);
+  }
+
+  document.querySelectorAll('input[type="date"]').forEach(upgradeDate);
+  document.querySelectorAll('input[type="time"]').forEach(upgradeTime);
+  window.syncDateFields = () => syncers.forEach(f => f());
+})();
+
+</script>
+<script>
 const CFG = {"tool": "oikonomika", "kind": "astro1", "title": "Μια Φωτισμένη Οικονομική Αρχή", "needDob2": false, "needQuestion": true, "pctLabel": "ΠΙΘΑΝΟΤΗΤΑ ΑΝΑΚΟΥΦΙΣΗΣ", "teaserRitual": ["Τα άστρα ανοίγουν τον χάρτη της γέννησής σου{name}...", "Ο Δίας και ο Κρόνος παίρνουν τις θέσεις τους...", "Αναζητούμε το σημείο των χρημάτων στον χάρτη σου..."], "fullRitual": ["Η σφραγίδα του χρησμού σου ανοίγει...", "Υπολογίζονται οι κινήσεις του Δία και της Αφροδίτης για τους επόμενους 12 μήνες...", "Αναζητούμε τη μέρα που ανοίγει το παράθυρο...", "Ο χρησμός σου γράφεται{name}..."], "questionRitual": ["Η ερώτησή σου φτάνει στα άστρα{name}...", "Αναζητούμε την απάντηση στους ίδιους χάρτες...", "Η απάντησή σου γράφεται..."], "waitSteps": ["Η πληρωμή σου επιβεβαιώθηκε", "Οι χάρτες ανοίγουν", "Υπολογίζονται οι κινήσεις των πλανητών για τους επόμενους 12 μήνες", "Ο χρησμός σου γράφεται ειδικά για σένα"], "questionSteps": ["Η πληρωμή σου επιβεβαιώθηκε", "Η ερώτησή σου διαβάζεται", "Αναζητούμε την απάντηση", "Η απάντηση γράφεται ειδικά για σένα"], "questionPlaceholder": "π.χ. Αξίζει να αλλάξω δουλειά φέτος;", "questionHint": "Ρώτα ό,τι σε απασχολεί για τα χρήματα, τη δουλειά ή το σπίτι σου.", "sameData": "με τον ίδιο χάρτη"};
 /* Κοινή λογική σελίδας για τα εργαλεία του κοινού μηχανισμού.
    Η σελίδα κάθε εργαλείου ορίζει πριν από αυτό το script το αντικείμενο CFG (δες build-oracle-pages.py).
@@ -440,6 +535,7 @@ function clearTeaserState() {
 function fillSavedFields() {
   if (!savedFields) return;
   FIELD_IDS.forEach(k => { if ($(k) && savedFields[k]) $(k).value = savedFields[k]; });
+  if (window.syncDateFields) window.syncDateFields();
 }
 function readFields() {
   const v = (id) => ($(id) ? $(id).value.trim() : '');

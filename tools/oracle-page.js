@@ -41,6 +41,7 @@ function clearTeaserState() {
 function fillSavedFields() {
   if (!savedFields) return;
   FIELD_IDS.forEach(k => { if ($(k) && savedFields[k]) $(k).value = savedFields[k]; });
+  if (window.syncDateFields) window.syncDateFields();
 }
 function readFields() {
   const v = (id) => ($(id) ? $(id).value.trim() : '');

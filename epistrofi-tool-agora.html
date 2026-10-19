@@ -236,6 +236,20 @@
   .info{ text-align:center; font-size:13.5px; color:var(--paper); line-height:1.6; margin:4px 0 6px; }
   .safety-note{ font-size:12px; line-height:1.55; color:var(--muted); margin:16px 0 0; padding:10px 12px; border-left:2px solid var(--gold); background:rgba(217,178,92,0.06); border-radius:4px; text-align:left; }
   .result:has(#fullWrap.show) .teaser-note{ display:none; }
+
+  .dt-row{ display:flex; gap:6px; }
+  .dt-select{
+    flex:1 1 0; min-width:0; appearance:none; -webkit-appearance:none;
+    background:rgba(255,255,255,0.03) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%23D9B25C' stroke-width='1.4' fill='none'/%3E%3C/svg%3E") no-repeat right 8px center;
+    border:1px solid var(--line); border-radius:9px;
+    padding:11px 20px 11px 9px; color:var(--paper); font-size:15px; font-family:'Inter',sans-serif;
+  }
+  .dt-select:focus{ outline:none; border-color:var(--gold); }
+  .dt-select option{ background:#15122a; color:#F4EEDF; }
+  .dt-day{ flex:1 1 0; }
+  .dt-month{ flex:2 1 0; }
+  .dt-year{ flex:1.15 1 0; }
+  .dt-time .dt-select{ max-width:120px; }
 </style>
 <script type="text/javascript">
     (function(c,l,a,r,i,t,y){
@@ -402,6 +416,86 @@
 </div>
 
 <script>
+/* Ημερομηνία και ώρα με απλές λίστες (μέρα, μήνας, έτος / ώρα, λεπτά) αντί για το ημερολόγιο του κινητού.
+   Το ημερολόγιο του κινητού κολλάει συχνά μέσα στον browser του Facebook και στα Android, και για ημερομηνία
+   γέννησης θέλει δεκάδες χρόνια κύλισμα. Το αρχικό πεδίο μένει κρυφό με το ίδιο id και την ίδια μορφή
+   (ΕΕΕΕ-ΜΜ-ΗΗ και ΩΩ:ΛΛ), οπότε η υπόλοιπη σελίδα δεν αλλάζει. Μετά από αλλαγή της τιμής του κρυφού
+   πεδίου από κώδικα, καλείται window.syncDateFields(). */
+(function () {
+  const MONTHS = ['Ιαν', 'Φεβ', 'Μαρ', 'Απρ', 'Μάιος', 'Ιούνιος', 'Ιούλιος', 'Αύγ', 'Σεπτ', 'Οκτ', 'Νοέμ', 'Δεκ'];
+  const pad = (n) => String(n).padStart(2, '0');
+  const opt = (value, label) => { const o = document.createElement('option'); o.value = value; o.textContent = label; return o; };
+  const makeSelect = (placeholder, items, cls) => {
+    const s = document.createElement('select');
+    s.className = 'dt-select ' + cls;
+    s.appendChild(opt('', placeholder));
+    items.forEach(([v, l]) => s.appendChild(opt(v, l)));
+    return s;
+  };
+  const syncers = [];
+
+  function upgradeDate(input) {
+    const thisYear = new Date().getFullYear();
+    const days = Array.from({ length: 31 }, (_, i) => [pad(i + 1), String(i + 1)]);
+    const months = MONTHS.map((m, i) => [pad(i + 1), m]);
+    const years = Array.from({ length: thisYear - 1920 + 1 }, (_, i) => { const y = thisYear - i; return [String(y), String(y)]; });
+    const d = makeSelect('Μέρα', days, 'dt-day');
+    const m = makeSelect('Μήνας', months, 'dt-month');
+    const y = makeSelect('Έτος', years, 'dt-year');
+    const row = document.createElement('div');
+    row.className = 'dt-row';
+    row.append(d, m, y);
+    const write = () => {
+      if (d.value && m.value && y.value) {
+        // Αν η μέρα δεν υπάρχει σε αυτόν τον μήνα (π.χ. 31 Απριλίου), πάει στην τελευταία του μήνα.
+        const last = new Date(+y.value, +m.value, 0).getDate();
+        if (+d.value > last) d.value = pad(last);
+        input.value = `${y.value}-${m.value}-${d.value}`;
+      } else input.value = '';
+      input.dispatchEvent(new Event('change', { bubbles: true }));
+    };
+    [d, m, y].forEach(s => s.addEventListener('change', write));
+    const read = () => {
+      const v = /^(\d{4})-(\d{2})-(\d{2})$/.exec(input.value || '');
+      y.value = v ? v[1] : ''; m.value = v ? v[2] : ''; d.value = v ? v[3] : '';
+    };
+    input.type = 'hidden';
+    input.insertAdjacentElement('afterend', row);
+    read();
+    syncers.push(read);
+  }
+
+  function upgradeTime(input) {
+    const hours = Array.from({ length: 24 }, (_, i) => [pad(i), pad(i)]);
+    const mins = Array.from({ length: 60 }, (_, i) => [pad(i), pad(i)]);
+    const h = makeSelect('Ώρα', hours, 'dt-hour');
+    const mi = makeSelect('Λεπτά', mins, 'dt-min');
+    const row = document.createElement('div');
+    row.className = 'dt-row dt-time';
+    row.append(h, mi);
+    const write = () => {
+      // Αν διάλεξε μόνο ώρα, τα λεπτά θεωρούνται 00.
+      if (h.value && !mi.value) mi.value = '00';
+      input.value = h.value ? `${h.value}:${mi.value || '00'}` : '';
+      input.dispatchEvent(new Event('change', { bubbles: true }));
+    };
+    [h, mi].forEach(s => s.addEventListener('change', write));
+    const read = () => {
+      const v = /^(\d{2}):(\d{2})$/.exec(input.value || '');
+      h.value = v ? v[1] : ''; mi.value = v ? v[2] : '';
+    };
+    input.type = 'hidden';
+    input.insertAdjacentElement('afterend', row);
+    read();
+    syncers.push(read);
+  }
+
+  document.querySelectorAll('input[type="date"]').forEach(upgradeDate);
+  document.querySelectorAll('input[type="time"]').forEach(upgradeTime);
+  window.syncDateFields = () => syncers.forEach(f => f());
+})();
+</script>
+<script>
 const STORAGE_KEY = 'manteio_epistrofi_fields';
 const RID_KEY = 'manteio_epistrofi_rid';
 const TEASER_KEY = 'manteio_epistrofi_teaser';   // το δωρεάν άνοιγμα, για να μένει μετά από ανανέωση
@@ -466,6 +560,7 @@ function setLoadingText(t) {
 function fillSavedFields() {
   if (!savedFields) return;
   ['name1','dob1','tob1','pob1','name2','dob2','tob2','pob2'].forEach(k => { if ($(k)) $(k).value = savedFields[k] || ''; });
+  if (window.syncDateFields) window.syncDateFields();
 }
 function readFields() {
   const v = (id) => $(id).value.trim();
