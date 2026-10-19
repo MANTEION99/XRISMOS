@@ -270,6 +270,115 @@
     .swipe-hint{ display:block; }
   }
 
+  /* ============ ΤΙ ΡΩΤΟΥΝ ============ */
+  .asked{
+    max-width:1000px;
+    margin:0 auto;
+    padding:0 5vw 5rem;
+    text-align:center;
+  }
+  .asked .kicker{
+    display:block;
+    font-family:'Cinzel', serif;
+    font-size:0.85rem;
+    letter-spacing:0.3em;
+    text-transform:uppercase;
+    color:var(--gold);
+    margin-bottom:1rem;
+  }
+  .asked h2{
+    font-family:'Cinzel', serif;
+    font-weight:600;
+    font-size:clamp(1.4rem, 3.6vw, 2rem);
+    color:var(--gold-bright);
+    margin:0 0 1.8rem;
+  }
+  .asked-wrap{ position:relative; }
+  .asked-track{
+    display:flex;
+    gap:1rem;
+    overflow-x:auto;
+    scroll-snap-type:x mandatory;
+    scroll-behavior:smooth;
+    scrollbar-width:none;
+    padding:0.4rem 0.2rem 0.8rem;
+    -webkit-overflow-scrolling:touch;
+  }
+  .asked-track::-webkit-scrollbar{ display:none; }
+  .qcard{
+    flex:0 0 calc((100% - 2rem) / 3);
+    scroll-snap-align:start;
+    display:flex;
+    flex-direction:column;
+    justify-content:space-between;
+    gap:1rem;
+    min-height:210px;
+    padding:1.6rem 1.4rem 1.3rem;
+    background:linear-gradient(160deg, rgba(16,12,38,0.95), rgba(8,6,26,0.95));
+    border:1px solid var(--line);
+    border-radius:12px;
+    text-decoration:none;
+    text-align:left;
+    transition:border-color 0.2s ease, transform 0.2s ease;
+  }
+  .qcard:hover{ border-color:var(--gold); transform:translateY(-3px); }
+  .qtag{
+    font-family:'Cinzel', serif;
+    font-size:0.75rem;
+    letter-spacing:0.22em;
+    text-transform:uppercase;
+    color:var(--gold);
+  }
+  .qtext{
+    font-family:'Cormorant Garamond', serif;
+    font-style:italic;
+    font-weight:500;
+    font-size:1.35rem;
+    line-height:1.4;
+    color:var(--ink);
+  }
+  .qgo{
+    font-family:'Cinzel', serif;
+    font-size:0.78rem;
+    letter-spacing:0.12em;
+    text-transform:uppercase;
+    color:var(--gold-bright);
+  }
+  .asked-arrow{
+    position:absolute;
+    top:50%;
+    transform:translateY(-50%);
+    z-index:2;
+    width:48px; height:48px;
+    border-radius:50%;
+    border:1px solid var(--gold);
+    background:rgba(8,6,26,0.92);
+    color:var(--gold-bright);
+    display:flex; align-items:center; justify-content:center;
+    cursor:pointer;
+    box-shadow:0 0 22px rgba(212,175,55,0.35);
+    transition:opacity 0.2s ease, background 0.2s ease;
+  }
+  .asked-arrow svg{ width:24px; height:24px; }
+  .asked-arrow:hover{ background:var(--gold); color:#100c26; }
+  .asked-arrow.prev{ left:-24px; }
+  .asked-arrow.next{ right:-24px; }
+  .asked-arrow[disabled]{ opacity:0.25; cursor:default; }
+  .asked-count{
+    margin:1rem 0 0;
+    color:var(--ink-dim);
+    font-family:'Cinzel', serif;
+    font-size:0.85rem;
+    letter-spacing:0.15em;
+  }
+  @media(max-width:720px){
+    .qcard{ flex:0 0 78%; scroll-snap-align:center; min-height:190px; }
+    .asked-arrow{ width:44px; height:44px; }
+    .asked-arrow.prev{ left:-6px; }
+    .asked-arrow.next{ right:-6px; }
+    .asked-track{ padding-left:2.4rem; padding-right:2.4rem; scroll-padding:0 2.4rem; }
+  }
+
   /* ============ LIGHTBOX ============ */
   .lightbox{
     display:none;
@@ -443,7 +552,7 @@
     position:relative;
     max-width:840px;
     margin:0 auto;
-    padding:5rem 6vw 7rem;
+    padding:3rem 6vw 4rem;
     text-align:center;
   }
   .proof .flourish{
@@ -576,6 +685,29 @@
     <p>Κάθε χρησμός χτίζεται πάνω στον δικό σου αστρολογικό χάρτη, όχι σε γενικές προβλέψεις για όλους. Η αλήθεια που θα διαβάσεις είναι δική σου, και μόνο δική σου.</p>
   </section>
 
+  <section class="proof">
+    <div class="flourish">
+      <svg viewBox="0 0 120 60" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M2 30C20 10 40 10 60 30C80 50 100 50 118 30" stroke="#d4af37" stroke-width="1"/>
+        <circle cx="60" cy="30" r="3" fill="#f6dd8a"/>
+      </svg>
+    </div>
+    <div class="proof-grid">
+      <div class="proof-item">
+        <blockquote>&laquo;Ρώτησα το Μαντείο ένα απλό πράγμα. Θα γυρίσει; Πήρα την απάντηση που χρειαζόμουν, ευτυχώς.&raquo;</blockquote>
+        <cite>ΑΝΝΑ, 50 ΕΤΩΝ</cite>
+      </div>
+      <div class="proof-item">
+        <blockquote>&laquo;Δεν πίστευα σε αυτά τα πράγματα. Τα χαρτιά μου έδειξαν ακριβώς αυτό που φοβόμουν να παραδεχτώ, και επιτέλους ένιωσα ανακούφιση.&raquo;</blockquote>
+        <cite>ΜΑΡΙΑ, 58 ΕΤΩΝ</cite>
+      </div>
+      <div class="proof-item">
+        <blockquote>&laquo;Ρώτησα αν αξίζει να ξεκινήσω κάτι δικό μου. Η απάντηση μου έδωσε το θάρρος που έψαχνα εδώ και καιρό.&raquo;</blockquote>
+        <cite>ΕΛΕΝΗ, 54 ΕΤΩΝ</cite>
+      </div>
+    </div>
+  </section>
+
   <section class="fb-wall">
     <span class="kicker">Από τη σελίδα μας στο Facebook</span>
     <h2>Αυτό γράφουν κάτω από τις αναρτήσεις μας</h2>
@@ -587,6 +719,48 @@
       <img src="manteio-sxolia-4.jpg" alt="Σχόλια αναγνωστών στη σελίδα του Μαντείου στο Facebook" loading="lazy">
     </div>
     <p class="fb-note">Πραγματικά σχόλια από τη σελίδα μας στο Facebook. Τα ονόματα συντομεύτηκαν και οι φωτογραφίες θολώθηκαν για την ιδιωτικότητα των αναγνωστών.</p>
+  </section>
+
+  <section class="asked" aria-label="Τι ρωτούν στο Μαντείο">
+    <span class="kicker">Τι ρωτούν στο Μαντείο</span>
+    <h2>Μήπως ρωτάς κι εσύ το ίδιο;</h2>
+    <div class="asked-wrap">
+      <button class="asked-arrow prev" type="button" aria-label="Προηγούμενη ερώτηση"><svg viewBox="0 0 24 24" fill="none"><path d="M15 5L8 12L15 19" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+      <div class="asked-track" tabindex="0">
+      <a class="qcard" href="agapi-tool-agora.html"><span class="qtag">Αγάπη</span><span class="qtext">&laquo;Με σκέφτεται ακόμα;&raquo;</span><span class="qgo">Ρώτησε κι εσύ</span></a>
+      <a class="qcard" href="epistrofi-tool-agora.html"><span class="qtag">Επιστροφή</span><span class="qtext">&laquo;Θα γυρίσει ή να προχωρήσω;&raquo;</span><span class="qgo">Ρώτησε κι εσύ</span></a>
+      <a class="qcard" href="alitheia-tool-agora.html"><span class="qtag">Αλήθεια</span><span class="qtext">&laquo;Μου κρύβει κάτι;&raquo;</span><span class="qgo">Ρώτησε κι εσύ</span></a>
+      <a class="qcard" href="oikonomika-tool-agora.html"><span class="qtag">Αφθονία</span><span class="qtext">&laquo;Αξίζει να ξεκινήσω κάτι δικό μου;&raquo;</span><span class="qgo">Ρώτησε κι εσύ</span></a>
+      <a class="qcard" href="epistrofi-tool-agora.html"><span class="qtag">Επιστροφή</span><span class="qtext">&laquo;Γιατί σταμάτησε να μου γράφει χωρίς καμία εξήγηση;&raquo;</span><span class="qgo">Ρώτησε κι εσύ</span></a>
+      <a class="qcard" href="symvatotita-tool-agora.html"><span class="qtag">Σύνδεση</span><span class="qtext">&laquo;Ταιριάζουμε πραγματικά ή απλώς συνηθίσαμε ο ένας τον άλλον;&raquo;</span><span class="qgo">Ρώτησε κι εσύ</span></a>
+      <a class="qcard" href="taro-tool-agora.html"><span class="qtag">Ταρώ</span><span class="qtext">&laquo;Τι έρχεται στη ζωή μου τους επόμενους μήνες;&raquo;</span><span class="qgo">Ρώτησε κι εσύ</span></a>
+      <a class="qcard" href="agapi-tool-agora.html"><span class="qtag">Αγάπη</span><span class="qtext">&laquo;Αξίζει αυτή η γνωριμία από την εφαρμογή ή χάνω τον χρόνο μου;&raquo;</span><span class="qgo">Ρώτησε κι εσύ</span></a>
+      <a class="qcard" href="oikonomika-tool-agora.html"><span class="qtag">Αφθονία</span><span class="qtext">&laquo;Να αλλάξω δουλειά ή να μείνω εκεί που είμαι;&raquo;</span><span class="qgo">Ρώτησε κι εσύ</span></a>
+      <a class="qcard" href="numerology-tool-agora.html"><span class="qtag">Αριθμολογία</span><span class="qtext">&laquo;Ποιο μοτίβο επαναλαμβάνω στη ζωή μου χωρίς να το βλέπω;&raquo;</span><span class="qgo">Ρώτησε κι εσύ</span></a>
+      <a class="qcard" href="alitheia-tool-agora.html"><span class="qtag">Αλήθεια</span><span class="qtext">&laquo;Γιατί νιώθω ότι κάτι αλλάζει ανάμεσά μας;&raquo;</span><span class="qgo">Ρώτησε κι εσύ</span></a>
+      <a class="qcard" href="oikonomika-tool-agora.html"><span class="qtag">Αφθονία</span><span class="qtext">&laquo;Να φύγω για δουλειά στο εξωτερικό;&raquo;</span><span class="qgo">Ρώτησε κι εσύ</span></a>
+      <a class="qcard" href="agapi-tool-agora.html"><span class="qtag">Αγάπη</span><span class="qtext">&laquo;Να στείλω εγώ πρώτο μήνυμα;&raquo;</span><span class="qgo">Ρώτησε κι εσύ</span></a>
+      <a class="qcard" href="symvatotita-tool-agora.html"><span class="qtag">Σύνδεση</span><span class="qtext">&laquo;Είναι ο σωστός άνθρωπος ή απλώς φοβάμαι τη μοναξιά;&raquo;</span><span class="qgo">Ρώτησε κι εσύ</span></a>
+      <a class="qcard" href="oikonomika-tool-agora.html"><span class="qtag">Αφθονία</span><span class="qtext">&laquo;Πότε θα ξεχρεώσω και θα ανασάνω;&raquo;</span><span class="qgo">Ρώτησε κι εσύ</span></a>
+      <a class="qcard" href="taro-tool-agora.html"><span class="qtag">Ταρώ</span><span class="qtext">&laquo;Θα πάρω τη θέση για την οποία έκανα συνέντευξη;&raquo;</span><span class="qgo">Ρώτησε κι εσύ</span></a>
+      <a class="qcard" href="epistrofi-tool-agora.html"><span class="qtag">Επιστροφή</span><span class="qtext">&laquo;Τον απασχολεί ακόμα η προηγούμενη σχέση του;&raquo;</span><span class="qgo">Ρώτησε κι εσύ</span></a>
+      <a class="qcard" href="numerology-tool-agora.html"><span class="qtag">Αριθμολογία</span><span class="qtext">&laquo;Σπούδασα κάτι που δεν με γεμίζει. Τι μου ταιριάζει στ' αλήθεια;&raquo;</span><span class="qgo">Ρώτησε κι εσύ</span></a>
+      <a class="qcard" href="oikonomika-tool-agora.html"><span class="qtag">Αφθονία</span><span class="qtext">&laquo;Είναι η σωστή στιγμή να ζητήσω αύξηση;&raquo;</span><span class="qgo">Ρώτησε κι εσύ</span></a>
+      <a class="qcard" href="agapi-tool-agora.html"><span class="qtag">Αγάπη</span><span class="qtext">&laquo;Θα γνωρίσω κάποιον μέσα στη χρονιά;&raquo;</span><span class="qgo">Ρώτησε κι εσύ</span></a>
+      <a class="qcard" href="alitheia-tool-agora.html"><span class="qtag">Αλήθεια</span><span class="qtext">&laquo;Μπορώ να εμπιστευτώ τη φίλη που μου τα λέει όλα;&raquo;</span><span class="qgo">Ρώτησε κι εσύ</span></a>
+      <a class="qcard" href="taro-tool-agora.html"><span class="qtag">Ταρώ</span><span class="qtext">&laquo;Να μετακομίσω σε άλλη πόλη;&raquo;</span><span class="qgo">Ρώτησε κι εσύ</span></a>
+      <a class="qcard" href="symvatotita-tool-agora.html"><span class="qtag">Σύνδεση</span><span class="qtext">&laquo;Γιατί καταλήγω πάντα σε σχέσεις που με πληγώνουν;&raquo;</span><span class="qgo">Ρώτησε κι εσύ</span></a>
+      <a class="qcard" href="oikonomika-tool-agora.html"><span class="qtag">Αφθονία</span><span class="qtext">&laquo;Θα πάει καλά η δουλειά που άνοιξε το παιδί μου;&raquo;</span><span class="qgo">Ρώτησε κι εσύ</span></a>
+      <a class="qcard" href="taro-tool-agora.html"><span class="qtag">Ταρώ</span><span class="qtext">&laquo;Θα τα βρω με την αδερφή μου;&raquo;</span><span class="qgo">Ρώτησε κι εσύ</span></a>
+      <a class="qcard" href="numerology-tool-agora.html"><span class="qtag">Αριθμολογία</span><span class="qtext">&laquo;Τι μου φέρνει η νέα χρονιά;&raquo;</span><span class="qgo">Ρώτησε κι εσύ</span></a>
+      <a class="qcard" href="agapi-tool-agora.html"><span class="qtag">Αγάπη</span><span class="qtext">&laquo;Νιώθει το ίδιο για μένα ή είμαι μόνο εγώ;&raquo;</span><span class="qgo">Ρώτησε κι εσύ</span></a>
+      <a class="qcard" href="oikonomika-tool-agora.html"><span class="qtag">Αφθονία</span><span class="qtext">&laquo;Να βάλω τις οικονομίες μου στο σπίτι ή να περιμένω;&raquo;</span><span class="qgo">Ρώτησε κι εσύ</span></a>
+      <a class="qcard" href="taro-tool-agora.html"><span class="qtag">Ταρώ</span><span class="qtext">&laquo;Γιατί νιώθω ότι δεν προχωράω, όσο κι αν προσπαθώ;&raquo;</span><span class="qgo">Ρώτησε κι εσύ</span></a>
+      <a class="qcard" href="epistrofi-tool-agora.html"><span class="qtag">Επιστροφή</span><span class="qtext">&laquo;Αν γυρίσει, θα είναι για τους σωστούς λόγους;&raquo;</span><span class="qgo">Ρώτησε κι εσύ</span></a>
+      </div>
+      <button class="asked-arrow next" type="button" aria-label="Επόμενη ερώτηση"><svg viewBox="0 0 24 24" fill="none"><path d="M9 5L16 12L9 19" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+    </div>
+    <p class="asked-count"><span id="askedNow">1</span> από 30</p>
   </section>
 
   <section class="oracles" id="oracles">
@@ -649,28 +823,6 @@
 
   </section>
 
-  <section class="proof">
-    <div class="flourish">
-      <svg viewBox="0 0 120 60" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <path d="M2 30C20 10 40 10 60 30C80 50 100 50 118 30" stroke="#d4af37" stroke-width="1"/>
-        <circle cx="60" cy="30" r="3" fill="#f6dd8a"/>
-      </svg>
-    </div>
-    <div class="proof-grid">
-      <div class="proof-item">
-        <blockquote>&laquo;Ρώτησα το Μαντείο ένα απλό πράγμα. Θα γυρίσει; Πήρα την απάντηση που χρειαζόμουν, ευτυχώς.&raquo;</blockquote>
-        <cite>ΑΝΝΑ, 50 ΕΤΩΝ</cite>
-      </div>
-      <div class="proof-item">
-        <blockquote>&laquo;Δεν πίστευα σε αυτά τα πράγματα. Τα χαρτιά μου έδειξαν ακριβώς αυτό που φοβόμουν να παραδεχτώ, και επιτέλους ένιωσα ανακούφιση.&raquo;</blockquote>
-        <cite>ΜΑΡΙΑ, 58 ΕΤΩΝ</cite>
-      </div>
-      <div class="proof-item">
-        <blockquote>&laquo;Ρώτησα αν αξίζει να ξεκινήσω κάτι δικό μου. Η απάντηση μου έδωσε το θάρρος που έψαχνα εδώ και καιρό.&raquo;</blockquote>
-        <cite>ΕΛΕΝΗ, 54 ΕΤΩΝ</cite>
-      </div>
-    </div>
-  </section>
 
 </main>
 
@@ -728,6 +880,28 @@
   lightbox.addEventListener('click', (e) => {
     if (e.target === lightbox) lightbox.classList.remove('show');
   });
+
+  // Καρουζέλ «Τι ρωτούν στο Μαντείο»: βελάκια δεξιά αριστερά και μετρητής.
+  (function () {
+    const track = document.querySelector('.asked-track');
+    if (!track) return;
+    const cards = track.querySelectorAll('.qcard');
+    const prev = document.querySelector('.asked-arrow.prev');
+    const next = document.querySelector('.asked-arrow.next');
+    const now = document.getElementById('askedNow');
+    const step = () => cards[0].getBoundingClientRect().width + 16;
+    prev.addEventListener('click', () => track.scrollBy({ left: -step(), behavior: 'smooth' }));
+    next.addEventListener('click', () => track.scrollBy({ left: step(), behavior: 'smooth' }));
+    const update = () => {
+      const i = Math.round(track.scrollLeft / step());
+      now.textContent = Math.min(cards.length, i + 1);
+      prev.disabled = track.scrollLeft < 4;
+      next.disabled = track.scrollLeft + track.clientWidth >= track.scrollWidth - 4;
+    };
+    track.addEventListener('scroll', () => requestAnimationFrame(update), { passive: true });
+    window.addEventListener('resize', update);
+    update();
+  })();
 </script>
 </body>
 </html>
