@@ -5,6 +5,8 @@
 import { verifyStripeSession, capturePayment, streamClaude } from "../lib/epistrofi-common.mjs";
 import { fullPromptFor, questionPromptFor } from "../lib/oracle-tools.mjs";
 import { oracleStore } from "../lib/oracle-store.mjs";
+import textCheck from "../lib/text-check.cjs";
+const { fixText, audit } = textCheck;
 
 const REDIRECT = /\[\s*ΑΝΑΚΑΤΕΥΘΥΝΣΗ\s*\]/;
 const paidToolFor = (r) => r.kind === "question" ? `${r.tool}_${r.stage}` : r.tool;
@@ -50,7 +52,8 @@ export default async (req) => {
     if (!force && Date.now() - lastSave < 1200) return;
     lastSave = Date.now();
     // Η σελίδα δεν πρέπει να δείξει ποτέ την ένδειξη της ανακατεύθυνσης ως κείμενο χρησμού.
-    const snapshot = REDIRECT.test(text) ? "" : text;
+    // Διορθώνεται και όσο γράφεται, ώστε η πελάτισσα να μη δει ποτέ λάθος μέρα της εβδομάδας.
+    const snapshot = REDIRECT.test(text) ? "" : fixText(text).text;
     if (snapshot.length !== lastLen) { lastLen = snapshot.length; progressAt = Date.now(); }
     const pAt = progressAt;
     saving = saving.then(async () => {
@@ -65,7 +68,7 @@ export default async (req) => {
   const beat = setInterval(() => savePartial(true), 15000);
   savePartial(true);
   try {
-    const full = await streamClaude(prompt, maxTokens, (t) => { text += t; savePartial(false); },
+    const raw = await streamClaude(prompt, maxTokens, (t) => { text += t; savePartial(false); },
       minWords, prefix, (rewound) => { text = rewound; savePartial(true); }).catch(e => {
         // Μια ανακατεύθυνση είναι σύντομη από τη φύση της· δεν είναι αποτυχία.
         if (isQuestion && REDIRECT.test(text)) return text;
@@ -74,6 +77,12 @@ export default async (req) => {
     clearInterval(beat);
     await saving;
     if (!(await stillMine())) return;
+
+    const { text: full, fixes } = fixText(raw);
+    const checks = audit(full, prompt);
+    if (fixes.length || checks.length) {
+      console.warn(`[oracle-bg] ${reading.tool}/${reading.stage} έλεγχος κειμένου: διορθώσεις=${JSON.stringify(fixes)} θέματα=${JSON.stringify(checks)}`);
+    }
 
     if (isQuestion && REDIRECT.test(full)) {
       const message = full.replace(REDIRECT, "").trim();
@@ -86,7 +95,7 @@ export default async (req) => {
     }
 
     await readings.setJSON(readingId, {
-      ...reading, full, partial: null, paidSession: sessionId,
+      ...reading, full, partial: null, paidSession: sessionId, textFixes: fixes, textChecks: checks,
       paidAt: new Date().toISOString(), generatingSince: null, genError: null
     });
     console.log(`[oracle-bg] ${reading.tool}/${reading.stage} done words=${full.split(/\s+/).length}`);

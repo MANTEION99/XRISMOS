@@ -5,6 +5,8 @@
 import {
   readingsStore, verifyStripeSession, capturePayment, fullPrompt, skyBlock, streamClaude
 } from "../lib/epistrofi-common.mjs";
+import textCheck from "../lib/text-check.cjs";
+const { fixText, audit } = textCheck;
 
 export default async (req) => {
   let b;
@@ -42,7 +44,7 @@ export default async (req) => {
     if (superseded) return;
     if (!force && Date.now() - lastSave < 1200) return;
     lastSave = Date.now();
-    const snapshot = text;
+    const snapshot = fixText(text).text;
     if (snapshot.length !== lastLen) { lastLen = snapshot.length; progressAt = Date.now(); }
     const pAt = progressAt;
     saving = saving.then(async () => {
@@ -60,16 +62,22 @@ export default async (req) => {
   try {
     const hasTime1 = /^\d{2}:\d{2}$/.test(reading.inputs.tob1 || "");
     const sky = skyBlock(reading.inputs, reading.charts, hasTime1);
-    const full = await streamClaude(
-      fullPrompt(reading.inputs, reading.charts, reading.teaser, sky), 4000,
+    const prompt = fullPrompt(reading.inputs, reading.charts, reading.teaser, sky);
+    const raw = await streamClaude(
+      prompt, 4000,
       (t) => { text += t; savePartial(false); }, 450, prefix,
       (rewound) => { text = rewound; savePartial(true); }
     );
     clearInterval(beat);
     await saving;
     if (!(await stillMine())) return;
+    const { text: full, fixes } = fixText(raw);
+    const checks = audit(full, prompt);
+    if (fixes.length || checks.length) {
+      console.warn(`[full-bg] έλεγχος κειμένου: διορθώσεις=${JSON.stringify(fixes)} θέματα=${JSON.stringify(checks)}`);
+    }
     await readings.setJSON(readingId, {
-      ...reading, full, partial: null, paidSession: sessionId,
+      ...reading, full, partial: null, paidSession: sessionId, textFixes: fixes, textChecks: checks,
       paidAt: new Date().toISOString(), generatingSince: null, genError: null
     });
     console.log(`[full-bg] done words=${full.split(/\s+/).length}`);
