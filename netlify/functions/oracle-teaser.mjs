@@ -69,6 +69,12 @@ export default async (req) => {
 
   return streamResponse(async (write) => {
     const teaser = await streamClaude(teaserPromptFor(tool, p, data), 1200, write, 110);
+    if (/\[\s*ΑΝΑΚΑΤΕΥΘΥΝΣΗ\s*\]/.test(teaser)) {
+      // Ερώτηση που δεν απαντιέται: δεν «καίει» το δωρεάν άνοιγμα, μπορεί να ρωτήσει κάτι άλλο.
+      await emails.delete(emailKey);
+      await readings.setJSON(readingId, { ...base, data, teaser: "", redirect: teaser.replace(/\[\s*ΑΝΑΚΑΤΕΥΘΥΝΣΗ\s*\]/, "").trim() });
+      return;
+    }
     await readings.setJSON(readingId, { ...base, data, teaser });
   }, { "X-Reading-Id": readingId, "X-Oracle-Data": pubHeader });
 };

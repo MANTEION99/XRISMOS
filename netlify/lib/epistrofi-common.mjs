@@ -261,10 +261,12 @@ ${full}
     const words = wordCount(full);
     console.log(`[claude] attempt=${attempt} stop=${r.stopReason} ended=${r.ended} words=${words}`);
     diag.push(`#${attempt} ${r.stopReason || "-"}${r.detail ? " (" + r.detail + ")" : ""} λέξεις=${words}`);
-    if (r.ended && r.stopReason === "end_turn" && words >= minWords) return full;
+    // Η ανακατεύθυνση (ερώτηση που δεν απαντιέται) είναι σύντομη από τη φύση της· δεν ζητάμε συνέχεια.
+    const isRedirect = /\[\s*ΑΝΑΚΑΤΕΥΘΥΝΣΗ\s*\]/.test(full);
+    if (r.ended && r.stopReason === "end_turn" && (words >= minWords || isRedirect)) return full;
     if (r.stopReason === "refusal") break;
   }
-  if (wordCount(full) < Math.max(20, minWords / 2)) throw new Error("Η απάντηση βγήκε ελλιπής: " + diag.join(" | "));
+  if (!/\[\s*ΑΝΑΚΑΤΕΥΘΥΝΣΗ\s*\]/.test(full) && wordCount(full) < Math.max(20, minWords / 2)) throw new Error("Η απάντηση βγήκε ελλιπής: " + diag.join(" | "));
   return full;
 }
 

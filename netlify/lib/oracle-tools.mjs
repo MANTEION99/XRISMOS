@@ -6,6 +6,8 @@ import {
   computeCharts, chartsBlock, chartForPrompt, timeNote, moonChangesSign, skyBlock
 } from "./epistrofi-common.mjs";
 import { drawThreeCards } from "./tarot-deck.mjs";
+import safety from "./safety.cjs";
+const { REDIRECT_RULES } = safety;
 
 /* ---------- Κοινοί κανόνες γραφής ---------- */
 
@@ -113,6 +115,16 @@ function tarotBlock(p, cards) {
 Τα χαρτιά που τραβήχτηκαν (πραγματικά, δεν αλλάζουν):
 ${cards.map((c, i) => `${SLOT[i]}: ${c.name}, ${c.reversed ? "ανάστροφο" : "όρθιο"}. Νόημα: ${c.reversed ? c.reversed_meaning : c.upright}`).join("\n")}`;
 }
+
+// «Ρώτα το Μαντείο»: ελεύθερη ερώτηση. Ο χρησμός διαβάζει πρώτα το θέμα και κοιτάζει τα σωστά σημεία.
+const OPEN_TOPIC = "Μένεις αυστηρά στο θέμα της ερώτησής της. Δεν απλώνεσαι σε άλλους τομείς της ζωής της.";
+const OPEN_FOCUS = (p) => `Πρώτα κατάλαβε σιωπηλά το θέμα της ερώτησης και στηρίξου στα σωστά σημεία του χάρτη:
+• αγάπη, σχέση, πρώην, γνωριμία: Αφροδίτη, Άρης, Σελήνη, και αν υπάρχει ώρα ο 5ος και ο 7ος οίκος
+• χρήματα, δουλειά, επιχείρηση, σπουδές: Δίας, Κρόνος, Ήλιος, και αν υπάρχει ώρα ο 2ος, ο 6ος, ο 10ος οίκος και το Μεσουράνημα
+• σπίτι, οικογένεια, παιδιά, γονείς: Σελήνη, και αν υπάρχει ώρα ο 4ος οίκος (και ο 5ος για τα παιδιά)
+• μετακόμιση, ταξίδι, εξωτερικό: Δίας, Ερμής, και αν υπάρχει ώρα ο 3ος, ο 4ος και ο 9ος οίκος
+• ο εαυτός της, ο δρόμος της, η χρονιά της: Ήλιος, Σελήνη, Ωροσκόπος, Δεσμοί της Σελήνης
+${p.name2 ? `Η ερώτηση αφορά και τον/την ${p.name2}: χρησιμοποίησε και τα στοιχεία του/της, όπου υπάρχουν.` : ""}`;
 
 /* ---------- Τα εργαλεία ---------- */
 
@@ -281,6 +293,50 @@ ${ASTRO_LANG}
 ${ENDING(STARS_CHANGE)}`
   },
 
+  erotima: {
+    title: "Ρώτα το Μαντείο",
+    kind: "open", needDob2: false, needQuestion: true,
+    pctLabel: null,
+    skySpec: {
+      p1: { Sun: "τον Ήλιο", Moon: "τη Σελήνη", Venus: "την Αφροδίτη", Mars: "τον Άρη", Jupiter: "τον Δία" },
+      desc1: true, mc1: true,
+      p2: { Sun: "τον Ήλιο", Venus: "την Αφροδίτη", Moon: "τη Σελήνη" }
+    },
+    teaser: (p, block) => `${voice("ο αστρολόγος", OPEN_TOPIC)}
+
+${block}
+
+Η ερώτηση του/της ${p.name1}: «${p.question}»
+${OPEN_FOCUS(p)}
+
+${TEASER_CORE(
+  `Δείξε με την πρώτη σου πρόταση μετά τον χαιρετισμό ότι άκουσες την ερώτησή της, πιάνοντάς την με δικά της λόγια και με το συναίσθημα που κρύβει. Μετά πες της δύο συγκεκριμένα χαρακτηριστικά της, το καθένα δεμένο με μια πραγματική θέση του χάρτη της που σχετίζεται ΜΕ ΤΟ ΘΕΜΑ της ερώτησης, τόσο ακριβή ώστε να σκεφτεί «με ξέρει».`,
+  `ότι ο χάρτης της δείχνει καθαρά την απάντηση σε αυτό που ρωτά, μια συγκεκριμένη περίοδο που το αλλάζει και τι να κάνει τότε, και ότι αυτά ακολουθούν αμέσως παρακάτω. Μη δώσεις την απάντηση.`
+)}`,
+    full: (p, block, teaser, sky) => `${voice("ο αστρολόγος", OPEN_TOPIC)}
+
+${block}
+
+${sky}
+
+Η ερώτηση του/της ${p.name1}: «${p.question}»
+${OPEN_FOCUS(p)}
+
+${CONT_OPENING(teaser, p.name1)}
+
+Μήκος: 500 έως 700 λέξεις.
+${ASTRO_LANG}
+Δομή, σε ρέοντα λόγο χωρίς τίτλους:
+1. Απάντησε ΚΑΘΑΡΑ και ΣΥΓΚΕΚΡΙΜΕΝΑ σε αυτό που ρωτά, από την αρχή. Όχι γενικά για τη ζωή της.
+2. Γιατί η απάντηση είναι αυτή: οι λίγες πιο δυνατές θέσεις του χάρτη της για αυτό το θέμα, και τι σημαίνουν για εκείνη.
+3. ΠΟΤΕ: δύο χρονικά σημεία, (α) ένα ΠΡΩΤΟ ΣΗΜΑΔΙ μέσα στους επόμενους 1 έως 3 μήνες και (β) η πιο δυνατή περίοδος για αυτό που ρωτά. ${SKY_RULE}
+4. Τι να κάνει και τι να αποφύγει σε αυτές τις περιόδους.
+5. Κλείσε θυμίζοντας με τρυφερότητα ότι η έκβαση εξαρτάται και από τις δικές της επιλογές.
+
+ΜΟΡΦΗ: Ξεκίνα κατευθείαν με το κείμενο, χωρίς ποσοστό.
+${ENDING(STARS_CHANGE)}`
+  },
+
   numerology: {
     title: "Ο Χρησμός της Αριθμολογίας",
     kind: "numerology", needDob2: false, needQuestion: false,
@@ -348,6 +404,7 @@ export async function computeData(toolId, p) {
   const t = TOOLS[toolId];
   if (t.kind === "astro2") return { charts: await computeCharts(p) };
   if (t.kind === "astro1") return { charts: await computeCharts({ ...p, dob2: "", name2: "" }) };
+  if (t.kind === "open") return { charts: await computeCharts(p) };
   if (t.kind === "numerology") return { numbers: numerologyData(p) };
   if (t.kind === "taro") {
     return { cards: drawThreeCards().map(c => ({ file: c.file, name: c.name, reversed: !!c.reversed, upright: c.upright, reversed_meaning: c.reversedMeaning })) };
@@ -367,6 +424,7 @@ export function dataBlock(toolId, p, data) {
   const t = TOOLS[toolId];
   if (t.kind === "astro2") return chartsBlock(p, data.charts);
   if (t.kind === "astro1") return personBlock(p, data.charts);
+  if (t.kind === "open") return p.name2 ? chartsBlock(p, data.charts) : personBlock(p, data.charts);
   if (t.kind === "numerology") return numerologyBlock(p, data.numbers);
   if (t.kind === "taro") return tarotBlock(p, data.cards);
   return "";
@@ -374,12 +432,15 @@ export function dataBlock(toolId, p, data) {
 
 export function skyFor(toolId, p, data) {
   const t = TOOLS[toolId];
-  if (t.kind !== "astro1" && t.kind !== "astro2") return "";
+  if (t.kind !== "astro1" && t.kind !== "astro2" && t.kind !== "open") return "";
   return skyBlock(p, data.charts, hasTime(p.tob1), new Date(), t.skySpec || null);
 }
 
 export function teaserPromptFor(toolId, p, data) {
-  return TOOLS[toolId].teaser(p, dataBlock(toolId, p, data));
+  const t = TOOLS[toolId];
+  const prompt = t.teaser(p, dataBlock(toolId, p, data));
+  // Όπου η πελάτισσα γράφει δική της ερώτηση, ο κανόνας ασφαλείας ισχύει ήδη από τη δωρεάν αρχή.
+  return t.needQuestion ? `${REDIRECT_RULES}\n\nΑν η ερώτηση ΔΕΝ ανήκει σε καμία από αυτές τις περιπτώσεις, ακολουθείς κανονικά τις οδηγίες:\n\n${prompt}` : prompt;
 }
 
 export function fullPromptFor(toolId, p, data, teaser) {
@@ -397,9 +458,10 @@ export function questionPromptFor(toolId, p, data, previous, question, stage = "
     astro2: "τη σχέση, το άλλο πρόσωπο ή την καρδιά της",
     astro1: "τα χρήματα, τη δουλειά ή την οικονομική της ασφάλεια",
     numerology: "τον εαυτό της, τα μοτίβα της ή τη χρονιά της",
-    taro: "το αρχικό της ερώτημα ή κάτι που αφορά την ίδια"
+    taro: "το αρχικό της ερώτημα ή κάτι που αφορά την ίδια",
+    open: "οτιδήποτε αφορά τη ζωή της, την καρδιά της ή τους ανθρώπους της"
   }[t.kind];
-  const ownSource = { astro2: "τον ΔΙΚΟ ΤΗΣ χάρτη μόνο", astro1: "τον χάρτη της", numerology: "τους αριθμούς της", taro: "τα ίδια τρία χαρτιά" }[t.kind];
+  const ownSource = { astro2: "τον ΔΙΚΟ ΤΗΣ χάρτη μόνο", astro1: "τον χάρτη της", numerology: "τους αριθμούς της", taro: "τα ίδια τρία χαρτιά", open: "τον χάρτη της" }[t.kind];
   return `${voice(t.kind === "taro" ? "η αναγνώστρια ταρώ" : t.kind === "numerology" ? "η αριθμολόγος" : "ο αστρολόγος", "")}
 
 ${dataBlock(toolId, p, data)}
@@ -416,7 +478,9 @@ ${prev}
 Πρώτα κατάταξε σιωπηλά την ερώτηση σε μία από τρεις κατηγορίες και ακολούθησε ΜΟΝΟ τον αντίστοιχο κανόνα:
 Α) Αφορά ${topicWord}: γράψε μια προσωπική, ζεστή απάντηση (${qWords}) ΑΚΡΙΒΩΣ σε αυτή την ερώτηση, από τα ίδια δεδομένα, χωρίς να επαναλάβεις όσα ειπώθηκαν. Το μήκος το χρησιμοποιείς για να εξηγήσεις τι σημαίνει αυτό για τη ζωή της και τι να κάνει, όχι για να προσθέσεις κι άλλα στοιχεία στη σειρά.${sky ? " Αν ρωτά «πότε», δώσε ημερομηνίες ΜΟΝΟ από τον «ΠΡΑΓΜΑΤΙΚΟ ΟΥΡΑΝΟ»." : ""}
 Β) Αφορά άλλο κομμάτι της ζωής της (δουλειά, χρήματα, σπίτι, οικογένεια, ταξίδι): απάντησε από ${ownSource}, ${qWords}, ίδιος ζεστός τόνος, πραγματική απάντηση. Στην τελευταία πρόταση δέσε διακριτικά με την καρδιά της.
-Γ) Αφορά υγεία ή ασθένεια (δική της ή άλλου), εγκυμοσύνη, θάνατο, ατύχημα, δικαστήριο ή νομικά, ή δεν βγάζει νόημα: ΜΗΝ κάνεις καμία πρόβλεψη. Γράψε ΑΚΡΙΒΩΣ στην πρώτη γραμμή [ΑΝΑΚΑΤΕΥΘΥΝΣΗ] και από κάτω 2 με 3 ζεστές προτάσεις: ότι για τόσο σημαντικό θέμα δεν παίρνουμε τη θέση γιατρού ή δικηγόρου (ή ότι η ερώτηση δεν έγινε κατανοητή), και ότι μπορεί να ρωτήσει κάτι άλλο. Σε αυτή την περίπτωση δεν γράφεις τίποτα άλλο.
+Γ) Ανήκει σε μία από τις περιπτώσεις του ΚΑΝΟΝΑ ΑΣΦΑΛΕΙΑΣ παρακάτω: ακολουθείς ΜΟΝΟ τον κανόνα.
+
+${REDIRECT_RULES}
 
 ΜΟΡΦΗ για Α και Β: Ξεκίνα κατευθείαν με την απάντηση, χωρίς χαιρετισμό. ΔΕΝ γράφεις ποσοστό. Μετά, σε νέα γραμμή, ακριβώς [ΣΥΜΒΟΥΛΗ] και 1 έως 2 προτάσεις πρακτικής συμβουλής για αυτή την ερώτηση.
 Ολοκλήρωσε πάντα κάθε πρόταση.`;

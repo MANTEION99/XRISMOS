@@ -388,7 +388,29 @@ async function submitTeaser() {
       }
       teaserText.textContent = txt;
     });
-    const all = await readStream(res, (t) => teaserTyper.set(t.replace(ERR_MARK, ''), false));
+    // Η απάντηση μπορεί να είναι «ανακατεύθυνση» (υγεία, νομικά, απόγνωση, βία, τζόγος): τότε δεν
+    // δείχνουμε χρησμό ούτε πληρωμή. Περιμένουμε τους πρώτους χαρακτήρες για να το καταλάβουμε.
+    const REDIRECT_RE = /^\s*\[\s*ΑΝΑΚΑΤΕΥΘΥΝΣΗ\s*\]/;
+    let redirectMode = null;
+    const all = await readStream(res, (t) => {
+      const clean = t.replace(ERR_MARK, '');
+      if (redirectMode === null) {
+        if (clean.trim().length < 18) return;
+        redirectMode = REDIRECT_RE.test(clean);
+      }
+      if (!redirectMode) teaserTyper.set(clean, false);
+    });
+    if (redirectMode || REDIRECT_RE.test(all)) {
+      stopRitual(); loading.classList.remove('show');
+      result.classList.remove('show');
+      form.style.display = '';
+      const msg = all.replace(ERR_MARK, '').replace(REDIRECT_RE, '').trim();
+      showError(msg + (CFG.needQuestion ? ' Ο δωρεάν χρησμός σου δεν χρησιμοποιήθηκε: μπορείς να γράψεις μια άλλη ερώτηση.' : ''));
+      err.classList.add('redirect-msg');
+      if ($('question')) { $('question').value = ''; $('question').focus(); }
+      currentReadingId = null;
+      return;
+    }
     teaserTyper.set(all.replace(ERR_MARK, ''), true);
     await teaserTyper.whenDone();
     stopRitual(); loading.classList.remove('show');

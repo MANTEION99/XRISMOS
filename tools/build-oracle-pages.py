@@ -36,6 +36,9 @@ EXTRA_CSS = """
   .ask-box{ max-width:380px; margin:0 auto; }
   .ask-box .enter-btn{ padding:11px 28px; font-size:14px; }
   .seal-blur{ min-height:360px; }
+  .safety-note{ font-size:12px; line-height:1.55; color:var(--muted); margin:16px 0 0; padding:10px 12px; border-left:2px solid var(--gold); background:rgba(217,178,92,0.06); border-radius:4px; text-align:left; }
+  .result:has(#fullWrap.show) .teaser-note{ display:none; }
+  .error.redirect-msg{ color:var(--paper); line-height:1.6; }
   .value-note-q{ font-size:12.5px; line-height:1.55; color:var(--muted); max-width:320px; margin:12px auto 18px; text-align:center; }
 """
 
@@ -71,6 +74,19 @@ Q_STEPS = ["Η πληρωμή σου επιβεβαιώθηκε", "Η ερώτη
 Q_RITUAL = ["Η ερώτησή σου φτάνει στα άστρα{name}...", "Αναζητούμε την απάντηση στους ίδιους χάρτες...", "Η απάντησή σου γράφεται..."]
 
 TOOLS = {
+  "erotima": dict(
+    file="erotima-tool-agora.html", kind="open", needDob2=False, needQuestion=True,
+    title="Ρώτα το Μαντείο", h1="Ρώτα<br>το Μαντείο", img="images/manteio-advisor.jpg",
+    sub="Γράψε ό,τι σε απασχολεί, με δικά σου λόγια. Ο χάρτης της γέννησής σου έχει ήδη την απάντηση.",
+    ask="Και μετά τον χρησμό σου, μπορείς να κάνεις και δεύτερη και τρίτη ερώτηση πάνω στον ίδιο χάρτη.",
+    fields=lambda: person1() + field("question", "Τι θέλεις να ρωτήσεις;", "textarea", "π.χ. Θα βρει δουλειά ο γιος μου φέτος; Να μετακομίσω; Τι μου φέρνει ο χειμώνας;", '<div class="time-note">Γράψε με δικά σου λόγια αυτό που σε απασχολεί. Όσο πιο συγκεκριμένα, τόσο πιο καθαρή η απάντηση.</div>') + '      <div class="divider">ΑΝ Η ΕΡΩΤΗΣΗ ΑΦΟΡΑ ΚΑΙ ΑΛΛΟ ΠΡΟΣΩΠΟ (ΠΡΟΑΙΡΕΤΙΚΟ)</div>\n' + field("name2", "Το όνομά του/της", placeholder="π.χ. Γιώργος") + field("dob2", "Ημερομηνία γέννησής του/της (αν την ξέρεις)", "date") + field("tob2", "Ώρα γέννησής του/της (αν την ξέρεις)", "time", note=NOTE_TIME2) + field("pob2", "Πόλη γέννησής του/της (αν την ξέρεις)", placeholder="π.χ. Θεσσαλονίκη", note=NOTE_PLACE),
+    pctLabel=None,
+    blur="Ο χάρτης σου δείχνει καθαρά την απάντηση σε αυτό που ρωτάς. Υπάρχει ένα πρώτο σημάδι μέσα στους επόμενους μήνες και μια περίοδος που αλλάζει τα πράγματα, με συγκεκριμένες ημερομηνίες από τον πραγματικό ουρανό, και τι χρειάζεται να κάνεις εσύ τότε.",
+    sealSub="Η καθαρή απάντηση στην ερώτησή σου, πότε αλλάζει και τι να κάνεις τότε.",
+    teaserRitual=["Η ερώτησή σου φτάνει στα άστρα{name}...", "Ο χάρτης της γέννησής σου ανοίγει...", "Αναζητούμε στον χάρτη σου το σημείο που απαντά..."],
+    fullRitual=["Η σφραγίδα του χρησμού σου ανοίγει...", "Υπολογίζονται οι κινήσεις των πλανητών για τους επόμενους 12 μήνες...", "Αναζητούμε τη στιγμή που αλλάζει αυτό που ρωτάς...", "Ο χρησμός σου γράφεται{name}..."],
+    waitSteps=ASTRO_STEPS,
+    qPh="π.χ. Και τι να κάνω μέχρι τότε;", qHint="Ρώτα ό,τι σε καίει, πάνω στον ίδιο χάρτη.", sameData="με τον ίδιο χάρτη"),
   "agapi": dict(
     file="agapi-tool-agora.html", kind="astro2", needDob2=False, needQuestion=False,
     title="Ο Χρησμός της Αγάπης", h1="Ο Χρησμός<br>της Αγάπης", img="images/agapi.jpg",
@@ -156,6 +172,8 @@ LOCK = '<svg viewBox="0 0 24 24" fill="none"><rect x="5" y="11" width="14" heigh
 STAR = '<svg viewBox="0 0 24 24" fill="none"><path d="M12 2l2.4 6.6L21 10l-5 4.4 1.5 6.6L12 17.8 6.5 21l1.5-6.6L3 10l6.6-1.4z" stroke="currentColor" stroke-width="1.4"/></svg>'
 DISCLAIMER = "Το περιεχόμενο του Μαντείου έχει αποκλειστικά ψυχαγωγικό χαρακτήρα και απευθύνεται σε ενήλικες. Δεν αποτελεί πρόβλεψη με επιστημονική βάση και δεν υποκαθιστά τη γνώμη ή τη συμβουλή γιατρού, ψυχολόγου, δικηγόρου, οικονομικού συμβούλου ή άλλου επαγγελματία. Μην παίρνεις σημαντικές αποφάσεις για την υγεία, τα οικονομικά, τις σχέσεις ή τη ζωή σου βασισμένη μόνο σε αυτό. Αν περνάς μια δύσκολη περίοδο, μίλησε με έναν ειδικό ή με έναν άνθρωπο που εμπιστεύεσαι."
 
+SAFETY_NOTE = "Το Μαντείο δεν απαντά σε θέματα υγείας, εγκυμοσύνης, νομικά ή δικαστικά, ούτε δίνει οικονομικές ή επενδυτικές συμβουλές. Αν σε κάποιο σημείο ο χρησμός σου φαίνεται να αγγίζει τέτοιο θέμα, μην τον λάβεις υπόψη σε καμία περίπτωση και απευθύνσου σε γιατρό, δικηγόρο ή οικονομικό σύμβουλο. Αν περνάς κάτι πολύ δύσκολο, μίλησε τώρα με έναν ειδικό: Γραμμή Παρέμβασης για την Αυτοκτονία 1018, Γραμμή SOS για τη βία κατά των γυναικών 15900, και σε άμεσο κίνδυνο 112."
+
 def build(tool, c):
     cfg = {
         "tool": tool, "kind": c["kind"], "title": c["title"], "needDob2": c["needDob2"], "needQuestion": c["needQuestion"],
@@ -236,6 +254,7 @@ def build(tool, c):
     <div class="spread" id="spread"></div>
     <div class="numbers" id="numbers"></div>
     <div class="reading" id="teaserText"></div>
+    <p class="safety-note teaser-note">{SAFETY_NOTE}</p>
     <p class="info" id="infoLine" style="display:none;"></p>
 
     <div class="seal-wrap" id="seal">
@@ -256,6 +275,7 @@ def build(tool, c):
       <div class="question-head" id="questionHead"><div class="ql">Η ΕΡΩΤΗΣΗ ΣΟΥ</div><div class="qt" id="questionShown"></div></div>
       <div id="ritualFull"></div>
 {pct}      <div class="reading" id="readingtext"></div>
+      <p class="safety-note">{SAFETY_NOTE}</p>
       <p id="pauseNote" class="pause-note" style="display:none;">Ο χρησμός σου συνεχίζει να γράφεται, μείνε εδώ<span class="dots"><i>.</i><i>.</i><i>.</i></span></p>
       <div id="adviceWrap" style="display:none; margin-top:20px; padding-top:18px; border-top:1px solid var(--line);">
         <div style="font-size:11.5px; letter-spacing:2px; color:var(--gold); text-transform:uppercase; margin-bottom:8px;">Πρακτική συμβουλή</div>

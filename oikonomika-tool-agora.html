@@ -261,6 +261,9 @@
   .ask-box{ max-width:380px; margin:0 auto; }
   .ask-box .enter-btn{ padding:11px 28px; font-size:14px; }
   .seal-blur{ min-height:360px; }
+  .safety-note{ font-size:12px; line-height:1.55; color:var(--muted); margin:16px 0 0; padding:10px 12px; border-left:2px solid var(--gold); background:rgba(217,178,92,0.06); border-radius:4px; text-align:left; }
+  .result:has(#fullWrap.show) .teaser-note{ display:none; }
+  .error.redirect-msg{ color:var(--paper); line-height:1.6; }
   .value-note-q{ font-size:12.5px; line-height:1.55; color:var(--muted); max-width:320px; margin:12px auto 18px; text-align:center; }
 
   .time-note{ font-size:12px; opacity:0.7; margin-top:6px; line-height:1.4; }
@@ -353,6 +356,7 @@
     <div class="spread" id="spread"></div>
     <div class="numbers" id="numbers"></div>
     <div class="reading" id="teaserText"></div>
+    <p class="safety-note teaser-note">Το Μαντείο δεν απαντά σε θέματα υγείας, εγκυμοσύνης, νομικά ή δικαστικά, ούτε δίνει οικονομικές ή επενδυτικές συμβουλές. Αν σε κάποιο σημείο ο χρησμός σου φαίνεται να αγγίζει τέτοιο θέμα, μην τον λάβεις υπόψη σε καμία περίπτωση και απευθύνσου σε γιατρό, δικηγόρο ή οικονομικό σύμβουλο. Αν περνάς κάτι πολύ δύσκολο, μίλησε τώρα με έναν ειδικό: Γραμμή Παρέμβασης για την Αυτοκτονία 1018, Γραμμή SOS για τη βία κατά των γυναικών 15900, και σε άμεσο κίνδυνο 112.</p>
     <p class="info" id="infoLine" style="display:none;"></p>
 
     <div class="seal-wrap" id="seal">
@@ -377,6 +381,7 @@
         <div class="pct-label">ΠΙΘΑΝΟΤΗΤΑ ΑΝΑΚΟΥΦΙΣΗΣ</div>
       </div>
       <div class="reading" id="readingtext"></div>
+      <p class="safety-note">Το Μαντείο δεν απαντά σε θέματα υγείας, εγκυμοσύνης, νομικά ή δικαστικά, ούτε δίνει οικονομικές ή επενδυτικές συμβουλές. Αν σε κάποιο σημείο ο χρησμός σου φαίνεται να αγγίζει τέτοιο θέμα, μην τον λάβεις υπόψη σε καμία περίπτωση και απευθύνσου σε γιατρό, δικηγόρο ή οικονομικό σύμβουλο. Αν περνάς κάτι πολύ δύσκολο, μίλησε τώρα με έναν ειδικό: Γραμμή Παρέμβασης για την Αυτοκτονία 1018, Γραμμή SOS για τη βία κατά των γυναικών 15900, και σε άμεσο κίνδυνο 112.</p>
       <p id="pauseNote" class="pause-note" style="display:none;">Ο χρησμός σου συνεχίζει να γράφεται, μείνε εδώ<span class="dots"><i>.</i><i>.</i><i>.</i></span></p>
       <div id="adviceWrap" style="display:none; margin-top:20px; padding-top:18px; border-top:1px solid var(--line);">
         <div style="font-size:11.5px; letter-spacing:2px; color:var(--gold); text-transform:uppercase; margin-bottom:8px;">Πρακτική συμβουλή</div>
@@ -782,7 +787,29 @@ async function submitTeaser() {
       }
       teaserText.textContent = txt;
     });
-    const all = await readStream(res, (t) => teaserTyper.set(t.replace(ERR_MARK, ''), false));
+    // Η απάντηση μπορεί να είναι «ανακατεύθυνση» (υγεία, νομικά, απόγνωση, βία, τζόγος): τότε δεν
+    // δείχνουμε χρησμό ούτε πληρωμή. Περιμένουμε τους πρώτους χαρακτήρες για να το καταλάβουμε.
+    const REDIRECT_RE = /^\s*\[\s*ΑΝΑΚΑΤΕΥΘΥΝΣΗ\s*\]/;
+    let redirectMode = null;
+    const all = await readStream(res, (t) => {
+      const clean = t.replace(ERR_MARK, '');
+      if (redirectMode === null) {
+        if (clean.trim().length < 18) return;
+        redirectMode = REDIRECT_RE.test(clean);
+      }
+      if (!redirectMode) teaserTyper.set(clean, false);
+    });
+    if (redirectMode || REDIRECT_RE.test(all)) {
+      stopRitual(); loading.classList.remove('show');
+      result.classList.remove('show');
+      form.style.display = '';
+      const msg = all.replace(ERR_MARK, '').replace(REDIRECT_RE, '').trim();
+      showError(msg + (CFG.needQuestion ? ' Ο δωρεάν χρησμός σου δεν χρησιμοποιήθηκε: μπορείς να γράψεις μια άλλη ερώτηση.' : ''));
+      err.classList.add('redirect-msg');
+      if ($('question')) { $('question').value = ''; $('question').focus(); }
+      currentReadingId = null;
+      return;
+    }
     teaserTyper.set(all.replace(ERR_MARK, ''), true);
     await teaserTyper.whenDone();
     stopRitual(); loading.classList.remove('show');
