@@ -942,7 +942,7 @@ async function submitPaidQuestion() {
     const response = await fetch('/.netlify/functions/epistrofi-agora', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ ...f, question, session_id: sessionId })
+      body: JSON.stringify({ ...f, question, stage, session_id: sessionId })
     });
     let data = {};
     try { data = await response.json(); } catch (e) { data = { error: 'μη έγκυρη απάντηση' }; }
@@ -976,7 +976,9 @@ async function submitPaidQuestion() {
 
     const text = data.reading || '';
     const match = text.match(/\[ΠΟΣΟΣΤΟ:\s*(\d+)\]/);
-    pctnum.textContent = (match ? match[1] : '…') + '%';
+    // Η πιθανότητα επανένωσης ανήκει στον πρώτο χρησμό· στη 2η και 3η ερώτηση δεν εμφανίζεται.
+    if (stage !== 'q1' || !match) $('pctWrap').style.display = 'none';
+    else pctnum.textContent = match[1] + '%';
     const body = text.replace(/\[ΠΟΣΟΣΤΟ:\s*\d+\]/, '').trim();
     const parts = body.split(/\[?\s*ΣΥΜΒΟΥΛΗ\s*\]?\s*:?/);
     readingtext.textContent = parts[0].trim();

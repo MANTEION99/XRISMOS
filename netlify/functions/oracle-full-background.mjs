@@ -29,7 +29,7 @@ export default async (req) => {
 
   const isQuestion = reading.kind === "question";
   const prompt = isQuestion
-    ? questionPromptFor(reading.tool, reading.inputs, reading.data, reading.previous || [], reading.question)
+    ? questionPromptFor(reading.tool, reading.inputs, reading.data, reading.previous || [], reading.question, reading.stage)
     : fullPromptFor(reading.tool, reading.inputs, reading.data, reading.teaser || "");
   const maxTokens = isQuestion ? 1500 : 4000;
   // Οι απαντήσεις σε ερωτήσεις είναι σύντομες (και η ανακατεύθυνση ακόμα πιο σύντομη), οπότε εκεί δεν ζητάμε ελάχιστο μήκος.
