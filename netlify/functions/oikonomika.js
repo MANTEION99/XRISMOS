@@ -1,8 +1,15 @@
+const { callClaude } = require("../lib/claude.cjs");
+const astro = require("../lib/astro.cjs");
 // Αρχείο: netlify/functions/oikonomika.js
 // Ανέβασέ το ακριβώς σε αυτόν τον φάκελο μέσα στο repo σου: netlify/functions/oikonomika.js
 // Χρησιμοποιεί τα ΙΔΙΑ environment variables με το epistrofi.js (ASTROLOGY_API_KEY, ANTHROPIC_API_KEY), δεν χρειάζεται τίποτα νέο.
 
 exports.handler = async function (event) {
+  // Η δωρεάν εκδοχή είναι για τη συνδρομή, που δεν έχει ξεκινήσει. Μέχρι τότε μένει κλειστή,
+  // αλλιώς ο καθένας θα έπαιρνε δωρεάν ολόκληρο χρησμό από εδώ χωρίς να πληρώσει.
+  if (process.env.FREE_TOOLS_ENABLED !== "1") {
+    return { statusCode: 404, body: JSON.stringify({ error: "Not found" }) };
+  }
   if (event.httpMethod !== "POST") {
     return { statusCode: 405, body: "Method Not Allowed" };
   }
@@ -14,8 +21,12 @@ exports.handler = async function (event) {
       return { statusCode: 400, body: JSON.stringify({ error: "Λείπουν απαραίτητα στοιχεία." }) };
     }
 
+    // Πραγματικός τόπος γέννησης (συντεταγμένες και ζώνη ώρας). Αν δεν βρεθεί: Αθήνα.
+    const pl1 = await astro.place(pob1, dob1, tob1);
+
+
     // --- Βήμα 1: πραγματικά αστρολογικά δεδομένα ---
-    const [d1, m1, y1] = dob1.split("-");
+    const [d1, m1, y1] = dob1.split("-").reverse(); // dob1 έρχεται σαν YYYY-MM-DD
     const [hour1, min1] = (tob1 || "12:00").split(":");
 
     const chart1Body = {
@@ -24,9 +35,9 @@ exports.handler = async function (event) {
       year: parseInt(y1 || dob1.split("-")[0]),
       hour: parseInt(hour1),
       min: parseInt(min1),
-      lat: 37.9838,
-      lon: 23.7275,
-      tzone: 2,
+      lat: pl1.lat,
+      lon: pl1.lon,
+      tzone: pl1.tzone,
       house_type: "placidus"
     };
 
@@ -34,6 +45,7 @@ exports.handler = async function (event) {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
+        "Accept-Language": "en",
         "x-astrologyapi-key": process.env.ASTROLOGY_API_KEY
       },
       body: JSON.stringify(chart1Body)
@@ -44,7 +56,7 @@ exports.handler = async function (event) {
     const prompt = `Είσαι ένας έμπειρος, ζεστός Έλληνας αστρολόγος που γράφει για το "Μαντείο". Το κοινό σου είναι κυρίως γυναίκες 50-65 ετών. Παρακάτω σου δίνω ΠΡΑΓΜΑΤΙΚΑ υπολογισμένα αστρολογικά δεδομένα (θέσεις πλανητών, οίκους, όψεις) για το άτομο. Χρησιμοποίησέ τα σαν βάση, μην εφευρίσκεις νέα δεδομένα εκτός αυτών.
 
 Στοιχεία (${name1}):
-${JSON.stringify(astroData1)}
+${astro.forPrompt(astroData1, tob1, name1, dob1, pl1.tzName)}
 
 Η ερώτηση που έθεσε το άτομο: "${question}"
 
@@ -55,25 +67,11 @@ ${JSON.stringify(astroData1)}
 Ξεκίνα την απάντησή σου ΜΟΝΟ με έναν αριθμό ποσοστού σε αυτή τη μορφή: [ΠΟΣΟΣΤΟ: 67]
 Μετά γράψε το κείμενο, μιλώντας απευθείας στο άτομο, με ζεστασιά και μυστήριο, απαντώντας ΣΤΗ ΣΥΓΚΕΚΡΙΜΕΝΗ ερώτηση που έθεσε, όχι γενικά για οικονομικά. Κλείσε υπενθυμίζοντας ότι η τελική έκβαση εξαρτάται και από τις δικές του/της ενέργειες, όχι μόνο τον ουρανό.
 
-ΥΠΟΧΡΕΩΤΙΚΟ: Μετά, σε νέα γραμμή, γράψε ΑΚΡΙΒΩΣ [ΣΥΜΒΟΥΛΗ] και αμέσως μετά 1-2 προτάσεις πρακτικής συμβουλής σχετικής με την ερώτηση, κλείνοντας με μία σύντομη πρόταση ότι ο ουρανός αλλάζει κάθε μήνα και η εικόνα μπορεί να είναι διαφορετική, πιο θετική, τον επόμενο μήνα. Μην αναφέρεις τίποτα για συνδρομή ή πληρωμή.
+ΥΠΟΧΡΕΩΤΙΚΟ: Μετά, σε νέα γραμμή, γράψε ΑΚΡΙΒΩΣ [ΣΥΜΒΟΥΛΗ] και αμέσως μετά 1-2 προτάσεις πρακτικής συμβουλής σχετικής με την ερώτηση, κλείνοντας με μία σύντομη πρόταση ότι τα άστρα αλλάζουν κάθε μήνα και η εικόνα μπορεί να είναι διαφορετική, πιο θετική, τον επόμενο μήνα. Μην αναφέρεις τίποτα για συνδρομή ή πληρωμή.
 
 ΠΟΛΥ ΣΗΜΑΝΤΙΚΟ: Πρέπει να ολοκληρώσεις πάντα κάθε πρόταση και ολόκληρο το κείμενο κανονικά, ποτέ να μην κοπεί στη μέση λέξης ή πρότασης. Αν πλησιάζεις στο όριο μήκους, συντόμευσε νωρίτερα αλλά πάντα κλείσε το κείμενο ολοκληρωμένο, με τελεία στο τέλος.`;
 
-    const claudeRes = await fetch("https://api.anthropic.com/v1/messages", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "x-api-key": process.env.ANTHROPIC_API_KEY,
-        "anthropic-version": "2023-06-01"
-      },
-      body: JSON.stringify({
-        model: "claude-sonnet-5",
-        max_tokens: 1100,
-        messages: [{ role: "user", content: prompt }]
-      })
-    });
-    const claudeData = await claudeRes.json();
-    const text = claudeData.content.map(b => b.text || "").join("").trim();
+    const text = await callClaude(prompt + astro.RULES, 3000);
 
     return {
       statusCode: 200,

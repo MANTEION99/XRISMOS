@@ -1,0 +1,18 @@
+# Όμορφοι σύνδεσμοι για τα εργαλεία (οι παλιοί .html συνεχίζουν να δουλεύουν)
+/epistrofi      /epistrofi-tool-agora.html     200
+/erotima        /erotima-tool-agora.html       200
+/agapi          /agapi-tool-agora.html         200
+/alitheia       /alitheia-tool-agora.html      200
+/symvatotita    /symvatotita-tool-agora.html   200
+/oikonomika     /oikonomika-tool-agora.html    200
+/arithmologia   /numerology-tool-agora.html    200
+/taro           /taro-tool-agora.html          200
+
+# Οι παλιές δωρεάν σελίδες (για τη μελλοντική συνδρομή) οδηγούν στις κανονικές σελίδες των εργαλείων
+/agapi-tool.html            /agapi            301!
+/alitheia-tool.html         /alitheia         301!
+/epistrofi-tool.html        /epistrofi        301!
+/oikonomika-tool.html       /oikonomika       301!
+/symvatotita-tool.html      /symvatotita      301!
+/taro-tool.html             /taro             301!
+/numerology-tool%20(1).html /arithmologia     301!

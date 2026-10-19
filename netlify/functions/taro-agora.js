@@ -1,3 +1,5 @@
+const { oncePerPayment } = require("../lib/once.cjs");
+const { callClaude } = require("../lib/claude.cjs");
 // Αρχείο: netlify/functions/taro-agora.js
 // Η ΕΠΙ ΠΛΗΡΩΜΗ εκδοχή, ξεχωριστή από το taro.js που μένει δωρεάν μέσα στη συνδρομή.
 // Ανέβασέ το στο netlify/functions/taro-agora.js
@@ -55,7 +57,7 @@ async function verifyPaidSession(sessionId, expectedTool) {
   }
 }
 
-exports.handler = async function (event) {
+async function handle(event) {
   if (event.httpMethod !== "POST") {
     return { statusCode: 405, body: "Method Not Allowed" };
   }
@@ -108,21 +110,7 @@ ${cardLine("ΜΕΛΛΟΝ", future)}
 
 ΠΟΛΥ ΣΗΜΑΝΤΙΚΟ: Πρέπει να ολοκληρώσεις πάντα κάθε πρόταση και ολόκληρο το κείμενο κανονικά, ποτέ να μην κοπεί στη μέση λέξης ή πρότασης. Αν πλησιάζεις στο όριο μήκους, συντόμευσε νωρίτερα αλλά πάντα κλείσε το κείμενο ολοκληρωμένο, με τελεία στο τέλος.`;
 
-    const claudeRes = await fetch("https://api.anthropic.com/v1/messages", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "x-api-key": process.env.ANTHROPIC_API_KEY,
-        "anthropic-version": "2023-06-01"
-      },
-      body: JSON.stringify({
-        model: "claude-sonnet-5",
-        max_tokens: 1300,
-        messages: [{ role: "user", content: prompt }]
-      })
-    });
-    const claudeData = await claudeRes.json();
-    const text = claudeData.content.map(b => b.text || "").join("").trim();
+    const text = await callClaude(prompt, 3000);
 
     return {
       statusCode: 200,
@@ -139,4 +127,6 @@ ${cardLine("ΜΕΛΛΟΝ", future)}
       body: JSON.stringify({ error: "Κάτι πήγε στραβά.", details: error.message })
     };
   }
-};
+}
+
+exports.handler = oncePerPayment(handle, "taro");
