@@ -250,6 +250,7 @@
   .dt-month{ flex:2 1 0; }
   .dt-year{ flex:1.15 1 0; }
   .dt-time .dt-select{ max-width:120px; }
+  .adult-note{ text-align:center; font-size:11.5px; color:var(--muted); margin:10px 0 0; line-height:1.5; }
 </style>
 <script type="text/javascript">
     (function(c,l,a,r,i,t,y){
@@ -259,7 +260,7 @@
     })(window, document, "clarity", "script", "ydrxibksl6");
 </script>
 </head>
-<body>
+<body data-adult2="1">
 <div class="stars"></div>
 
 <div class="cover" id="cover">
@@ -363,6 +364,7 @@
     </div>
     <p class="error" id="err">Συμπλήρωσε τουλάχιστον τα δύο ονόματα και τη δική σου ημερομηνία γέννησης.</p>
     <button type="submit" class="submit" id="btn">Δες τον χρησμό </button>
+    <p class="adult-note">Οι χρησμοί απευθύνονται μόνο σε ενήλικες (18+). Συνεχίζοντας δηλώνεις ότι είσαι ενήλικας.</p>
   </form>
 
   <div class="loading" id="loading">
@@ -438,7 +440,10 @@
     const thisYear = new Date().getFullYear();
     const days = Array.from({ length: 31 }, (_, i) => [pad(i + 1), String(i + 1)]);
     const months = MONTHS.map((m, i) => [pad(i + 1), m]);
-    const years = Array.from({ length: thisYear - 1920 + 1 }, (_, i) => { const y = thisYear - i; return [String(y), String(y)]; });
+    // Μόνο ενήλικες: για όποιον ρωτά (dob1), και για το άλλο πρόσωπο στα εργαλεία της αγάπης.
+    const adult = input.id === 'dob1' || (input.id === 'dob2' && document.body.dataset.adult2 === '1');
+    const maxYear = adult ? thisYear - 18 : thisYear;
+    const years = Array.from({ length: maxYear - 1920 + 1 }, (_, i) => { const y = maxYear - i; return [String(y), String(y)]; });
     const d = makeSelect('Μέρα', days, 'dt-day');
     const m = makeSelect('Μήνας', months, 'dt-month');
     const y = makeSelect('Έτος', years, 'dt-year');

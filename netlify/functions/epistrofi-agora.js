@@ -158,6 +158,10 @@ exports.handler = async function (event) {
       session_id, question, stage
     } = JSON.parse(event.body);
 
+    const adult = (d) => { const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(String(d || "")); if (!m) return true; const t = new Date(new Date().toLocaleString("en-US", { timeZone: "Europe/Athens" })); let a = t.getFullYear() - +m[1]; if (t.getMonth() + 1 < +m[2] || (t.getMonth() + 1 === +m[2] && t.getDate() < +m[3])) a--; return a >= 18; };
+    if (!adult(dob1) || (dob2 && !adult(dob2))) {
+      return { statusCode: 403, body: JSON.stringify({ error: "Το Μαντείο απευθύνεται μόνο σε ενήλικες (18+)." }) };
+    }
     if (!name1 || !name2 || !dob1) {
       return { statusCode: 400, body: JSON.stringify({ error: "Λείπουν απαραίτητα στοιχεία." }) };
     }

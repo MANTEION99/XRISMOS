@@ -20,7 +20,10 @@
     const thisYear = new Date().getFullYear();
     const days = Array.from({ length: 31 }, (_, i) => [pad(i + 1), String(i + 1)]);
     const months = MONTHS.map((m, i) => [pad(i + 1), m]);
-    const years = Array.from({ length: thisYear - 1920 + 1 }, (_, i) => { const y = thisYear - i; return [String(y), String(y)]; });
+    // Μόνο ενήλικες: για όποιον ρωτά (dob1), και για το άλλο πρόσωπο στα εργαλεία της αγάπης.
+    const adult = input.id === 'dob1' || (input.id === 'dob2' && document.body.dataset.adult2 === '1');
+    const maxYear = adult ? thisYear - 18 : thisYear;
+    const years = Array.from({ length: maxYear - 1920 + 1 }, (_, i) => { const y = maxYear - i; return [String(y), String(y)]; });
     const d = makeSelect('Μέρα', days, 'dt-day');
     const m = makeSelect('Μήνας', months, 'dt-month');
     const y = makeSelect('Έτος', years, 'dt-year');

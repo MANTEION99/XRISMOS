@@ -37,6 +37,7 @@ EXTRA_CSS = """
   .ask-box{ max-width:380px; margin:0 auto; }
   .ask-box .enter-btn{ padding:11px 28px; font-size:14px; }
   .seal-blur{ min-height:360px; }
+  .adult-note{ text-align:center; font-size:11.5px; color:var(--muted); margin:10px 0 0; line-height:1.5; }
   .safety-note{ font-size:12px; line-height:1.55; color:var(--muted); margin:16px 0 0; padding:10px 12px; border-left:2px solid var(--gold); background:rgba(217,178,92,0.06); border-radius:4px; text-align:left; }
   .result:has(#fullWrap.show) .teaser-note{ display:none; }
   .error.redirect-msg{ color:var(--paper); line-height:1.6; }
@@ -208,7 +209,7 @@ def build(tool, c):
     }})(window, document, "clarity", "script", "ydrxibksl6");
 </script>
 </head>
-<body>
+<body{' data-adult2="1"' if c["kind"] == "astro2" else ""}>
 <div class="stars"></div>
 
 <div class="cover" id="cover">
@@ -247,6 +248,7 @@ def build(tool, c):
       </div>
     <p class="error" id="err"></p>
     <button type="submit" class="submit" id="btn">Δες δωρεάν τον χρησμό σου</button>
+    <p class="adult-note">Οι χρησμοί απευθύνονται μόνο σε ενήλικες (18+). Συνεχίζοντας δηλώνεις ότι είσαι ενήλικας.</p>
   </form>
 
   <div class="loading" id="loading"></div>

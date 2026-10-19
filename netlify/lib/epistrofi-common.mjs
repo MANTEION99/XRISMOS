@@ -105,6 +105,17 @@ export function chartForPrompt(chart, hasTime, moonUnsure) {
   };
 }
 
+// Ενήλικας (18+) με βάση την ημερομηνία γέννησης ΕΕΕΕ-ΜΜ-ΗΗ, ώρα Ελλάδας.
+export function isAdult(dob, now = new Date()) {
+  const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(String(dob || ""));
+  if (!m) return true;
+  const today = new Date(now.toLocaleString("en-US", { timeZone: "Europe/Athens" }));
+  let age = today.getFullYear() - +m[1];
+  if (today.getMonth() + 1 < +m[2] || (today.getMonth() + 1 === +m[2] && today.getDate() < +m[3])) age--;
+  return age >= 18;
+}
+export const ADULTS_ONLY = "Το Μαντείο απευθύνεται μόνο σε ενήλικες (18+).";
+
 export const timeNote = (name, hasTime, moonUnsure) => hasTime
   ? ""
   : `\n(Για ${name} δεν δόθηκε ώρα γέννησης: ΜΗΝ αναφέρεις οίκους ούτε Ωροσκόπο. Μίλα μόνο για πλανήτες σε ζώδια και τις όψεις τους.` +

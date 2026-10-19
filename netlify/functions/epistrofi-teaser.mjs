@@ -6,7 +6,7 @@
 
 import {
   readingsStore, emailsStore, json, normalizeEmail, isValidEmail,
-  computeCharts, teaserPrompt, streamClaude, streamResponse
+  computeCharts, teaserPrompt, streamClaude, streamResponse, isAdult, ADULTS_ONLY
 } from "../lib/epistrofi-common.mjs";
 
 const clip = (v, n) => String(v || "").trim().slice(0, n);
@@ -31,7 +31,9 @@ export default async (req) => {
   const dateOk = (d) => /^\d{4}-\d{2}-\d{2}$/.test(d);
   if (!p.name1 || !p.name2 || !dateOk(p.dob1) || (p.dob2 && !dateOk(p.dob2))) {
     return json(400, { error: "Συμπλήρωσε τα δύο ονόματα και τη δική σου ημερομηνία γέννησης." });
-  }
+  }  if (!isAdult(p.dob1)) return json(403, { error: ADULTS_ONLY });
+  if (p.dob2 && !isAdult(p.dob2)) return json(403, { error: "Οι χρησμοί αγάπης αφορούν μόνο ενήλικες." });
+
   if (!isValidEmail(email)) {
     return json(400, { error: "Γράψε ένα σωστό email." });
   }

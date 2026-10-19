@@ -3,7 +3,7 @@
 // αποθηκεύει τα πάντα, ώστε μετά την πληρωμή η συνέχεια να γραφτεί πάνω σε αυτό.
 // Ένα δωρεάν άνοιγμα ανά email και ανά εργαλείο.
 
-import { json, normalizeEmail, isValidEmail, streamClaude, streamResponse } from "../lib/epistrofi-common.mjs";
+import { json, normalizeEmail, isValidEmail, streamClaude, streamResponse, isAdult, ADULTS_ONLY } from "../lib/epistrofi-common.mjs";
 import { TOOLS, isTool, computeData, publicData, teaserPromptFor } from "../lib/oracle-tools.mjs";
 
 import { oracleStore, emailsStore } from "../lib/oracle-store.mjs";
@@ -37,6 +37,9 @@ export default async (req) => {
   if (p.dob2 && !dateOk(p.dob2)) p.dob2 = "";
   if (t.needQuestion && p.question.length < 3) return json(400, { error: "Γράψε την ερώτησή σου." });
   if (!isValidEmail(email)) return json(400, { error: "Γράψε ένα σωστό email." });
+  // Μόνο ενήλικες: όποιος ρωτά, και το άλλο πρόσωπο στα εργαλεία της αγάπης. Δεν κρατιέται τίποτα.
+  if (p.dob1 && !isAdult(p.dob1)) return json(403, { error: ADULTS_ONLY });
+  if (t.kind === "astro2" && p.dob2 && !isAdult(p.dob2)) return json(403, { error: "Οι χρησμοί αγάπης αφορούν μόνο ενήλικες." });
 
   const readings = oracleStore();
   const emails = emailsStore();
