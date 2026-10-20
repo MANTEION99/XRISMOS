@@ -5,7 +5,7 @@
 Αλλαγές στην εμφάνιση ή στη λογική γίνονται ΜΟΝΟ στα tools/oracle-base.css, tools/oracle-page.js
 και σε αυτό το αρχείο, και μετά ξανατρέχει το script."""
 
-import json, html, pathlib
+import json, html, pathlib, re
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 BASE_CSS = (ROOT / "tools/oracle-base.css").read_text(encoding="utf-8")
@@ -77,7 +77,7 @@ Q_RITUAL = ["Η ερώτησή σου φτάνει στα άστρα{name}...", 
 
 TOOLS = {
   "erotima": dict(
-    file="erotima-tool-agora.html", kind="open", needDob2=False, needQuestion=True,
+    slug="erotima", file="erotima-tool-agora.html", kind="open", needDob2=False, needQuestion=True,
     title="Ρώτα το Μαντείο", h1="Ρώτα<br>το Μαντείο", img="images/manteio-advisor.jpg",
     sub="Γράψε ό,τι σε απασχολεί, με δικά σου λόγια. Ο χάρτης της γέννησής σου έχει ήδη την απάντηση.",
     ask="Και μετά τον χρησμό σου, μπορείς να κάνεις και δεύτερη και τρίτη ερώτηση πάνω στον ίδιο χάρτη.",
@@ -90,7 +90,7 @@ TOOLS = {
     waitSteps=ASTRO_STEPS,
     qPh="π.χ. Και τι να κάνω μέχρι τότε;", qHint="Ρώτα ό,τι σε καίει, πάνω στον ίδιο χάρτη.", sameData="με τον ίδιο χάρτη"),
   "agapi": dict(
-    file="agapi-tool-agora.html", kind="astro2", needDob2=False, needQuestion=False,
+    slug="agapi", file="agapi-tool-agora.html", kind="astro2", needDob2=False, needQuestion=False,
     title="Ο Χρησμός της Αγάπης", h1="Ο Χρησμός<br>της Αγάπης", img="images/agapi.jpg",
     sub="Σε σκέφτεται ακόμα; Νιώθει το ίδιο; Η Αφροδίτη του δεν αλλάζει ανάλογα με το τι θα ήθελες να ακούσεις.",
     ask="Και μετά τον χρησμό σου, μπορείς να ρωτήσεις τα άστρα ό,τι σε καίει για εκείνο το πρόσωπο και για την καρδιά σου.",
@@ -103,7 +103,7 @@ TOOLS = {
     waitSteps=ASTRO_STEPS,
     qPh="π.χ. Θα μου πει τι νιώθει τελικά;", qHint="Ρώτα ό,τι σε καίει για εσάς τους δύο ή για την καρδιά σου.", sameData="με τους ίδιους χάρτες"),
   "alitheia": dict(
-    file="alitheia-tool-agora.html", kind="astro2", needDob2=False, needQuestion=False,
+    slug="alitheia", file="alitheia-tool-agora.html", kind="astro2", needDob2=False, needQuestion=False,
     title="Ο Χρησμός της Αλήθειας", h1="Ο Χρησμός<br>της Αλήθειας", img="images/alitheia.jpg",
     sub="Υπάρχει κάτι που δεν σου λέει; Ο χάρτης του δεν κρύβεται, ακόμα κι όταν εκείνος προσπαθεί.",
     ask="Και μετά τον χρησμό σου, μπορείς να ρωτήσεις τα άστρα ό,τι σε καίει για εκείνο το πρόσωπο.",
@@ -116,7 +116,7 @@ TOOLS = {
     waitSteps=ASTRO_STEPS,
     qPh="π.χ. Γιατί άλλαξε συμπεριφορά τον τελευταίο μήνα;", qHint="Ρώτα ό,τι σε καίει για εκείνο το πρόσωπο ή για την καρδιά σου.", sameData="με τους ίδιους χάρτες"),
   "symvatotita": dict(
-    file="symvatotita-tool-agora.html", kind="astro2", needDob2=True, needQuestion=False,
+    slug="symvatotita", file="symvatotita-tool-agora.html", kind="astro2", needDob2=True, needQuestion=False,
     title="Ταιριάζετε; Η Πλήρης Συμβατότητά σας", h1="Ταιριάζετε;<br>Η Πλήρης Συμβατότητά σας", img="images/syndesi.jpg",
     sub="Κατανόησε τι δείχνει πραγματικά ο συνδυασμός των δύο χαρτών σας, πέρα από αμφιβολίες και σιωπές.",
     ask="Και μετά τον χρησμό σας, μπορείς να ρωτήσεις τα άστρα ό,τι σε καίει για εσάς τους δύο.",
@@ -129,7 +129,7 @@ TOOLS = {
     waitSteps=ASTRO_STEPS,
     qPh="π.χ. Γιατί νιώθω ότι κάτι δεν λέγεται μεταξύ μας;", qHint="Ρώτα ό,τι σε καίει για εσάς τους δύο.", sameData="με τους ίδιους χάρτες"),
   "oikonomika": dict(
-    file="oikonomika-tool-agora.html", kind="astro1", needDob2=False, needQuestion=True,
+    slug="oikonomika", file="oikonomika-tool-agora.html", kind="astro1", needDob2=False, needQuestion=True,
     title="Μια Φωτισμένη Οικονομική Αρχή", h1="Μια Φωτισμένη<br>Οικονομική Αρχή", img="images/afthonia.jpg",
     sub="Κατανόησε τι δείχνει ο χάρτης σου για τα οικονομικά σου, και πότε ανοίγει το παράθυρο ανακούφισης.",
     ask="Και μετά τον χρησμό σου, μπορείς να ρωτήσεις τα άστρα ό,τι σε απασχολεί για τα χρήματα και τη δουλειά σου.",
@@ -142,7 +142,7 @@ TOOLS = {
     waitSteps=ASTRO_STEPS,
     qPh="π.χ. Αξίζει να αλλάξω δουλειά φέτος;", qHint="Ρώτα ό,τι σε απασχολεί για τα χρήματα, τη δουλειά ή το σπίτι σου.", sameData="με τον ίδιο χάρτη"),
   "numerology": dict(
-    file="numerology-tool-agora.html", kind="numerology", needDob2=False, needQuestion=False,
+    slug="arithmologia", file="numerology-tool-agora.html", kind="numerology", needDob2=False, needQuestion=False,
     title="Ο Χρησμός της Αριθμολογίας", h1="Ο Χρησμός<br>της Αριθμολογίας", img="images/arithmologia.jpg",
     sub="Οι αριθμοί της γέννησής σου κρύβουν ένα μοτίβο που επαναλαμβάνεται σε όλη σου τη ζωή, χωρίς να το έχεις προσέξει ποτέ.",
     ask="Και μετά τον χρησμό σου, μπορείς να ρωτήσεις ό,τι σε καίει για τον εαυτό σου και τη χρονιά σου.",
@@ -155,7 +155,7 @@ TOOLS = {
     waitSteps=["Η πληρωμή σου επιβεβαιώθηκε", "Οι αριθμοί σου φανερώνονται", "Το μοτίβο της ζωής σου συντίθεται", "Ο χρησμός σου γράφεται ειδικά για σένα"],
     qPh="π.χ. Γιατί επαναλαμβάνω τα ίδια λάθη στις σχέσεις μου;", qHint="Ρώτα ό,τι σε καίει για τον εαυτό σου, τις σχέσεις ή τη χρονιά σου.", sameData="με τους ίδιους αριθμούς"),
   "taro": dict(
-    file="taro-tool-agora.html", kind="taro", needDob2=False, needQuestion=True,
+    slug="taro", file="taro-tool-agora.html", kind="taro", needDob2=False, needQuestion=True,
     title="Το Τρίφυλλο Ταρώ", h1="Το Τρίφυλλο<br>Ταρώ", img="images/taro.jpg",
     sub="Τρία χαρτιά πάνω στο δικό σου ερώτημα: τι σε έφερε ως εδώ, τι ζεις τώρα και τι έρχεται.",
     ask="Και μετά την ανάγνωσή σου, μπορείς να ρωτήσεις κι άλλα πάνω στα ίδια χαρτιά.",
@@ -193,6 +193,13 @@ def build(tool, c):
 <link rel="icon" type="image/svg+xml" href="favicon.svg">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>{html.escape(title_plain)} | Μαντείο</title>
+<meta name="description" content="{html.escape(re.sub('<[^>]+>', '', c["sub"]))}">
+<meta property="og:title" content="{html.escape(title_plain if "Μαντείο" in title_plain else title_plain + " | Μαντείο")}">
+<meta property="og:description" content="{html.escape(re.sub('<[^>]+>', '', c["sub"]))} Η αρχή του χρησμού σου είναι δωρεάν.">
+<meta property="og:image" content="https://manteio.live/{c["img"]}">
+<meta property="og:url" content="https://manteio.live/{c["slug"]}">
+<meta property="og:type" content="website">
+<meta property="og:locale" content="el_GR">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,500&family=Inter:wght@400;500&display=swap" rel="stylesheet">
 <!-- ΠΑΡΑΓΕΤΑΙ ΑΥΤΟΜΑΤΑ από tools/build-oracle-pages.py. Μην το αλλάζεις με το χέρι. -->
