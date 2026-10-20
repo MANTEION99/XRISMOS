@@ -11,6 +11,7 @@ ROOT = pathlib.Path(__file__).resolve().parent.parent
 BASE_CSS = (ROOT / "tools/oracle-base.css").read_text(encoding="utf-8")
 PAGE_JS = (ROOT / "tools/oracle-page.js").read_text(encoding="utf-8")
 DATE_JS = (ROOT / "tools/date-fields.js").read_text(encoding="utf-8")
+SRC_JS = (ROOT / "tools/source.js").read_text(encoding="utf-8")
 
 EXTRA_CSS = """
   .spread{ display:none; gap:10px; justify-content:center; margin:0 0 22px; flex-wrap:nowrap; }
@@ -299,6 +300,9 @@ def build(tool, c):
   </div>
 </div>
 
+<script>
+{SRC_JS}
+</script>
 <script>
 {DATE_JS}
 </script>

@@ -59,7 +59,7 @@ exports.handler = async function (event) {
   }
 
   try {
-    const { tool, returnUrl, reading_id } = JSON.parse(event.body);
+    const { tool, returnUrl, reading_id, src } = JSON.parse(event.body);
     const product = PRODUCTS[tool];
 
     if (!product || !returnUrl) {
@@ -73,6 +73,9 @@ exports.handler = async function (event) {
 
     // Για τον δωρεάν χρησμό που συνεχίζεται μετά την πληρωμή: η πληρωμή δένεται με τον συγκεκριμένο χρησμό.
     const metadata = { tool };
+    // Από ποιο post ήρθε (σύντομο link), για να φαίνεται και στο Stripe.
+    const cleanSrc = String(src || "").replace(/[^\w\/.-]/g, "").slice(0, 80);
+    if (cleanSrc) metadata.src = cleanSrc;
     if (reading_id) {
       if (!/^[0-9a-f-]{36}$/.test(String(reading_id))) {
         return { statusCode: 400, body: JSON.stringify({ error: "Λάθος χρησμός." }) };

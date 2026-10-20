@@ -419,6 +419,31 @@
 </div>
 
 <script>
+/* Από ποιο post ήρθε η επισκέπτρια. Τα σύντομα links (manteio.live/r/ΚΩΔΙΚΟΣ) φέρνουν ?utm_campaign=ΚΩΔΙΚΟΣ.
+   Κρατάμε τον τελευταίο κωδικό για 14 μέρες, ώστε να μετρά και όταν γυρίσει αργότερα να πληρώσει.
+   window.manteioSource() δίνει τον κωδικό (ή κενό), και στέλνεται μαζί με τον δωρεάν χρησμό και την πληρωμή. */
+(function () {
+  const KEY = 'manteio_src';
+  const DAYS = 14;
+  try {
+    const q = new URLSearchParams(location.search);
+    const c = (q.get('utm_campaign') || '').trim();
+    if (c) {
+      const parts = [q.get('utm_source'), q.get('utm_medium'), c].filter(Boolean);
+      localStorage.setItem(KEY, JSON.stringify({ src: parts.join('/').slice(0, 80), ts: Date.now() }));
+    }
+  } catch (e) {}
+  window.manteioSource = function () {
+    try {
+      const v = JSON.parse(localStorage.getItem(KEY) || 'null');
+      if (v && v.src && Date.now() - v.ts < DAYS * 86400000) return v.src;
+    } catch (e) {}
+    return '';
+  };
+})();
+
+</script>
+<script>
 /* Ημερομηνία και ώρα με απλές λίστες (μέρα, μήνας, έτος / ώρα, λεπτά) αντί για το ημερολόγιο του κινητού.
    Το ημερολόγιο του κινητού κολλάει συχνά μέσα στον browser του Facebook και στα Android, και για ημερομηνία
    γέννησης θέλει δεκάδες χρόνια κύλισμα. Το αρχικό πεδίο μένει κρυφό με το ίδιο id και την ίδια μορφή
@@ -817,7 +842,7 @@ async function startCheckout(buttonEl, readingId, tool, stage) {
     const res = await fetch('/.netlify/functions/create-checkout', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ tool, reading_id: readingId, returnUrl })
+      body: JSON.stringify({ tool, reading_id: readingId, returnUrl, src: window.manteioSource ? window.manteioSource() : '' })
     });
     const data = await res.json();
     if (!data.url) throw new Error('no url');
@@ -851,7 +876,7 @@ async function submitTeaser() {
     const res = await fetch('/api/oracle-teaser', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ tool: TOOL, ...f, email, consent: $('consent').checked })
+      body: JSON.stringify({ tool: TOOL, ...f, email, consent: $('consent').checked, src: window.manteioSource ? window.manteioSource() : '' })
     });
 
     if (res.status === 409) {

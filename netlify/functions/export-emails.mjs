@@ -5,6 +5,7 @@
 // Μία γραμμή ανά email και εργαλείο. Προαιρετικά:
 //   &consent=1  μόνο όσοι έδωσαν συναίνεση για επικοινωνία
 //   &tests=1    να συμπεριληφθούν και οι δοκιμές (email που περιέχουν "pliromes2021")
+//   &ana=post   αντί για email, πίνακας ανά post (σύντομο link): δωρεάν χρησμοί και πληρωμένοι
 
 import { getStore } from "@netlify/blobs";
 
@@ -54,6 +55,31 @@ export default async (req) => {
     ...(await allDocs(getStore({ name: "epistrofi-readings", consistency: "strong" })))
   ];
 
+  const today = new Date().toISOString().slice(0, 10);
+  const csv = (header, rows, name) => new Response("\uFEFF" + [header.join(",")].concat(rows.map(r => r.map(csvCell).join(","))).join("\r\n"), {
+    status: 200,
+    headers: { "Content-Type": "text/csv; charset=utf-8", "Content-Disposition": `attachment; filename="${name}"`, "Cache-Control": "no-store" }
+  });
+
+  // Ανά post: πόσοι δωρεάν χρησμοί και πόσοι πληρωμένοι ήρθαν από κάθε σύντομο link.
+  if (url.searchParams.get("ana") === "post") {
+    const per = new Map();
+    for (const r of docs) {
+      if (r.kind === "question") continue;
+      const email = String(r.email || "").toLowerCase();
+      if (!email || (!withTests && /pliromes2021/.test(email))) continue;
+      const src = (r.src || "χωρίς link").split("/").pop();
+      const x = per.get(src) || { free: 0, paid: 0, first: r.createdAt || "" };
+      x.free++;
+      if (r.full || r.paidSession) x.paid++;
+      if ((r.createdAt || "") < x.first) x.first = r.createdAt;
+      per.set(src, x);
+    }
+    const rows = [...per.entries()].sort((a, b) => b[1].free - a[1].free)
+      .map(([src, x]) => [src, x.free, x.paid, x.free ? Math.round(100 * x.paid / x.free) + "%" : "", (x.first || "").slice(0, 10)]);
+    return csv(["post (κωδικός link)", "δωρεάν χρησμοί", "πλήρωσαν", "ποσοστό", "πρώτη φορά"], rows, `manteio-ana-post-${today}.csv`);
+  }
+
   // Μία εγγραφή ανά email και εργαλείο: κρατάμε την πιο πρόσφατη, η συναίνεση και η πληρωμή μετράνε αν υπήρξαν έστω μία φορά.
   const rows = new Map();
   for (const r of docs) {
@@ -69,6 +95,7 @@ export default async (req) => {
     const created = r.createdAt || "";
     const row = {
       email, name: p.name1 || "", sign: signOf(p.dob1), dob: p.dob1 || "", tool: TOOL_NAMES[tool] || tool,
+      src: (prev && prev.src) || (r.src || "").split("/").pop(),
       paid: paid || (prev && prev.paid), consent: !!r.marketingConsent || (prev && prev.consent),
       date: prev && prev.date > created ? prev.date : created
     };
@@ -79,12 +106,11 @@ export default async (req) => {
   if (onlyConsent) list = list.filter(r => r.consent);
   list.sort((a, b) => (b.date || "").localeCompare(a.date || ""));
 
-  const header = ["email", "όνομα", "ζώδιο", "ημερομηνία γέννησης", "εργαλείο", "πλήρωσε", "συναίνεση επικοινωνίας", "ημερομηνία"];
+  const header = ["email", "όνομα", "ζώδιο", "ημερομηνία γέννησης", "εργαλείο", "πλήρωσε", "συναίνεση επικοινωνίας", "ημερομηνία", "πηγή (post)"];
   const lines = [header.join(",")].concat(list.map(r => [
-    r.email, r.name, r.sign, r.dob, r.tool, r.paid ? "ναι" : "όχι", r.consent ? "ναι" : "όχι", (r.date || "").slice(0, 10)
+    r.email, r.name, r.sign, r.dob, r.tool, r.paid ? "ναι" : "όχι", r.consent ? "ναι" : "όχι", (r.date || "").slice(0, 10), r.src || ""
   ].map(csvCell).join(",")));
 
-  const today = new Date().toISOString().slice(0, 10);
   // Το BOM στην αρχή κάνει το Excel να διαβάζει σωστά τα ελληνικά.
   return new Response("﻿" + lines.join("\r\n"), {
     status: 200,

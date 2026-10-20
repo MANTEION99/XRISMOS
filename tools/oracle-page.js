@@ -311,7 +311,7 @@ async function startCheckout(buttonEl, readingId, tool, stage) {
     const res = await fetch('/.netlify/functions/create-checkout', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ tool, reading_id: readingId, returnUrl })
+      body: JSON.stringify({ tool, reading_id: readingId, returnUrl, src: window.manteioSource ? window.manteioSource() : '' })
     });
     const data = await res.json();
     if (!data.url) throw new Error('no url');
@@ -345,7 +345,7 @@ async function submitTeaser() {
     const res = await fetch('/api/oracle-teaser', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ tool: TOOL, ...f, email, consent: $('consent').checked })
+      body: JSON.stringify({ tool: TOOL, ...f, email, consent: $('consent').checked, src: window.manteioSource ? window.manteioSource() : '' })
     });
 
     if (res.status === 409) {

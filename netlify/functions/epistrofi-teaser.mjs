@@ -43,6 +43,7 @@ export default async (req) => {
   const readingId = crypto.randomUUID();
   const base = {
     id: readingId, tool: "epistrofi", inputs: p, email, marketingConsent,
+    src: String(b.src || "").replace(/[^\w\/.-]/g, "").slice(0, 80),
     createdAt: new Date().toISOString()
   };
 
