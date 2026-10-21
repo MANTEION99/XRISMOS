@@ -1,3 +1,4 @@
+const { chartWithFallback } = require("../lib/local-chart.cjs");
 const { oncePerPayment } = require("../lib/once.cjs");
 const { callClaude } = require("../lib/claude.cjs");
 const astro = require("../lib/astro.cjs");
@@ -61,15 +62,7 @@ async function handle(event) {
       house_type: "placidus"
     };
 
-    const fetchChart = (body) => fetch("https://json.astrologyapi.com/v1/western_horoscope", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "Accept-Language": "en",
-        "x-astrologyapi-key": process.env.ASTROLOGY_API_KEY
-      },
-      body: JSON.stringify(body)
-    }).then(r => r.json());
+    const fetchChart = (body) => chartWithFallback(body);
 
     let chart2Body = null;
     if (dob2) {

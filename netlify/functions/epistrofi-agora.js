@@ -1,3 +1,4 @@
+const { chartWithFallback } = require("../lib/local-chart.cjs");
 const { callClaude } = require("../lib/claude.cjs");
 const { fixText, audit } = require("../lib/text-check.cjs");
 const { REDIRECT_RULES } = require("../lib/safety.cjs");
@@ -72,15 +73,7 @@ async function generate({ name1, dob1, tob1, pob1, name2, dob2, tob2, pob2, ques
     house_type: "placidus"
   };
 
-  const fetchChart = (body) => fetch("https://json.astrologyapi.com/v1/western_horoscope", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "Accept-Language": "en",
-      "x-astrologyapi-key": process.env.ASTROLOGY_API_KEY
-    },
-    body: JSON.stringify(body)
-  }).then(r => r.json());
+  const fetchChart = (body) => chartWithFallback(body);
 
   let chart2Body = null;
   if (dob2) {

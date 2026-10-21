@@ -7,6 +7,8 @@ import makeSky from "./sky.cjs";
 const sky = makeSky(Astronomy);
 const { zoneOffset, moonChangesSign } = sky;
 import placeLib from "./place.cjs";
+import localChartLib from "./local-chart.cjs";
+const { localChart } = localChartLib;
 export const skyBlock = sky.skyBlock;
 
 export const MODEL = "claude-sonnet-5";
@@ -57,23 +59,35 @@ function chartBody(dob, tob, place) {
 }
 
 async function fetchChart(body) {
-  const res = await fetch("https://json.astrologyapi.com/v1/western_horoscope", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "Accept-Language": "en",
+  let res = null, text = "", data = null;
+  try {
+    res = await fetch("https://json.astrologyapi.com/v1/western_horoscope", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Accept-Language": "en",
         "x-astrologyapi-key": process.env.ASTROLOGY_API_KEY
-    },
-    body: JSON.stringify(body)
-  });
-  const text = await res.text();
-  let data = null;
-  try { data = JSON.parse(text); } catch {}
+      },
+      body: JSON.stringify(body)
+    });
+    text = await res.text();
+    try { data = JSON.parse(text); } catch {}
+  } catch (e) {
+    text = "network: " + (e && e.message);
+  }
   // Ένας σωστός χάρτης έχει πάντα λίστα πλανητών. Αλλιώς το AstrologyAPI απάντησε με σφάλμα
-  // (κλειδί, όριο, λάθος στοιχεία) και ΔΕΝ αφήνουμε το Claude να γράψει χρησμό χωρίς χάρτη.
-  if (!res.ok || !data || !Array.isArray(data.planets) || data.planets.length === 0) {
-    console.error(`[astrologyapi] status=${res.status} key=${process.env.ASTROLOGY_API_KEY ? "set" : "MISSING"} body=${text.slice(0, 300)}`);
-    throw new Error("Ο χάρτης δεν υπολογίστηκε");
+  // (κλειδί, όριο, λάθος στοιχεία) και τότε υπολογίζουμε τον χάρτη τοπικά, ώστε η πελάτισσα
+  // να μη βλέπει ποτέ σφάλμα. Ο χρησμός ΠΟΤΕ δεν γράφεται χωρίς χάρτη.
+  if (!res || !res.ok || !data || !Array.isArray(data.planets) || data.planets.length === 0) {
+    console.error(`[astrologyapi] status=${res ? res.status : "-"} key=${process.env.ASTROLOGY_API_KEY ? "set" : "MISSING"} body=${text.slice(0, 300)}`);
+    try {
+      const local = localChart(body);
+      console.warn("[astrologyapi] fallback: τοπικός υπολογισμός χάρτη");
+      return local;
+    } catch (e) {
+      console.error("[local-chart] " + (e && e.message));
+      throw new Error("Ο χάρτης δεν υπολογίστηκε");
+    }
   }
   return data;
 }
