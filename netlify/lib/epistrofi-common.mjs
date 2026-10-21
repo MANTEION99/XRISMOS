@@ -81,10 +81,23 @@ async function fetchChart(body) {
 // Υπολογίζει τους δύο χάρτες μία φορά. Το αποτέλεσμα αποθηκεύεται μαζί με τον χρησμό,
 // ώστε η πληρωμένη συνέχεια να μη χρειάζεται νέα κλήση στο AstrologyAPI.
 export async function computeCharts(p) {
-  const [place1, place2] = await Promise.all([birthPlace(p.pob1), birthPlace(p.pob2)]);
+  let [place1, place2] = await Promise.all([birthPlace(p.pob1), birthPlace(p.pob2)]);
+  // Αν η πόλη που γράφτηκε δεν είναι πραγματική (π.χ. «Dhsshs» ή ένα email), ο εντοπισμός μπορεί να βρει
+  // κάτι άσχετο και ο χάρτης να αποτύχει. Τότε ξαναϋπολογίζεται με Αθήνα, αντί να βγει σφάλμα στην πελάτισσα.
+  const ATHENS = { lat: 37.9838, lon: 23.7275, tzName: "Europe/Athens", label: "Αθήνα (προεπιλογή)", found: false };
+  const safeChart = async (dob, tob, place, setPlace) => {
+    try {
+      return await fetchChart(chartBody(dob, tob, place));
+    } catch (e) {
+      if (!place.found) throw e;
+      console.error(`[place] ο χάρτης απέτυχε με ${place.label}, ξανά με Αθήνα`, e && e.message);
+      setPlace(ATHENS);
+      return fetchChart(chartBody(dob, tob, ATHENS));
+    }
+  };
   const [chart1, chart2] = await Promise.all([
-    fetchChart(chartBody(p.dob1, p.tob1, place1)),
-    p.dob2 ? fetchChart(chartBody(p.dob2, p.tob2, place2)) : Promise.resolve(null)
+    safeChart(p.dob1, p.tob1, place1, (x) => { place1 = x; }),
+    p.dob2 ? safeChart(p.dob2, p.tob2, place2, (x) => { place2 = x; }) : Promise.resolve(null)
   ]);
   console.log(`[place] 1="${p.pob1 || ""}" -> ${place1.label} | 2="${p.pob2 || ""}" -> ${place2.label}`);
   return { chart1, chart2, tz1: place1.tzName, tz2: place2.tzName, place1: place1.label, place2: place2.label };
