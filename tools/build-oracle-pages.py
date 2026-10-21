@@ -216,6 +216,7 @@ def build(tool, c):
         y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
     }})(window, document, "clarity", "script", "ydrxibksl6");
 </script>
+<script src="/reviews.js" defer></script>
 </head>
 <body{' data-adult2="1"' if c["kind"] == "astro2" else ""}>
 <div class="stars"></div>
@@ -279,6 +280,7 @@ def build(tool, c):
         <div class="secure-note">{LOCK} Ασφαλής πληρωμή μέσω Stripe</div>
       </div>
     </div>
+    <div id="socialProof"></div>
     <p class="support-line" style="text-align:center;font-size:12.5px;color:var(--muted);margin-top:18px;line-height:1.5;">Αν κάτι δεν πάει καλά, γράψε μας στο <a href="https://m.me/61573958341176" target="_blank" rel="noopener" style="color:var(--gold);">Messenger του Μαντείου</a> και θα το λύσουμε αμέσως.</p>
     <p id="restartLink" style="display:none;text-align:center;font-size:12.5px;color:var(--muted);margin-top:16px;cursor:pointer;text-decoration:underline;">Θέλεις νέο χρησμό; Ξεκίνα από την αρχή</p>
 
@@ -294,6 +296,7 @@ def build(tool, c):
       </div>
     </div>
     <div id="extraActions" style="margin-top:22px; text-align:center;"></div>
+    <div id="reviewBox"></div>
   </div>
 
   <p class="note" style="line-height:1.55;">{DISCLAIMER}</p>
