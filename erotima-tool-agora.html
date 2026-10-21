@@ -664,10 +664,10 @@ function renderContinuation(cont, finished) {
   if (pct && CFG.pctLabel) { stopRitual(); revealPercent(pct); }
   if (text.trim()) stopRitual();
   const parts = text.split(/\[?\s*ΣΥΜΒΟΥΛΗ\s*\]?\s*:?/);
-  readingtext.textContent = parts[0].trim();
+  setText(readingtext, parts[0].trim());
   if (parts[1] !== undefined) {
     adviceWrap.style.display = 'block';
-    adviceText.textContent = parts[1].trim();
+    setText(adviceText, parts[1].trim());
     readingtext.classList.remove('typing');
     adviceText.classList.toggle('typing', !finished);
   } else {
@@ -676,6 +676,12 @@ function renderContinuation(cont, finished) {
 }
 
 /* Γραφή με ανθρώπινο ρυθμό: σταθερός ρυθμός, μικρές παύσεις στα σημεία στίξης. */
+function setText(el, s) {
+  // Ένας σταθερός κόμβος κειμένου που απλώς μεγαλώνει: ήρεμη γραφή και σωστές καταγραφές στο Clarity.
+  const n = el.firstChild;
+  if (n && n.nodeType === 3 && !n.nextSibling) { if (n.data !== s) n.data = s; }
+  else el.textContent = s;
+}
 function makeTyper(render) {
   let target = '', shown = 0, finished = false, timer = null, pauseUntil = 0, doneCbs = [];
   const skip = (t, i) => {
@@ -690,7 +696,7 @@ function makeTyper(render) {
       if (finished) { clearInterval(timer); timer = null; render(target, true); doneCbs.splice(0).forEach(f => f()); }
       return;
     }
-    const cps = backlog > 2500 ? 220 : backlog > 1200 ? 110 : backlog > 500 ? 60 : 32;
+    const cps = backlog > 2500 ? 120 : backlog > 1200 ? 75 : backlog > 500 ? 45 : 32;
     const n = Math.max(1, Math.round(cps * 0.04));
     shown = skip(target, shown);
     shown = Math.min(target.length, shown + n);
@@ -935,7 +941,7 @@ async function submitTeaser() {
         result.classList.add('show');
         renderData(pub, false);
       }
-      teaserText.textContent = txt;
+      setText(teaserText, txt);
     });
     // Η απάντηση μπορεί να είναι «ανακατεύθυνση» (υγεία, νομικά, απόγνωση, βία, τζόγος): τότε δεν
     // δείχνουμε χρησμό ούτε πληρωμή. Περιμένουμε τους πρώτους χαρακτήρες για να το καταλάβουμε.

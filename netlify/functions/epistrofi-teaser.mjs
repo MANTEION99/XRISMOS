@@ -67,7 +67,7 @@ export default async (req) => {
   await readings.setJSON(readingId, { ...base, charts, teaser: "" });
 
   return streamResponse(async (write) => {
-    const teaser = await streamClaude(teaserPrompt(p, charts), 1200, write, 110);
+    const teaser = await streamClaude(teaserPrompt(p, charts), 1200, write, 60);
     await readings.setJSON(readingId, { ...base, charts, teaser });
   }, { "X-Reading-Id": readingId });
 };
