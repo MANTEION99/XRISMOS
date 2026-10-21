@@ -628,10 +628,10 @@ function renderContinuation(cont, finished) {
   if (pct && CFG.pctLabel) { stopRitual(); revealPercent(pct); }
   if (text.trim()) stopRitual();
   const parts = text.split(/\[?\s*ΣΥΜΒΟΥΛΗ\s*\]?\s*:?/);
-  readingtext.textContent = parts[0].trim();
+  setText(readingtext, parts[0].trim());
   if (parts[1] !== undefined) {
     adviceWrap.style.display = 'block';
-    adviceText.textContent = parts[1].trim();
+    setText(adviceText, parts[1].trim());
     readingtext.classList.remove('typing');
     adviceText.classList.toggle('typing', !finished);
   } else {
@@ -640,6 +640,12 @@ function renderContinuation(cont, finished) {
 }
 
 /* Γραφή με ανθρώπινο ρυθμό: σταθερός ρυθμός, μικρές παύσεις στα σημεία στίξης. */
+function setText(el, s) {
+  // Ένας σταθερός κόμβος κειμένου που απλώς μεγαλώνει: ήρεμη γραφή και σωστές καταγραφές στο Clarity.
+  const n = el.firstChild;
+  if (n && n.nodeType === 3 && !n.nextSibling) { if (n.data !== s) n.data = s; }
+  else el.textContent = s;
+}
 function makeTyper(render) {
   let target = '', shown = 0, finished = false, timer = null, pauseUntil = 0, doneCbs = [];
   const skip = (t, i) => {
@@ -654,7 +660,7 @@ function makeTyper(render) {
       if (finished) { clearInterval(timer); timer = null; render(target, true); doneCbs.splice(0).forEach(f => f()); }
       return;
     }
-    const cps = backlog > 2500 ? 220 : backlog > 1200 ? 110 : backlog > 500 ? 60 : 32;
+    const cps = backlog > 2500 ? 120 : backlog > 1200 ? 75 : backlog > 500 ? 45 : 32;
     const n = Math.max(1, Math.round(cps * 0.04));
     shown = skip(target, shown);
     shown = Math.min(target.length, shown + n);
@@ -776,6 +782,31 @@ function revealPercent(target) {
 
 /* ---------- 1. Δωρεάν άνοιγμα ---------- */
 
+// Όταν το email έχει ήδη πάρει το δωρεάν άνοιγμα: δίνουμε δρόμο πίσω στη φόρμα για άλλο email.
+function offerOtherEmail() {
+  if ($('otherEmailLink')) return;
+  const a = document.createElement('p');
+  a.id = 'otherEmailLink';
+  a.style.cssText = 'text-align:center;font-size:14px;margin:12px 0 4px;';
+  a.innerHTML = '<span style="color:var(--gold);text-decoration:underline;cursor:pointer;">Θέλεις να δοκιμάσεις με άλλο email; Πάτα εδώ</span>';
+  infoLine.insertAdjacentElement('afterend', a);
+  a.addEventListener('click', () => {
+    a.remove();
+    clearTeaserState();
+    try { localStorage.setItem(ENTERED_KEY, '1'); } catch (e) {}
+    currentReadingId = null;
+    result.classList.remove('show');
+    seal.classList.remove('show');
+    infoLine.style.display = 'none';
+    teaserText.textContent = '';
+    teaserText.style.display = '';
+    $('restartLink').style.display = 'none';
+    form.style.display = '';
+    $('email').value = '';
+    try { $('email').scrollIntoView({ behavior: 'smooth', block: 'center' }); } catch (e) {}
+    $('email').focus();
+  });
+}
 function restoreTeaser() {
   let st = null;
   try { st = JSON.parse(localStorage.getItem(TEASER_KEY) || 'null'); } catch (e) {}
@@ -788,6 +819,7 @@ function restoreTeaser() {
   teaserText.textContent = st.text || '';
   if (!st.text) teaserText.style.display = 'none';
   if (st.info) { infoLine.textContent = st.info; infoLine.style.display = 'block'; }
+  if (!st.text) offerOtherEmail();
   seal.classList.add('show');
   $('restartLink').style.display = 'block';
   return true;
@@ -873,6 +905,7 @@ async function submitTeaser() {
       seal.classList.add('show');
       saveTeaserState(currentReadingId, '', infoLine.textContent, data.data);
       $('restartLink').style.display = 'block';
+      offerOtherEmail();
       return;
     }
     if (!res.ok) {
@@ -899,7 +932,7 @@ async function submitTeaser() {
         result.classList.add('show');
         renderData(pub, false);
       }
-      teaserText.textContent = txt;
+      setText(teaserText, txt);
     });
     // Η απάντηση μπορεί να είναι «ανακατεύθυνση» (υγεία, νομικά, απόγνωση, βία, τζόγος): τότε δεν
     // δείχνουμε χρησμό ούτε πληρωμή. Περιμένουμε τους πρώτους χαρακτήρες για να το καταλάβουμε.

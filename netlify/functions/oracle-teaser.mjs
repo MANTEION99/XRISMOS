@@ -72,7 +72,7 @@ export default async (req) => {
   await readings.setJSON(readingId, { ...base, data, teaser: "" });
 
   return streamResponse(async (write) => {
-    const teaser = await streamClaude(teaserPromptFor(tool, p, data), 1200, write, 110);
+    const teaser = await streamClaude(teaserPromptFor(tool, p, data), 1200, write, 60);
     if (/\[\s*ΑΝΑΚΑΤΕΥΘΥΝΣΗ\s*\]/.test(teaser)) {
       // Ερώτηση που δεν απαντιέται: δεν «καίει» το δωρεάν άνοιγμα, μπορεί να ρωτήσει κάτι άλλο.
       await emails.delete(emailKey);
