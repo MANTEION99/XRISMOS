@@ -817,6 +817,31 @@ function revealPercent(target) {
 
 /* ---------- 1. Δωρεάν άνοιγμα ---------- */
 
+// Όταν το email έχει ήδη πάρει το δωρεάν άνοιγμα: δίνουμε δρόμο πίσω στη φόρμα για άλλο email.
+function offerOtherEmail() {
+  if ($('otherEmailLink')) return;
+  const a = document.createElement('p');
+  a.id = 'otherEmailLink';
+  a.style.cssText = 'text-align:center;font-size:14px;margin:12px 0 4px;';
+  a.innerHTML = '<span style="color:var(--gold);text-decoration:underline;cursor:pointer;">Θέλεις να δοκιμάσεις με άλλο email; Πάτα εδώ</span>';
+  infoLine.insertAdjacentElement('afterend', a);
+  a.addEventListener('click', () => {
+    a.remove();
+    clearTeaserState();
+    try { localStorage.setItem(ENTERED_KEY, '1'); } catch (e) {}
+    currentReadingId = null;
+    result.classList.remove('show');
+    seal.classList.remove('show');
+    infoLine.style.display = 'none';
+    teaserText.textContent = '';
+    teaserText.style.display = '';
+    $('restartLink').style.display = 'none';
+    form.style.display = '';
+    $('email').value = '';
+    try { $('email').scrollIntoView({ behavior: 'smooth', block: 'center' }); } catch (e) {}
+    $('email').focus();
+  });
+}
 function restoreTeaser() {
   let st = null;
   try { st = JSON.parse(localStorage.getItem(TEASER_KEY) || 'null'); } catch (e) {}
@@ -829,6 +854,7 @@ function restoreTeaser() {
   teaserText.textContent = st.text || '';
   if (!st.text) teaserText.style.display = 'none';
   if (st.info) { infoLine.textContent = st.info; infoLine.style.display = 'block'; }
+  if (!st.text) offerOtherEmail();
   seal.classList.add('show');
   $('restartLink').style.display = 'block';
   return true;
@@ -914,6 +940,7 @@ async function submitTeaser() {
       seal.classList.add('show');
       saveTeaserState(currentReadingId, '', infoLine.textContent, data.data);
       $('restartLink').style.display = 'block';
+      offerOtherEmail();
       return;
     }
     if (!res.ok) {
