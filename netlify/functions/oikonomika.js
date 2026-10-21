@@ -1,3 +1,4 @@
+const { chartWithFallback } = require("../lib/local-chart.cjs");
 const { callClaude } = require("../lib/claude.cjs");
 const astro = require("../lib/astro.cjs");
 // Αρχείο: netlify/functions/oikonomika.js
@@ -41,16 +42,7 @@ exports.handler = async function (event) {
       house_type: "placidus"
     };
 
-    const astroRes1 = await fetch("https://json.astrologyapi.com/v1/western_horoscope", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "Accept-Language": "en",
-        "x-astrologyapi-key": process.env.ASTROLOGY_API_KEY
-      },
-      body: JSON.stringify(chart1Body)
-    });
-    const astroData1 = await astroRes1.json();
+    const astroData1 = await chartWithFallback(chart1Body);
 
     // --- Βήμα 2: δίνουμε τα πραγματικά δεδομένα στο Claude για να γράψει το κείμενο ---
     const prompt = `Είσαι ένας έμπειρος, ζεστός Έλληνας αστρολόγος που γράφει για το "Μαντείο". Το κοινό σου είναι κυρίως γυναίκες 50-65 ετών. Παρακάτω σου δίνω ΠΡΑΓΜΑΤΙΚΑ υπολογισμένα αστρολογικά δεδομένα (θέσεις πλανητών, οίκους, όψεις) για το άτομο. Χρησιμοποίησέ τα σαν βάση, μην εφευρίσκεις νέα δεδομένα εκτός αυτών.

@@ -7,6 +7,8 @@ import makeSky from "./sky.cjs";
 const sky = makeSky(Astronomy);
 const { zoneOffset, moonChangesSign } = sky;
 import placeLib from "./place.cjs";
+import localChartLib from "./local-chart.cjs";
+const { localChart } = localChartLib;
 export const skyBlock = sky.skyBlock;
 
 export const MODEL = "claude-sonnet-5";
@@ -57,23 +59,35 @@ function chartBody(dob, tob, place) {
 }
 
 async function fetchChart(body) {
-  const res = await fetch("https://json.astrologyapi.com/v1/western_horoscope", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "Accept-Language": "en",
+  let res = null, text = "", data = null;
+  try {
+    res = await fetch("https://json.astrologyapi.com/v1/western_horoscope", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Accept-Language": "en",
         "x-astrologyapi-key": process.env.ASTROLOGY_API_KEY
-    },
-    body: JSON.stringify(body)
-  });
-  const text = await res.text();
-  let data = null;
-  try { data = JSON.parse(text); } catch {}
+      },
+      body: JSON.stringify(body)
+    });
+    text = await res.text();
+    try { data = JSON.parse(text); } catch {}
+  } catch (e) {
+    text = "network: " + (e && e.message);
+  }
   // Ένας σωστός χάρτης έχει πάντα λίστα πλανητών. Αλλιώς το AstrologyAPI απάντησε με σφάλμα
-  // (κλειδί, όριο, λάθος στοιχεία) και ΔΕΝ αφήνουμε το Claude να γράψει χρησμό χωρίς χάρτη.
-  if (!res.ok || !data || !Array.isArray(data.planets) || data.planets.length === 0) {
-    console.error(`[astrologyapi] status=${res.status} key=${process.env.ASTROLOGY_API_KEY ? "set" : "MISSING"} body=${text.slice(0, 300)}`);
-    throw new Error("Ο χάρτης δεν υπολογίστηκε");
+  // (κλειδί, όριο, λάθος στοιχεία) και τότε υπολογίζουμε τον χάρτη τοπικά, ώστε η πελάτισσα
+  // να μη βλέπει ποτέ σφάλμα. Ο χρησμός ΠΟΤΕ δεν γράφεται χωρίς χάρτη.
+  if (!res || !res.ok || !data || !Array.isArray(data.planets) || data.planets.length === 0) {
+    console.error(`[astrologyapi] status=${res ? res.status : "-"} key=${process.env.ASTROLOGY_API_KEY ? "set" : "MISSING"} body=${text.slice(0, 300)}`);
+    try {
+      const local = localChart(body);
+      console.warn("[astrologyapi] fallback: τοπικός υπολογισμός χάρτη");
+      return local;
+    } catch (e) {
+      console.error("[local-chart] " + (e && e.message));
+      throw new Error("Ο χάρτης δεν υπολογίστηκε");
+    }
   }
   return data;
 }
@@ -81,10 +95,23 @@ async function fetchChart(body) {
 // Υπολογίζει τους δύο χάρτες μία φορά. Το αποτέλεσμα αποθηκεύεται μαζί με τον χρησμό,
 // ώστε η πληρωμένη συνέχεια να μη χρειάζεται νέα κλήση στο AstrologyAPI.
 export async function computeCharts(p) {
-  const [place1, place2] = await Promise.all([birthPlace(p.pob1), birthPlace(p.pob2)]);
+  let [place1, place2] = await Promise.all([birthPlace(p.pob1), birthPlace(p.pob2)]);
+  // Αν η πόλη που γράφτηκε δεν είναι πραγματική (π.χ. «Dhsshs» ή ένα email), ο εντοπισμός μπορεί να βρει
+  // κάτι άσχετο και ο χάρτης να αποτύχει. Τότε ξαναϋπολογίζεται με Αθήνα, αντί να βγει σφάλμα στην πελάτισσα.
+  const ATHENS = { lat: 37.9838, lon: 23.7275, tzName: "Europe/Athens", label: "Αθήνα (προεπιλογή)", found: false };
+  const safeChart = async (dob, tob, place, setPlace) => {
+    try {
+      return await fetchChart(chartBody(dob, tob, place));
+    } catch (e) {
+      if (!place.found) throw e;
+      console.error(`[place] ο χάρτης απέτυχε με ${place.label}, ξανά με Αθήνα`, e && e.message);
+      setPlace(ATHENS);
+      return fetchChart(chartBody(dob, tob, ATHENS));
+    }
+  };
   const [chart1, chart2] = await Promise.all([
-    fetchChart(chartBody(p.dob1, p.tob1, place1)),
-    p.dob2 ? fetchChart(chartBody(p.dob2, p.tob2, place2)) : Promise.resolve(null)
+    safeChart(p.dob1, p.tob1, place1, (x) => { place1 = x; }),
+    p.dob2 ? safeChart(p.dob2, p.tob2, place2, (x) => { place2 = x; }) : Promise.resolve(null)
   ]);
   console.log(`[place] 1="${p.pob1 || ""}" -> ${place1.label} | 2="${p.pob2 || ""}" -> ${place2.label}`);
   return { chart1, chart2, tz1: place1.tzName, tz2: place2.tzName, place1: place1.label, place2: place2.label };

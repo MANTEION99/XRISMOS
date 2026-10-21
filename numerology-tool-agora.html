@@ -312,6 +312,7 @@
         y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
     })(window, document, "clarity", "script", "ydrxibksl6");
 </script>
+<script src="/reviews.js" defer></script>
 </head>
 <body>
 <div class="stars"></div>
@@ -393,6 +394,7 @@
         <div class="secure-note"><svg viewBox="0 0 24 24" fill="none"><rect x="5" y="11" width="14" height="10" rx="2" stroke="currentColor" stroke-width="1.6"/><path d="M8 11V7a4 4 0 0 1 8 0v4" stroke="currentColor" stroke-width="1.6"/></svg> Ασφαλής πληρωμή μέσω Stripe</div>
       </div>
     </div>
+    <div id="socialProof"></div>
     <p class="support-line" style="text-align:center;font-size:12.5px;color:var(--muted);margin-top:18px;line-height:1.5;">Αν κάτι δεν πάει καλά, γράψε μας στο <a href="https://m.me/61573958341176" target="_blank" rel="noopener" style="color:var(--gold);">Messenger του Μαντείου</a> και θα το λύσουμε αμέσως.</p>
     <p id="restartLink" style="display:none;text-align:center;font-size:12.5px;color:var(--muted);margin-top:16px;cursor:pointer;text-decoration:underline;">Θέλεις νέο χρησμό; Ξεκίνα από την αρχή</p>
 
@@ -408,6 +410,7 @@
       </div>
     </div>
     <div id="extraActions" style="margin-top:22px; text-align:center;"></div>
+    <div id="reviewBox"></div>
   </div>
 
   <p class="note" style="line-height:1.55;">Το περιεχόμενο του Μαντείου έχει αποκλειστικά ψυχαγωγικό χαρακτήρα και απευθύνεται σε ενήλικες. Δεν αποτελεί πρόβλεψη με επιστημονική βάση και δεν υποκαθιστά τη γνώμη ή τη συμβουλή γιατρού, ψυχολόγου, δικηγόρου, οικονομικού συμβούλου ή άλλου επαγγελματία. Μην παίρνεις σημαντικές αποφάσεις για την υγεία, τα οικονομικά, τις σχέσεις ή τη ζωή σου βασισμένη μόνο σε αυτό. Αν περνάς μια δύσκολη περίοδο, μίλησε με έναν ειδικό ή με έναν άνθρωπο που εμπιστεύεσαι.</p>
@@ -1138,6 +1141,7 @@ function askBox(label, buttonText, onAsk) {
 }
 
 function renderExtraActions(data) {
+  if (readingIdParam && sessionId && window.manteioReviewForm) window.manteioReviewForm(readingIdParam, sessionId);
   const box = $('extraActions');
   box.innerHTML = '';
   const stage = data.stage || 'q1';

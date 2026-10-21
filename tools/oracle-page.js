@@ -611,6 +611,7 @@ function askBox(label, buttonText, onAsk) {
 }
 
 function renderExtraActions(data) {
+  if (readingIdParam && sessionId && window.manteioReviewForm) window.manteioReviewForm(readingIdParam, sessionId);
   const box = $('extraActions');
   box.innerHTML = '';
   const stage = data.stage || 'q1';
