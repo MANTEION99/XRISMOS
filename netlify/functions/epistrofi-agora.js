@@ -36,15 +36,42 @@ async function verifyPaidSession(sessionId, expectedTool) {
   }
 }
 
+// Meta Conversions API (ίδια λογική με το netlify/lib/epistrofi-common.mjs): μόνο με συγκατάθεση cookies.
+async function sendCapiPurchase(session) {
+  try {
+    const token = process.env.META_CAPI_TOKEN;
+    const pixel = process.env.META_PIXEL_ID || "1662226415478227";
+    const md = (session && session.metadata) || {};
+    if (!token || !session || md.mc !== "1") return;
+    const email = String((session.customer_details && session.customer_details.email) || session.customer_email || "").trim().toLowerCase();
+    const user_data = {};
+    if (email) user_data.em = [require("crypto").createHash("sha256").update(email).digest("hex")];
+    if (md.fbp) user_data.fbp = md.fbp;
+    if (md.fbc) user_data.fbc = md.fbc;
+    const res = await fetch(`https://graph.facebook.com/${pixel}/events?access_token=${encodeURIComponent(token)}`, {
+      method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ data: [{
+        event_name: "Purchase", event_time: Math.floor(Date.now() / 1000), event_id: "purchase_" + session.id,
+        action_source: "website", event_source_url: "https://manteio.live/epistrofi", user_data,
+        custom_data: { currency: "EUR", value: (session.amount_total || 0) / 100, content_name: md.tool || "" }
+      }] })
+    });
+    if (!res.ok) console.error("[capi]", res.status, (await res.text()).slice(0, 200));
+  } catch (e) {
+    console.error("[capi]", e && e.message);
+  }
+}
+
 // Οριστική χρέωση της δέσμευσης, μόνο αφού δοθεί απάντηση.
 async function capturePayment(session) {
   const pi = session && session.payment_intent;
   if (!pi || typeof pi !== "object" || pi.status !== "requires_capture") return;
   try {
-    await fetch(`https://api.stripe.com/v1/payment_intents/${pi.id}/capture`, {
+    const capRes = await fetch(`https://api.stripe.com/v1/payment_intents/${pi.id}/capture`, {
       method: "POST",
       headers: { "Authorization": `Bearer ${process.env.STRIPE_SECRET_KEY}` }
     });
+    if (capRes.ok) await sendCapiPurchase(session);
   } catch (e) {
     console.error("[capture]", e.message);
   }

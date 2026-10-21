@@ -392,8 +392,46 @@ export async function capturePayment(session) {
   const pi = session && session.payment_intent;
   const id = pi && (typeof pi === "string" ? pi : pi.id);
   if (!id || (typeof pi === "object" && pi.status !== "requires_capture")) return { ok: true, skipped: true };
-  return stripePost(`payment_intents/${id}/capture`);
+  const r = await stripePost(`payment_intents/${id}/capture`);
+  if (r.ok) await sendCapiPurchase(session);
+  return r;
 }
+
+// Meta Conversions API: η αγορά πηγαίνει από τον server στο Facebook, μόνο αν η πελάτισσα δέχτηκε τα cookies.
+// Χρειάζεται το environment variable META_CAPI_TOKEN (Events Manager > Ρυθμίσεις > Conversions API).
+// Ίδιο event_id με το Pixel του browser, ώστε η αγορά να μη μετρηθεί δύο φορές.
+export async function sendCapiPurchase(session) {
+  try {
+    const token = process.env.META_CAPI_TOKEN;
+    const pixel = process.env.META_PIXEL_ID || "1662226415478227";
+    const md = (session && session.metadata) || {};
+    if (!token || !session || md.mc !== "1") return;
+    const { createHash } = await import("node:crypto");
+    const email = String((session.customer_details && session.customer_details.email) || session.customer_email || "").trim().toLowerCase();
+    const user_data = {};
+    if (email) user_data.em = [createHash("sha256").update(email).digest("hex")];
+    if (md.fbp) user_data.fbp = md.fbp;
+    if (md.fbc) user_data.fbc = md.fbc;
+    const body = {
+      data: [{
+        event_name: "Purchase",
+        event_time: Math.floor(Date.now() / 1000),
+        event_id: "purchase_" + session.id,
+        action_source: "website",
+        event_source_url: "https://manteio.live/",
+        user_data,
+        custom_data: { currency: "EUR", value: (session.amount_total || 0) / 100, content_name: md.tool || "" }
+      }]
+    };
+    const res = await fetch(`https://graph.facebook.com/${pixel}/events?access_token=${encodeURIComponent(token)}`, {
+      method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body)
+    });
+    if (!res.ok) console.error("[capi]", res.status, (await res.text()).slice(0, 200));
+  } catch (e) {
+    console.error("[capi]", e && e.message);
+  }
+}
+
 
 // Ακύρωση της δέσμευσης αν ο χρησμός δεν μπόρεσε να γραφτεί: η πελάτισσα δεν χρεώνεται.
 export async function releasePayment(paymentIntentId) {

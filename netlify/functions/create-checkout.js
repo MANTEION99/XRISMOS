@@ -59,7 +59,7 @@ exports.handler = async function (event) {
   }
 
   try {
-    const { tool, returnUrl, reading_id, src } = JSON.parse(event.body);
+    const { tool, returnUrl, reading_id, src, mc, fb } = JSON.parse(event.body);
     const product = PRODUCTS[tool];
 
     if (!product || !returnUrl) {
@@ -76,6 +76,13 @@ exports.handler = async function (event) {
     // Από ποιο post ήρθε (σύντομο link), για να φαίνεται και στο Stripe.
     const cleanSrc = String(src || "").replace(/[^\w\/.-]/g, "").slice(0, 80);
     if (cleanSrc) metadata.src = cleanSrc;
+    // Συγκατάθεση cookies και αναγνωριστικά του Facebook, για το Conversions API (μόνο αν δέχτηκε τα cookies).
+    if (mc === 1 || mc === "1") {
+      metadata.mc = "1";
+      const okId = (v) => typeof v === "string" && /^fb\.\d\.\d+\.[\w.-]{1,200}$/.test(v);
+      if (fb && okId(fb.fbp)) metadata.fbp = fb.fbp;
+      if (fb && okId(fb.fbc)) metadata.fbc = fb.fbc;
+    }
     if (reading_id) {
       if (!/^[0-9a-f-]{36}$/.test(String(reading_id))) {
         return { statusCode: 400, body: JSON.stringify({ error: "Λάθος χρησμός." }) };
