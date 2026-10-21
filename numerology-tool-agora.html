@@ -257,6 +257,21 @@
   .dt-year{ flex:1.15 1 0; }
   .dt-time .dt-select{ max-width:120px; }
 
+  /* Κινητό: το κουμπί του δωρεάν χρησμού φαίνεται στην πρώτη οθόνη, χωρίς σκρολάρισμα */
+  #enterBtn{ background:var(--gold); color:#241A08; font-weight:600; }
+  @media (max-width:520px){
+    body{ padding:16px 12px; }
+    .cover-inner{ display:flex; flex-direction:column; align-items:center; padding:26px 20px 24px; }
+    .cover h1{ font-size:24px; margin:0 0 14px; }
+    .illus{ max-width:150px; margin:0 auto 14px; }
+    .cover p.sub{ margin:0 0 12px; }
+    .cover .price-line{ order:1; margin:0 0 12px !important; }
+    #enterBtn{ order:2; }
+    .cover .secure-note{ order:3; margin-top:10px; }
+    .cover .ask-line{ order:4; margin:18px auto 10px !important; }
+    .cover .trust-line{ order:5; margin:0; }
+  }
+
 
   .spread{ display:none; gap:10px; justify-content:center; margin:0 0 22px; flex-wrap:nowrap; }
   .spread-card{ width:min(100px, 27vw); text-align:center; }
@@ -542,7 +557,7 @@ let currentReadingId = null;
 let currentData = {};
 
 const nameCase = (s) => String(s || '').replace(/(^|\s)(\S)/g, (m, sp, c) => sp + c.toLocaleUpperCase('el'));
-function showCard() { cover.style.display = 'none'; card.classList.add('show'); }
+function showCard() { cover.style.display = 'none'; card.classList.add('show'); try { window.scrollTo(0, 0); } catch (e) {} }
 function showError(t) { err.textContent = t; err.style.display = 'block'; }
 function saveTeaserState(rid, text, info, data) {
   try { localStorage.setItem(TEASER_KEY, JSON.stringify({ rid, text, info, data, ts: Date.now() })); } catch (e) {}

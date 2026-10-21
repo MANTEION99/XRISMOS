@@ -30,7 +30,7 @@ let currentReadingId = null;
 let currentData = {};
 
 const nameCase = (s) => String(s || '').replace(/(^|\s)(\S)/g, (m, sp, c) => sp + c.toLocaleUpperCase('el'));
-function showCard() { cover.style.display = 'none'; card.classList.add('show'); }
+function showCard() { cover.style.display = 'none'; card.classList.add('show'); try { window.scrollTo(0, 0); } catch (e) {} }
 function showError(t) { err.textContent = t; err.style.display = 'block'; }
 function saveTeaserState(rid, text, info, data) {
   try { localStorage.setItem(TEASER_KEY, JSON.stringify({ rid, text, info, data, ts: Date.now() })); } catch (e) {}
