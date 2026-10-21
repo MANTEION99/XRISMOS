@@ -216,6 +216,7 @@ def build(tool, c):
         y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
     }})(window, document, "clarity", "script", "ydrxibksl6");
 </script>
+<script src="/pixel.js"></script>
 </head>
 <body{' data-adult2="1"' if c["kind"] == "astro2" else ""}>
 <div class="stars"></div>

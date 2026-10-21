@@ -340,10 +340,11 @@ async function startCheckout(buttonEl, readingId, tool, stage) {
   buttonEl.style.pointerEvents = 'none';
   try {
     const returnUrl = window.location.origin + window.location.pathname + '?rid=' + encodeURIComponent(readingId) + (stage ? '&stage=' + stage : '');
+    if (window.manteioTrack) window.manteioTrack('InitiateCheckout', { content_name: tool, currency: 'EUR' });
     const res = await fetch('/.netlify/functions/create-checkout', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ tool, reading_id: readingId, returnUrl, src: window.manteioSource ? window.manteioSource() : '' })
+      body: JSON.stringify({ mc: window.manteioConsent && window.manteioConsent() ? 1 : 0, fb: window.manteioFbIds ? window.manteioFbIds() : {}, tool, reading_id: readingId, returnUrl, src: window.manteioSource ? window.manteioSource() : '' })
     });
     const data = await res.json();
     if (!data.url) throw new Error('no url');
@@ -409,6 +410,7 @@ async function submitTeaser() {
     }
 
     currentReadingId = res.headers.get('X-Reading-Id');
+    if (window.manteioTrack) window.manteioTrack('Lead', { content_name: TOOL });
     let pub = {};
     try { pub = JSON.parse(decodeURIComponent(escape(atob(res.headers.get('X-Oracle-Data') || 'e30=')))); } catch (e) {}
     form.style.display = 'none';

@@ -281,6 +281,7 @@
         y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
     })(window, document, "clarity", "script", "ydrxibksl6");
 </script>
+<script src="/pixel.js"></script>
 </head>
 <body data-adult2="1">
 <div class="stars"></div>
@@ -882,10 +883,11 @@ async function startCheckout(buttonEl, readingId) {
   buttonEl.style.pointerEvents = 'none';
   try {
     const returnUrl = window.location.origin + window.location.pathname + '?rid=' + encodeURIComponent(readingId);
+    if (window.manteioTrack) window.manteioTrack('InitiateCheckout', { content_name: 'epistrofi', currency: 'EUR' });
     const res = await fetch('/.netlify/functions/create-checkout', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ tool: 'epistrofi', reading_id: readingId, returnUrl, src: window.manteioSource ? window.manteioSource() : '' })
+      body: JSON.stringify({ mc: window.manteioConsent && window.manteioConsent() ? 1 : 0, fb: window.manteioFbIds ? window.manteioFbIds() : {}, tool: 'epistrofi', reading_id: readingId, returnUrl, src: window.manteioSource ? window.manteioSource() : '' })
     });
     const data = await res.json();
     if (!data.url) throw new Error('no url');
@@ -952,6 +954,7 @@ async function submitTeaser() {
     }
 
     currentReadingId = res.headers.get('X-Reading-Id');
+    if (window.manteioTrack) window.manteioTrack('Lead', { content_name: 'epistrofi' });
     try { localStorage.setItem(RID_KEY, currentReadingId); } catch (e) {}
     form.style.display = 'none';
     teaserText.classList.add('typing');
@@ -1079,7 +1082,7 @@ function startExtraCheckout(nextStage, buttonEl) {
   fetch('/.netlify/functions/create-checkout', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ tool: `epistrofi_${nextStage}`, returnUrl, src: window.manteioSource ? window.manteioSource() : '' })
+    body: JSON.stringify({ mc: window.manteioConsent && window.manteioConsent() ? 1 : 0, fb: window.manteioFbIds ? window.manteioFbIds() : {}, tool: `epistrofi_${nextStage}`, returnUrl, src: window.manteioSource ? window.manteioSource() : '' })
   })
     .then(res => res.json())
     .then(data => {
