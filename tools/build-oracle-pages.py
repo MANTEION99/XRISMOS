@@ -242,7 +242,7 @@ def build(tool, c):
     <div class="paid-badge" id="paidBadge" style="display:none;">Η πληρωμή σου επιβεβαιώθηκε ✓</div>
     <h2 id="cardTitle">{html.escape(title_plain)}</h2>
 
-  <form id="form">
+  <form id="form" novalidate>
 {c["fields"]()}
       <div id="emailFields">
         <div class="divider">ΠΟΥ ΝΑ ΣΟΥ ΤΟΝ ΚΡΑΤΗΣΟΥΜΕ</div>

@@ -213,8 +213,8 @@
 
   /* Δωρεάν χρησμός και σφραγισμένη συνέχεια */
   .field.consent{ display:flex; gap:10px; align-items:flex-start; }
-  .field.consent input{ width:auto; margin-top:3px; accent-color:var(--gold); }
-  .field.consent label{ color:var(--muted); font-size:12.5px; line-height:1.5; margin:0; letter-spacing:0; }
+  .field.consent input{ width:22px; height:22px; flex:0 0 22px; margin-top:0; accent-color:var(--gold); }
+  .field.consent label{ color:var(--muted); font-size:13px; cursor:pointer; line-height:1.5; margin:0; letter-spacing:0; }
   .typing::after{ content:'▍'; color:var(--gold); animation:blink 1s steps(2) infinite; margin-left:2px; }
   @keyframes blink{ 50%{ opacity:0; } }
   .seal-wrap{ position:relative; margin-top:18px; border-radius:12px; overflow:hidden; display:none; }
@@ -329,49 +329,49 @@
     <div class="paid-badge" id="paidBadge" style="display:none;">Η πληρωμή σου επιβεβαιώθηκε ✓</div>
   <h2 id="cardTitle">Η Επιστροφή της Χαμένης Αγάπης</h2>
 
-  <form id="form">
+  <form id="form" novalidate>
     <div id="personalFields">
       <div class="field">
-        <label>Το όνομά σου</label>
+        <label for="name1">Το όνομά σου</label>
         <input type="text" id="name1" placeholder="π.χ. Μαρία" />
       </div>
       <div class="field">
-        <label>Ημερομηνία γέννησής σου</label>
+        <label for="dob1">Ημερομηνία γέννησής σου</label>
         <input type="date" id="dob1" />
       </div>
       <div class="field">
-        <label>Ώρα γέννησής σου (αν την ξέρεις)</label>
+        <label for="tob1">Ώρα γέννησής σου (αν την ξέρεις)</label>
         <input type="time" id="tob1" />
 <div class="time-note" style="font-size:12px;opacity:0.7;margin-top:6px;line-height:1.4;">Αν δεν ξέρεις την ώρα, ο χρησμός θα βγει από τους πλανήτες σου.</div>
       </div>
       <div class="field">
-        <label>Πόλη γέννησής σου</label>
+        <label for="pob1">Πόλη γέννησής σου</label>
         <input type="text" id="pob1" placeholder="π.χ. Αθήνα" />
         <div class="time-note" style="font-size:12px;opacity:0.7;margin-top:6px;line-height:1.4;">Αν γεννήθηκες σε χωριό, γράψε την κοντινότερη πόλη.</div>
       </div>
       <div class="divider">ΚΑΙ</div>
       <div class="field">
-        <label>Το όνομά του/της</label>
+        <label for="name2">Το όνομά του/της</label>
         <input type="text" id="name2" placeholder="π.χ. Γιώργος" />
       </div>
       <div class="field">
-        <label>Ημερομηνία γέννησής του/της (αν την ξέρεις)</label>
+        <label for="dob2">Ημερομηνία γέννησής του/της (αν την ξέρεις)</label>
         <input type="date" id="dob2" />
       </div>
       <div class="field">
-        <label>Ώρα γέννησής του/της (αν την ξέρεις)</label>
+        <label for="tob2">Ώρα γέννησής του/της (αν την ξέρεις)</label>
         <input type="time" id="tob2" />
 <div class="time-note" style="font-size:12px;opacity:0.7;margin-top:6px;line-height:1.4;">Αν δεν την ξέρεις, ο χρησμός θα βγει από τους πλανήτες.</div>
       </div>
       <div class="field">
-        <label>Πόλη γέννησής του/της (αν την ξέρεις)</label>
+        <label for="pob2">Πόλη γέννησής του/της (αν την ξέρεις)</label>
         <input type="text" id="pob2" placeholder="π.χ. Θεσσαλονίκη" />
         <div class="time-note" style="font-size:12px;opacity:0.7;margin-top:6px;line-height:1.4;">Αν γεννήθηκες σε χωριό, γράψε την κοντινότερη πόλη.</div>
       </div>
       <div id="emailFields">
         <div class="divider">ΠΟΥ ΝΑ ΣΟΥ ΤΟΝ ΚΡΑΤΗΣΟΥΜΕ</div>
         <div class="field">
-          <label>Το email σου</label>
+          <label for="email">Το email σου</label>
           <input type="email" id="email" placeholder="π.χ. maria@gmail.com" autocomplete="email" />
         </div>
         <div class="field consent">
@@ -650,6 +650,30 @@ function readFields() {
     name2: v('name2'), dob2: $('dob2').value, tob2: $('tob2').value, pob2: v('pob2')
   };
 }
+// Διορθώνει τα συνηθισμένα λάθη στο email πριν τον έλεγχο: ελληνικό πληκτρολόγιο, κενά, κόμμα αντί για τελεία,
+// λάθος κατάληξη (gmail.con, σκέτο @gmail). Το διορθωμένο email μπαίνει πίσω στο πεδίο για να το δει η πελάτισσα.
+var GR_KEYS = {'α':'a','β':'b','γ':'g','δ':'d','ε':'e','ζ':'z','η':'h','θ':'u','ι':'i','κ':'k','λ':'l','μ':'m','ν':'n','ξ':'j','ο':'o','π':'p','ρ':'r','σ':'s','ς':'w','τ':'t','υ':'y','φ':'f','χ':'x','ψ':'c','ω':'v'};
+function fixEmail(v) {
+  var s = String(v || '').trim().toLowerCase();
+  if (/[Ͱ-Ͽἀ-῿]/.test(s)) {
+    s = s.normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[α-ως]/g, function (c) { return GR_KEYS[c] || c; });
+  }
+  s = s.replace(/\s+/g, '').replace(/,/g, '.').replace(/\.{2,}/g, '.').replace(/\.+$/, '').replace(/^mailto:/, '');
+  s = s.replace(/@(gmail|hotmail|outlook|live|icloud)$/, '@$1.com');
+  s = s.replace(/@gmail\.(con|cm|co|cim|vom|om|comm|cpm|xom)$/, '@gmail.com');
+  s = s.replace(/@(hotmail|outlook|live|icloud)\.(con|cm|cim|vom|om|comm|cpm|xom)$/, '@$1.com');
+  s = s.replace(/@(gmial|gmai|gmal|gnail|gamil)\.com$/, '@gmail.com');
+  return s;
+}
+function emailProblem(el) {
+  var fixed = fixEmail(el.value);
+  if (fixed !== el.value) el.value = fixed;
+  if (/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(fixed)) { el.style.borderColor = ''; return ''; }
+  el.style.borderColor = '#e07a6b';
+  try { el.scrollIntoView({ block: 'center' }); el.focus(); } catch (e) {}
+  el.addEventListener('input', function () { el.style.borderColor = ''; }, { once: true });
+  return fixed ? 'Το email δεν φαίνεται σωστό. Γράψ’ το με λατινικά γράμματα, π.χ. maria@gmail.com' : 'Γράψε το email σου, για να σου κρατήσουμε τον χρησμό.';
+}
 function showError(t) { err.textContent = t; err.style.display = 'block'; }
 
 // Διαβάζει μια απάντηση με streaming και καλεί το onText με όλο το κείμενο που έχει έρθει μέχρι στιγμής.
@@ -907,9 +931,10 @@ $('unlockBtn').addEventListener('click', () => {
 
 async function submitTeaser() {
   const f = readFields();
-  const email = $('email').value.trim();
   if (!f.name1 || !f.name2 || !f.dob1) { showError('Συμπλήρωσε τουλάχιστον τα δύο ονόματα και τη δική σου ημερομηνία γέννησης.'); return; }
-  if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)) { showError('Γράψε ένα σωστό email, για να σου κρατήσουμε τον χρησμό.'); return; }
+  const emailIssue = emailProblem($('email'));
+  if (emailIssue) { showError(emailIssue); return; }
+  const email = $('email').value.trim();
   err.style.display = 'none';
   btn.disabled = true;
   loading.innerHTML = '';
