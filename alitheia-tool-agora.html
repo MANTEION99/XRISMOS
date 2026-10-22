@@ -214,8 +214,8 @@
 
   /* Δωρεάν χρησμός και σφραγισμένη συνέχεια */
   .field.consent{ display:flex; gap:10px; align-items:flex-start; }
-  .field.consent input{ width:auto; margin-top:3px; accent-color:var(--gold); }
-  .field.consent label{ color:var(--muted); font-size:12.5px; line-height:1.5; margin:0; letter-spacing:0; }
+  .field.consent input{ width:22px; height:22px; flex:0 0 22px; margin-top:0; accent-color:var(--gold); }
+  .field.consent label{ color:var(--muted); font-size:13px; cursor:pointer; line-height:1.5; margin:0; letter-spacing:0; }
   .typing::after{ content:'▍'; color:var(--gold); animation:blink 1s steps(2) infinite; margin-left:2px; }
   @keyframes blink{ 50%{ opacity:0; } }
   .seal-wrap{ position:relative; margin-top:18px; border-radius:12px; overflow:hidden; display:none; }
@@ -346,7 +346,7 @@
     <div class="paid-badge" id="paidBadge" style="display:none;">Η πληρωμή σου επιβεβαιώθηκε ✓</div>
     <h2 id="cardTitle">Ο Χρησμός της Αλήθειας</h2>
 
-  <form id="form">
+  <form id="form" novalidate>
       <div class="field">
         <label for="name1">Το όνομά σου</label>
         <input type="text" id="name1" placeholder="π.χ. Μαρία" />
@@ -596,6 +596,30 @@ let currentData = {};
 
 const nameCase = (s) => String(s || '').replace(/(^|\s)(\S)/g, (m, sp, c) => sp + c.toLocaleUpperCase('el'));
 function showCard() { cover.style.display = 'none'; card.classList.add('show'); try { window.scrollTo(0, 0); } catch (e) {} }
+// Διορθώνει τα συνηθισμένα λάθη στο email πριν τον έλεγχο: ελληνικό πληκτρολόγιο, κενά, κόμμα αντί για τελεία,
+// λάθος κατάληξη (gmail.con, σκέτο @gmail). Το διορθωμένο email μπαίνει πίσω στο πεδίο για να το δει η πελάτισσα.
+var GR_KEYS = {'α':'a','β':'b','γ':'g','δ':'d','ε':'e','ζ':'z','η':'h','θ':'u','ι':'i','κ':'k','λ':'l','μ':'m','ν':'n','ξ':'j','ο':'o','π':'p','ρ':'r','σ':'s','ς':'w','τ':'t','υ':'y','φ':'f','χ':'x','ψ':'c','ω':'v'};
+function fixEmail(v) {
+  var s = String(v || '').trim().toLowerCase();
+  if (/[Ͱ-Ͽἀ-῿]/.test(s)) {
+    s = s.normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[α-ως]/g, function (c) { return GR_KEYS[c] || c; });
+  }
+  s = s.replace(/\s+/g, '').replace(/,/g, '.').replace(/\.{2,}/g, '.').replace(/\.+$/, '').replace(/^mailto:/, '');
+  s = s.replace(/@(gmail|hotmail|outlook|live|icloud)$/, '@$1.com');
+  s = s.replace(/@gmail\.(con|cm|co|cim|vom|om|comm|cpm|xom)$/, '@gmail.com');
+  s = s.replace(/@(hotmail|outlook|live|icloud)\.(con|cm|cim|vom|om|comm|cpm|xom)$/, '@$1.com');
+  s = s.replace(/@(gmial|gmai|gmal|gnail|gamil)\.com$/, '@gmail.com');
+  return s;
+}
+function emailProblem(el) {
+  var fixed = fixEmail(el.value);
+  if (fixed !== el.value) el.value = fixed;
+  if (/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(fixed)) { el.style.borderColor = ''; return ''; }
+  el.style.borderColor = '#e07a6b';
+  try { el.scrollIntoView({ block: 'center' }); el.focus(); } catch (e) {}
+  el.addEventListener('input', function () { el.style.borderColor = ''; }, { once: true });
+  return fixed ? 'Το email δεν φαίνεται σωστό. Γράψ’ το με λατινικά γράμματα, π.χ. maria@gmail.com' : 'Γράψε το email σου, για να σου κρατήσουμε τον χρησμό.';
+}
 function showError(t) { err.textContent = t; err.style.display = 'block'; }
 function saveTeaserState(rid, text, info, data) {
   try { localStorage.setItem(TEASER_KEY, JSON.stringify({ rid, text, info, data, ts: Date.now() })); } catch (e) {}
@@ -927,10 +951,11 @@ $('unlockBtn').addEventListener('click', () => {
 
 async function submitTeaser() {
   const f = readFields();
-  const email = $('email').value.trim();
   const problem = validate(f);
   if (problem) { showError(problem); return; }
-  if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)) { showError('Γράψε ένα σωστό email, για να σου κρατήσουμε τον χρησμό.'); return; }
+  const emailIssue = emailProblem($('email'));
+  if (emailIssue) { showError(emailIssue); return; }
+  const email = $('email').value.trim();
   err.style.display = 'none';
   btn.disabled = true;
   loading.innerHTML = '';
