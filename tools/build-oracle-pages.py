@@ -217,6 +217,7 @@ def build(tool, c):
     }})(window, document, "clarity", "script", "ydrxibksl6");
 </script>
 <script src="/reviews.js" defer></script>
+<script src="/vitals.js" defer></script>
 </head>
 <body{' data-adult2="1"' if c["kind"] == "astro2" else ""}>
 <div class="stars"></div>
