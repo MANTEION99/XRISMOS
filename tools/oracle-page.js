@@ -421,10 +421,6 @@ async function startCheckout(buttonEl, readingId, tool, stage) {
 $('unlockBtn').addEventListener('click', () => {
   if (currentReadingId) startCheckout($('unlockBtn'), currentReadingId, TOOL, '');
 });
-// ΜΟΝΟ στην προεπισκόπηση: ο Γενέθλιος Χάρτης χρεώνεται 0,50€ για δοκιμή, και τα κουμπιά το δείχνουν.
-if (PREVIEW && CFG.kind === 'natal') {
-  ['unlockBtn', 'plusBtn'].forEach(id => { if ($(id)) $(id).textContent = $(id).textContent.replace(/\d+€/, '0,50€ (δοκιμή)'); });
-}
 // Δεύτερη εκδοχή πληρωμής (Γενέθλιος Χάρτης με πρόβλεψη 12 μηνών).
 if ($('plusBtn') && CFG.plusTool) $('plusBtn').addEventListener('click', () => {
   if (currentReadingId) startCheckout($('plusBtn'), currentReadingId, CFG.plusTool, '');
