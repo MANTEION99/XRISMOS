@@ -57,7 +57,9 @@ EXTRA_CSS = """
   .cover-proof{ width:100%; margin:22px 0 0; text-align:left; }
   .cover-proof .cp-title{ font-family:'Cormorant Garamond',serif; font-size:17px; color:var(--gold); text-align:center; margin:0 0 10px; }
   .cover-proof .cp-strip{ display:flex; gap:10px; overflow-x:auto; scroll-snap-type:x mandatory; padding-bottom:8px; -webkit-overflow-scrolling:touch; }
-  .cover-proof img{ flex:0 0 82%; max-width:300px; width:82%; height:auto; border-radius:10px; border:1px solid var(--line); scroll-snap-align:start; display:block; }
+  .cp-card{ flex:0 0 78%; max-width:280px; scroll-snap-align:start; background:rgba(255,255,255,0.04); border:1px solid rgba(217,178,92,0.3); border-radius:12px; padding:12px 14px; }
+  .cp-who{ font-size:12.5px; color:var(--gold); font-weight:600; margin-bottom:4px; }
+  .cp-what{ font-family:'Cormorant Garamond',serif; font-size:18px; line-height:1.4; color:var(--paper); }
   @media (max-width:520px){ .cover .cover-proof{ order:6; } }
 """
 
@@ -94,11 +96,19 @@ Q_RITUAL = ["Η ερώτησή σου φτάνει στα άστρα{name}...", 
 
 NATAL_TIME = '<div class="time-note">Η ώρα κάνει την ανάλυση πλήρη: Ωροσκόπος, οίκοι, σύντροφος, καριέρα. Θα τη βρεις στο πιστοποιητικό γέννησης. Αν δεν την ξέρεις, η ανάλυση γίνεται χωρίς αυτά.</div>'
 
+# Τα πιο δυνατά ΠΡΑΓΜΑΤΙΚΑ σχόλια από τη σελίδα στο Facebook, αυτούσια (μικρό όνομα και αρχικό).
+STRONG_COMMENTS = [
+    ("Dimitrios A.", "Ότι γράφει είναι απλά αλήθεια......!!!"),
+    ("Olga K.", "Αλήθεια κ ικανοποίηση ταυτόχρονα!!!"),
+    ("Πέτρος Τ.", "Είμαι Τοξότης και γίνεται όπως το γράφεις"),
+    ("Ελένη Ζ.", "Ακριβώς έτσι είναι, είμαι μια Αιγόκερως!!!!"),
+    ("Lume L.", "Μπράβο Έτσι ακριβώς είναι ο ζυγός Είμαι ζυγός και το ξέρω"),
+]
 COVER_PROOF = (
     '    <div class="cover-proof">\n'
     '      <p class="cp-title">Αυτά γράφουν για το Μαντείο στο Facebook</p>\n'
     '      <div class="cp-strip">\n'
-    + "".join(f'        <img src="manteio-sxolia-{i}.jpg" alt="Σχόλια αναγνωστριών στη σελίδα του Μαντείου στο Facebook" loading="lazy" width="1000" height="840">\n' for i in range(1, 5))
+    + "".join(f'        <div class="cp-card"><div class="cp-who">{html.escape(w)}</div><div class="cp-what">«{html.escape(t)}»</div></div>\n' for w, t in STRONG_COMMENTS)
     + '      </div>\n    </div>\n')
 
 NATAL_UNLOCK = (
