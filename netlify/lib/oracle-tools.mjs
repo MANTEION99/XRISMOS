@@ -3,8 +3,9 @@
 // Η «Επιστροφή της Χαμένης Αγάπης» έχει δικό της, παλαιότερο αρχείο και δεν περνά από εδώ.
 
 import {
-  computeCharts, chartsBlock, chartForPrompt, timeNote, moonChangesSign, skyBlock
+  computeCharts, chartsBlock, chartForPrompt, timeNote, moonChangesSign, skyBlock, zoneOffset
 } from "./epistrofi-common.mjs";
+import { natalExtras, extrasBlock, solarReturns, solarBlock, big3, chapterList, chapterTitle } from "./natal.mjs";
 import { drawThreeCards } from "./tarot-deck.mjs";
 import safety from "./safety.cjs";
 const { REDIRECT_RULES } = safety;
@@ -131,6 +132,28 @@ ${p.name2 ? `Η ερώτηση αφορά και τον/την ${p.name2}: χρ�
 const LOVE_TOPIC = "Μένεις στο θέμα της αγάπης και της σχέσης. Δεν μιλάς για καριέρα ή επαγγελματικό δρόμο.";
 
 export const TOOLS = {
+  xartis: {
+    title: "Ο Γενέθλιος Χάρτης σου",
+    kind: "natal", needDob2: false, needQuestion: false, noQuestions: true,
+    pctLabel: null,
+    // Δύο εκδοχές πληρωμής: η πλήρης ανάλυση και η ανάλυση μαζί με την πρόβλεψη 12 μηνών.
+    variants: ["xartis", "xartis_plus"],
+    skySpec: {
+      p1: { Sun: "τον Ήλιο", Moon: "τη Σελήνη", Venus: "την Αφροδίτη", Mars: "τον Άρη", Jupiter: "τον Δία", Saturn: "τον Κρόνο" },
+      desc1: true, mc1: true
+    },
+    teaser: (p, block) => `${natalVoice()}
+
+${block}
+
+Ο/Η ${p.name1} ζήτησε την πλήρη ανάλυση του γενέθλιου χάρτη του/της.
+
+${TEASER_CORE(
+  `Πες της με ακρίβεια τι δείχνουν μαζί ο Ήλιος, η Σελήνη (αν δίνεται)${hasTimeP(p) ? " και ο Ωροσκόπος" : ""} της, ως δύο τρία πολύ συγκεκριμένα χαρακτηριστικά της, τόσο ακριβή ώστε να σκεφτεί «με ξέρει». Κάθε χαρακτηριστικό δεμένο με την πραγματική θέση από τον χάρτη, με τον όρο εξηγημένο με απλά λόγια.`,
+  `ότι ο χάρτης της κρύβει πολύ περισσότερα: πώς αγαπά, τι ήρθε να κάνει σε αυτή τη ζωή, πού βρίσκεται η τύχη της και ποια πληγή της γίνεται δώρο, και ότι όλα αυτά ακολουθούν αμέσως παρακάτω, κεφάλαιο κεφάλαιο.`
+)}`
+  },
+
   agapi: {
     title: "Ο Χρησμός της Αγάπης",
     kind: "astro2", needDob2: false, needQuestion: false,
@@ -397,6 +420,60 @@ ${ENDING("τα χαρτιά αλλάζουν κάθε φορά που ρίχνο
   }
 };
 
+/* ---------- Ο Γενέθλιος Χάρτης: φωνή και κεφάλαια ---------- */
+
+function natalVoice() {
+  return voice("ο Ιάκωβος, ο αστρολόγος", `Γράφεις την προσωπική ανάλυση του γενέθλιου χάρτη της, σαν μικρό βιβλίο που θα το κρατήσει.
+Στον γενέθλιο χάρτη, ο ΟΙΚΟΣ όπου βρίσκονται ο Ουρανός, ο Ποσειδώνας και ο Πλούτωνας είναι προσωπικός και μπορείς να τον αναφέρεις, όπως και μια πολύ στενή όψη τους (έως 3 μοίρες) με Ήλιο, Σελήνη ή Ωροσκόπο. Το ΖΩΔΙΟ τους όμως είναι ίδιο για όλη τη γενιά και δεν το παρουσιάζεις ποτέ ως προσωπικό.
+Δεν μιλάς για υγεία, ασθένειες, θάνατο, εγκυμοσύνη, δικαστήρια ή επενδύσεις.`);
+}
+
+const NATAL_LANG = `ΓΛΩΣΣΑ: Το διαβάζει ένας άνθρωπος, όχι αστρολόγος. Κάθε αστρολογικός όρος εξηγείται αμέσως με απλά λόγια μέσα στην ίδια πρόταση, την πρώτη φορά που εμφανίζεται σε αυτό το κεφάλαιο. Πρώτα η εικόνα και το συναίσθημα, μετά ο όρος. Δίνεις παραδείγματα από την καθημερινή ζωή (σπίτι, δουλειά, σχέσεις, φίλοι) ώστε να αναγνωρίζει τον εαυτό της. Παράγραφοι 3 έως 5 προτάσεων, με κενή γραμμή ανάμεσα.
+Γράφεις με σιγουριά. Οι λέξεις «ίσως», «πιθανόν» και «μπορεί» (με την έννοια του «ίσως») ΑΠΑΓΟΡΕΥΟΝΤΑΙ, και ιδίως σε κάθε πρόβλεψη: γράφεις «θα», «έρχεται», «δείχνει». Το «μπορεί» επιτρέπεται μόνο με την έννοια «έχει τη δύναμη να» (π.χ. «μπορεί να θεραπεύσει»).
+Πριν τελειώσεις, ξαναδιάβασε σιωπηλά το κείμενο για γραμματικά λάθη και ασυνταξίες (π.χ. «κι το» αντί για «και το», «τέσσερα τοιχία» αντί για «τέσσερις τοίχους») και γράψε τη σωστή μορφή.`;
+
+const hasTimeP = (p) => /^\d{2}:\d{2}$/.test(String(p.tob1 || ""));
+
+function natalData(p, data) {
+  return `${personBlock(p, data.charts)}
+
+${extrasBlock(data.extras)}`;
+}
+
+// Το prompt ενός κεφαλαίου. Κάθε κεφάλαιο γράφεται χωριστά, ώστε η ανάλυση να βγαίνει μεγάλη και ολόκληρη.
+export function natalChapterPrompt(p, data, teaser, index, plus) {
+  const list = chapterList(plus);
+  const ch = list[index];
+  const t = hasTimeP(p);
+  const titles = list.map((c, i) => `${i + 1}. ${chapterTitle(c, t)}`).join("\n");
+  const first = index === 0;
+  const last = index === list.length - 1;
+  const extra = ch.plus === "solar" ? `\n\n${solarBlock(data.solar || [])}` : ch.plus === "sky" ? `\n\n${skyFor("xartis", p, data)}` : "";
+  return `${natalVoice()}
+
+${natalData(p, data)}${extra}
+
+Η ανάλυση έχει αυτά τα κεφάλαια, που γράφονται χωριστά:
+${titles}
+
+Τώρα γράφεις ΜΟΝΟ το κεφάλαιο ${index + 1}, «${chapterTitle(ch, t)}».
+ΘΕΜΑ ΤΟΥ ΚΕΦΑΛΑΙΟΥ: ${ch.focus(t)}
+Μένεις ΑΥΣΤΗΡΑ στο θέμα του κεφαλαίου. Ό,τι ανήκει σε άλλο κεφάλαιο το αφήνεις εκεί, γιατί αλλιώς θα επαναληφθεί.
+
+${first ? (teaser ? `Ο/Η ${p.name1} έχει ήδη διαβάσει το άνοιγμα της ανάλυσης, που είναι αυτό:
+"""
+${teaser}
+"""
+Το κεφάλαιο αυτό είναι η ΣΥΝΕΧΕΙΑ του. Μην ξαναχαιρετήσεις και μην επαναλάβεις όσα ειπώθηκαν.` : `Ξεκίνα με προσωπικό χαιρετισμό με το όνομά της, π.χ. «Γεια σου ${p.name1} μου», σε μία πρόταση, και μπες κατευθείαν στο θέμα.`) : `Δεν χαιρετάς, δεν κάνεις εισαγωγή για το τι θα ακολουθήσει και δεν γράφεις τίτλο. Ξεκινάς κατευθείαν με το περιεχόμενο, σαν να γυρίζει η σελίδα.`}
+${last ? "Αυτό είναι το ΤΕΛΕΥΤΑΙΟ κεφάλαιο: κλείσε με ζεστό αποχαιρετισμό από τον Ιάκωβο και το όνομά της." : "Μην κλείσεις με αποχαιρετισμό ούτε με φράση του τύπου «στο επόμενο κεφάλαιο». Τελείωσε με μια δυνατή πρόταση για το θέμα του κεφαλαίου."}
+
+Μήκος: 700 έως 900 λέξεις.
+${NATAL_LANG}
+${ch.plus === "sky" ? SKY_RULE : "Δεν δίνεις ημερομηνίες και προβλέψεις για συγκεκριμένους μήνες σε αυτό το κεφάλαιο."}
+ΜΟΡΦΗ: Μόνο το κείμενο του κεφαλαίου, χωρίς τίτλο, χωρίς αριθμό, χωρίς λίστες με κουκκίδες, χωρίς ποσοστό, χωρίς [ΣΥΜΒΟΥΛΗ].
+Ολοκλήρωσε πάντα κάθε πρόταση.`;
+}
+
 /* ---------- Κοινά για όλα τα εργαλεία ---------- */
 
 // Υπολογίζει τα δεδομένα του χρησμού μία φορά (χάρτες, αριθμούς ή χαρτιά) και τα κρατά με τον χρησμό.
@@ -405,6 +482,14 @@ export async function computeData(toolId, p) {
   if (t.kind === "astro2") return { charts: await computeCharts(p) };
   if (t.kind === "astro1") return { charts: await computeCharts({ ...p, dob2: "", name2: "" }) };
   if (t.kind === "open") return { charts: await computeCharts(p) };
+  if (t.kind === "natal") {
+    const charts = await computeCharts({ ...p, dob2: "", name2: "" });
+    const [y, m, d] = String(p.dob1).split("-").map(Number);
+    const [hh, mm] = hasTimeP(p) ? p.tob1.split(":").map(Number) : [12, 0];
+    const tzone = zoneOffset(charts.tz1, y, m, d, hh, mm);
+    const moonUnsure = !hasTimeP(p) && moonChangesSign(p.dob1, charts.tz1);
+    return { charts, moonUnsure, extras: natalExtras(p, charts, hasTimeP(p), tzone) };
+  }
   if (t.kind === "numerology") return { numbers: numerologyData(p) };
   if (t.kind === "taro") {
     return { cards: drawThreeCards().map(c => ({ file: c.file, name: c.name, reversed: !!c.reversed, upright: c.upright, reversed_meaning: c.reversedMeaning })) };
@@ -417,6 +502,9 @@ export function publicData(toolId, data) {
   if (!data) return {};
   if (data.numbers) return { numbers: data.numbers };
   if (data.cards) return { cards: data.cards.map(c => ({ file: c.file, name: c.name, reversed: c.reversed })) };
+  if (toolId === "xartis" && data.charts) {
+    return { big3: big3(data.charts, !!(data.extras && data.extras.ascendant), !!data.moonUnsure) };
+  }
   return {};
 }
 
@@ -424,6 +512,7 @@ export function dataBlock(toolId, p, data) {
   const t = TOOLS[toolId];
   if (t.kind === "astro2") return chartsBlock(p, data.charts);
   if (t.kind === "astro1") return personBlock(p, data.charts);
+  if (t.kind === "natal") return natalData(p, data);
   if (t.kind === "open") return p.name2 ? chartsBlock(p, data.charts) : personBlock(p, data.charts);
   if (t.kind === "numerology") return numerologyBlock(p, data.numbers);
   if (t.kind === "taro") return tarotBlock(p, data.cards);
@@ -432,7 +521,7 @@ export function dataBlock(toolId, p, data) {
 
 export function skyFor(toolId, p, data) {
   const t = TOOLS[toolId];
-  if (t.kind !== "astro1" && t.kind !== "astro2" && t.kind !== "open") return "";
+  if (t.kind !== "astro1" && t.kind !== "astro2" && t.kind !== "open" && t.kind !== "natal") return "";
   return skyBlock(p, data.charts, hasTime(p.tob1), new Date(), t.skySpec || null);
 }
 
@@ -487,3 +576,18 @@ ${REDIRECT_RULES}
 }
 
 export const isTool = (id) => Object.prototype.hasOwnProperty.call(TOOLS, id);
+
+// Ποια προϊόντα του Stripe πληρώνουν αυτόν τον χρησμό (ο Γενέθλιος Χάρτης έχει δύο εκδοχές).
+export function paidToolsFor(reading) {
+  if (reading.kind === "question") return [`${reading.tool}_${reading.stage}`];
+  const t = TOOLS[reading.tool];
+  return (t && t.variants) || [reading.tool];
+}
+
+// Για τον Γενέθλιο Χάρτη με πρόβλεψη: η ηλιακή επιστροφή υπολογίζεται τη στιγμή της συγγραφής.
+export function addSolar(data) {
+  if (data && data.charts && !data.solar) {
+    try { data.solar = solarReturns(data.charts); } catch (e) { console.error("[natal] solar", e); data.solar = []; }
+  }
+  return data;
+}

@@ -107,11 +107,21 @@ function renderNumbers(n, revealAll) {
   box.innerHTML = items.map(([label, val, open]) =>
     `<div class="number-block${open ? '' : ' closed'}"><div class="num">${open ? val : '?'}</div><div class="num-label">${label}</div></div>`).join('');
 }
+// Γενέθλιος Χάρτης: Ήλιος, Σελήνη και Ωροσκόπος, φανερά από το δωρεάν άνοιγμα.
+function renderBig3(b) {
+  const box = $('numbers');
+  if (!box || !b || !b.sun) return;
+  box.style.display = 'flex';
+  const items = [['ΗΛΙΟΣ', b.sun], ['ΣΕΛΗΝΗ', b.moon], ['ΩΡΟΣΚΟΠΟΣ', b.asc]].filter(x => x[1]);
+  box.innerHTML = items.map(([label, val]) =>
+    `<div class="number-block big3"><div class="num">${val}</div><div class="num-label">${label}</div></div>`).join('');
+}
 function renderData(data, revealAll) {
   if (!data) return;
   currentData = data;
   if (data.cards) renderCards(data.cards, revealAll);
   if (data.numbers) renderNumbers(data.numbers, revealAll);
+  if (data.big3) renderBig3(data.big3);
 }
 
 /* ---------- Streaming και κείμενο ---------- */
@@ -131,7 +141,34 @@ async function readStream(response, onText) {
   return all;
 }
 
+// Γενέθλιος Χάρτης: η ανάλυση έρχεται σε κεφάλαια με τίτλο. Κάθε κεφάλαιο είναι δικό του κομμάτι της σελίδας
+// και ενημερώνεται μόνο αυτό που γράφεται, ώστε η σελίδα να μένει ελαφριά ακόμα και με χιλιάδες λέξεις.
+const CH_MARK = '[ΚΕΦΑΛΑΙΟ]';
+const natalCache = [];
+function renderNatal(text, finished) {
+  const parts = text.split(CH_MARK).slice(1);
+  if (parts.length) stopRitual();
+  parts.forEach((part, i) => {
+    const nl = part.indexOf('\n');
+    const title = (nl < 0 ? part : part.slice(0, nl)).trim();
+    const body = nl < 0 ? '' : part.slice(nl + 1).replace(/\s+$/, '');
+    let c = natalCache[i];
+    if (!c) {
+      const sec = document.createElement('section');
+      sec.className = 'natal-ch';
+      sec.innerHTML = '<div class="natal-n"></div><h3 class="natal-h"></h3><div class="natal-body"></div>';
+      sec.querySelector('.natal-n').textContent = 'ΚΕΦΑΛΑΙΟ ' + (i + 1);
+      readingtext.appendChild(sec);
+      c = natalCache[i] = { title: null, body: null, h: sec.querySelector('.natal-h'), b: sec.querySelector('.natal-body') };
+    }
+    if (c.title !== title) { c.title = title; c.h.textContent = title; }
+    if (c.body !== body) { c.body = body; setText(c.b, body); }
+    c.b.classList.toggle('typing', !finished && i === parts.length - 1);
+  });
+}
+
 function renderContinuation(cont, finished) {
+  if (CFG.kind === 'natal') return renderNatal(cont.replace(ERR_MARK, ''), finished);
   let text = cont.replace(ERR_MARK, '');
   let pct = null;
   const m = text.match(/^\s*\[ΠΟΣΟΣΤΟ:\s*(\d+)\]\s*/);
@@ -172,7 +209,7 @@ function makeTyper(render) {
       if (finished) { clearInterval(timer); timer = null; render(target, true); doneCbs.splice(0).forEach(f => f()); }
       return;
     }
-    const cps = backlog > 2500 ? 120 : backlog > 1200 ? 75 : backlog > 500 ? 45 : 32;
+    const cps = backlog > 6000 ? 360 : backlog > 2500 ? 120 : backlog > 1200 ? 75 : backlog > 500 ? 45 : 32;
     const n = Math.max(1, Math.round(cps * 0.04));
     shown = skip(target, shown);
     shown = Math.min(target.length, shown + n);
@@ -254,7 +291,7 @@ function addWaitProgress(container, steps) {
   box.insertAdjacentHTML('beforeend',
     '<div class="wait-bar"><span></span></div>' +
     '<ul class="wait-steps">' + steps.map(t => '<li><span class="dot"></span><span>' + t + '</span></li>').join('') + '</ul>' +
-    '<p class="wait-note">Συνήθως χρειάζεται 1 με 2 λεπτά. Μείνε σε αυτή τη σελίδα. Κι αν την κλείσεις, ο χρησμός σου θα σε περιμένει εδώ, χωρίς νέα χρέωση.</p>');
+    '<p class="wait-note">' + (CFG.waitNote || 'Συνήθως χρειάζεται 1 με 2 λεπτά. Μείνε σε αυτή τη σελίδα. Κι αν την κλείσεις, ο χρησμός σου θα σε περιμένει εδώ, χωρίς νέα χρέωση.') + '</p>');
   const bar = box.querySelector('.wait-bar span');
   const lis = box.querySelectorAll('.wait-steps li');
   const note = box.querySelector('.wait-note');
@@ -266,9 +303,10 @@ function addWaitProgress(container, steps) {
   const tick = () => {
     if (!box.isConnected) return clearInterval(timer);
     const t = (Date.now() - t0) / 1000;
-    setStep(t < 5 ? 1 : (t < 14 ? 2 : 3));
-    bar.style.width = Math.min(92, 100 * (1 - Math.exp(-t / 55))) + '%';
-    if (t > 150 && !note.dataset.long) {
+    const slow = CFG.waitSeconds ? CFG.waitSeconds / 120 : 1;
+    setStep(t < 5 ? 1 : (t < 14 * slow ? 2 : 3));
+    bar.style.width = Math.min(92, 100 * (1 - Math.exp(-t / (55 * slow)))) + '%';
+    if (t > 150 * slow && !note.dataset.long) {
       note.dataset.long = '1';
       note.textContent = 'Παίρνει λίγο περισσότερο από το συνηθισμένο, αλλά προχωρά κανονικά. Ο χρησμός σου θα εμφανιστεί εδώ μόλις ολοκληρωθεί.';
     }
@@ -382,6 +420,10 @@ async function startCheckout(buttonEl, readingId, tool, stage) {
 
 $('unlockBtn').addEventListener('click', () => {
   if (currentReadingId) startCheckout($('unlockBtn'), currentReadingId, TOOL, '');
+});
+// Δεύτερη εκδοχή πληρωμής (Γενέθλιος Χάρτης με πρόβλεψη 12 μηνών).
+if ($('plusBtn') && CFG.plusTool) $('plusBtn').addEventListener('click', () => {
+  if (currentReadingId) startCheckout($('plusBtn'), currentReadingId, CFG.plusTool, '');
 });
 
 async function submitTeaser() {
@@ -639,6 +681,7 @@ function renderExtraActions(data) {
   if (readingIdParam && sessionId && window.manteioReviewForm) window.manteioReviewForm(readingIdParam, sessionId);
   const box = $('extraActions');
   box.innerHTML = '';
+  if (CFG.noQuestions) return;
   const stage = data.stage || 'q1';
   const nextStage = stage === 'q1' ? 'q2' : (stage === 'q2' ? 'q3' : null);
   if (!nextStage) return;
@@ -678,7 +721,7 @@ function renderExtraActions(data) {
 if (sessionId && readingIdParam) {
   loadFullReading();
 } else {
-  btn.textContent = 'Δες δωρεάν τον χρησμό σου';
+  btn.textContent = CFG.btnText || 'Δες δωρεάν τον χρησμό σου';
   if (!restoreTeaser()) {
     let entered = null;
     try { entered = localStorage.getItem(ENTERED_KEY); } catch (e) {}

@@ -43,6 +43,22 @@ EXTRA_CSS = """
   .result:has(#fullWrap.show) .teaser-note{ display:none; }
   .error.redirect-msg{ color:var(--paper); line-height:1.6; }
   .value-note-q{ font-size:12.5px; line-height:1.55; color:var(--muted); max-width:320px; margin:12px auto 18px; text-align:center; }
+  .number-block.big3{ min-width:0; flex:1 1 0; }
+  .number-block.big3 .num{ font-size:20px; line-height:1.15; }
+  body[data-natal] .numbers{ flex-wrap:nowrap; gap:8px; }
+  .natal-ch{ margin:0 0 8px; }
+  .natal-n{ text-align:center; font-family:'Inter',sans-serif; font-size:10.5px; letter-spacing:2.5px; color:var(--muted); margin:30px 0 4px; white-space:normal; }
+  .natal-h{ text-align:center; font-family:'Cormorant Garamond',serif; font-weight:600; font-size:22px; line-height:1.3; color:var(--gold); margin:0 0 14px; white-space:normal; }
+  .natal-ch:first-child .natal-n{ margin-top:6px; }
+  body[data-natal] .seal-blur{ min-height:500px; }
+  body[data-natal] .seal-overlay{ gap:10px; }
+  #plusBtn{ padding:12px 22px; font-size:14.5px; letter-spacing:0.5px; background:var(--gold); color:#241A08; font-weight:600; }
+  .plus-tag{ font-size:11px; letter-spacing:1.5px; color:var(--gold); margin:4px 0 -4px; }
+  .cover-proof{ width:100%; margin:22px 0 0; text-align:left; }
+  .cover-proof .cp-title{ font-family:'Cormorant Garamond',serif; font-size:17px; color:var(--gold); text-align:center; margin:0 0 10px; }
+  .cover-proof .cp-strip{ display:flex; gap:10px; overflow-x:auto; scroll-snap-type:x mandatory; padding-bottom:8px; -webkit-overflow-scrolling:touch; }
+  .cover-proof img{ flex:0 0 82%; max-width:300px; width:82%; height:auto; border-radius:10px; border:1px solid var(--line); scroll-snap-align:start; display:block; }
+  @media (max-width:520px){ .cover .cover-proof{ order:6; } }
 """
 
 NOTE_TIME1 = '<div class="time-note">Αν δεν ξέρεις την ώρα, ο χρησμός θα βγει από τους πλανήτες σου.</div>'
@@ -76,7 +92,42 @@ ASTRO_STEPS = ["Η πληρωμή σου επιβεβαιώθηκε", "Οι χά
 Q_STEPS = ["Η πληρωμή σου επιβεβαιώθηκε", "Η ερώτησή σου διαβάζεται", "Αναζητούμε την απάντηση", "Η απάντηση γράφεται ειδικά για σένα"]
 Q_RITUAL = ["Η ερώτησή σου φτάνει στα άστρα{name}...", "Αναζητούμε την απάντηση στους ίδιους χάρτες...", "Η απάντησή σου γράφεται..."]
 
+NATAL_TIME = '<div class="time-note">Η ώρα κάνει την ανάλυση πλήρη: Ωροσκόπος, οίκοι, σύντροφος, καριέρα. Θα τη βρεις στο πιστοποιητικό γέννησης. Αν δεν την ξέρεις, η ανάλυση γίνεται χωρίς αυτά.</div>'
+
+COVER_PROOF = (
+    '    <div class="cover-proof">\n'
+    '      <p class="cp-title">Αυτά γράφουν για το Μαντείο στο Facebook</p>\n'
+    '      <div class="cp-strip">\n'
+    + "".join(f'        <img src="manteio-sxolia-{i}.jpg" alt="Σχόλια αναγνωστριών στη σελίδα του Μαντείου στο Facebook" loading="lazy" width="1000" height="840">\n' for i in range(1, 5))
+    + '      </div>\n    </div>\n')
+
+NATAL_UNLOCK = (
+    '        <div class="enter-btn" id="unlockBtn">Η πλήρης ανάλυση · 39€</div>\n'
+    '        <div class="plus-tag">Η ΠΙΟ ΟΛΟΚΛΗΡΩΜΕΝΗ</div>\n'
+    '        <div class="enter-btn" id="plusBtn">Ανάλυση και πρόβλεψη 12 μηνών · 59€</div>\n'
+    '        <p class="value-note" style="font-size:12.5px;line-height:1.55;color:var(--muted);max-width:320px;margin:6px auto 12px;text-align:center;">14 κεφάλαια, πάνω από 10.000 λέξεις, γραμμένα από τον Ιάκωβο μόνο για σένα, πάνω στον πραγματικό σου χάρτη. Η πρόβλεψη προσθέτει τον χάρτη των γενεθλίων σου και τους 12 επόμενους μήνες, εποχή με εποχή. Χρεώνεσαι μόνο όταν ολοκληρωθεί η ανάλυσή σου.</p>\n')
+
+DEFAULT_UNLOCK = (
+    '        <div class="enter-btn" id="unlockBtn">Δες τη συνέχεια · 4,99€</div>\n'
+    '        <p class="value-note" style="font-size:12.5px;line-height:1.55;color:var(--muted);max-width:320px;margin:10px auto 18px;text-align:center;">Μια τέτοια πρόβλεψη κοστίζει περίπου 100€. Εδώ γράφεται μόνο για σένα, με 4,99€. Χρεώνεσαι μόνο όταν ολοκληρωθεί ο χρησμός σου.</p>\n')
+
 TOOLS = {
+  "xartis": dict(
+    slug="xartis", file="xartis-tool-agora.html", kind="natal", needDob2=False, needQuestion=False,
+    title="Ο Γενέθλιος Χάρτης σου", h1="Ο Γενέθλιος<br>Χάρτης σου", img="images/iakovos.jpg",
+    sub="Ο ουρανός τη στιγμή που γεννήθηκες. Ο Ιάκωβος διαβάζει όλο τον χάρτη σου: ποιος είσαι, πώς αγαπάς, τι ήρθες να κάνεις και πού βρίσκεται η τύχη σου.",
+    ask="Δωρεάν βλέπεις τον Ήλιο, τη Σελήνη και τον Ωροσκόπο σου. Μετά, αν θέλεις, ο Ιάκωβος γράφει ολόκληρη την ανάλυση σε 14 κεφάλαια, σαν μικρό βιβλίο μόνο για σένα.",
+    fields=lambda: field("name1", "Το όνομά σου", placeholder="π.χ. Μαρία") + field("dob1", "Ημερομηνία γέννησής σου", "date") + field("tob1", "Ώρα γέννησής σου", "time", note=NATAL_TIME) + field("pob1", "Πόλη γέννησής σου", placeholder="π.χ. Αθήνα", note=NOTE_PLACE),
+    pctLabel=None,
+    blur="Η Σελήνη σου δείχνει τι χρειάζεται η καρδιά σου για να ησυχάσει, η Αφροδίτη και ο Άρης πώς αγαπάς και τι σε ελκύει, το Μεσουράνημα σε τι είσαι προικισμένη. Οι Δεσμοί της Σελήνης φανερώνουν τι ήρθες να κάνεις σε αυτή τη ζωή, και ο Χείρωνας ποια πληγή σου γίνεται δώρο για τους άλλους. Ο Δίας δείχνει πού έρχεται η τύχη εύκολα και ο Κρόνος τα μεγάλα μαθήματα της ζωής σου.",
+    sealSub="Ολόκληρη η ανάλυση του χάρτη σου σε 14 κεφάλαια, σαν μικρό βιβλίο γραμμένο μόνο για σένα.",
+    teaserRitual=["Τα άστρα ανοίγουν τον χάρτη της γέννησής σου{name}...", "Οι πλανήτες παίρνουν τις θέσεις που είχαν τη στιγμή που γεννήθηκες...", "Ο Ιάκωβος διαβάζει τον Ήλιο, τη Σελήνη και τον Ωροσκόπο σου..."],
+    fullRitual=["Η σφραγίδα της ανάλυσής σου ανοίγει...", "Ο Ιάκωβος διαβάζει έναν έναν τους πλανήτες σου...", "Τα κεφάλαια του χάρτη σου γράφονται...", "Η ανάλυσή σου γράφεται{name}..."],
+    waitSteps=["Η πληρωμή σου επιβεβαιώθηκε", "Ο χάρτης σου ανοίγει ολόκληρος", "Τα 14 κεφάλαια γράφονται ένα ένα", "Η ανάλυσή σου εμφανίζεται εδώ, κεφάλαιο κεφάλαιο"],
+    waitNote="Η πλήρης ανάλυση γράφεται σε 5 με 8 λεπτά και τα κεφάλαια εμφανίζονται εδώ ένα ένα. Κι αν κλείσεις τη σελίδα, η ανάλυσή σου θα σε περιμένει εδώ, χωρίς νέα χρέωση.",
+    waitSeconds=420, noQuestions=True, plusTool="xartis_plus", unlock=NATAL_UNLOCK, coverExtra=COVER_PROOF,
+    pricePrefix="Η αρχή της ανάλυσής σου δωρεάν", enterText="Δες τον χάρτη σου", btnText="Δες δωρεάν τον χάρτη σου",
+    qPh="", qHint="", sameData="με τον ίδιο χάρτη"),
   "erotima": dict(
     slug="erotima", file="erotima-tool-agora.html", kind="open", needDob2=False, needQuestion=True,
     title="Ρώτα το Μαντείο", h1="Ρώτα<br>το Μαντείο", img="images/manteio-advisor.jpg",
@@ -184,6 +235,8 @@ def build(tool, c):
         "questionRitual": Q_RITUAL, "waitSteps": c["waitSteps"], "questionSteps": Q_STEPS,
         "questionPlaceholder": c["qPh"], "questionHint": c["qHint"], "sameData": c["sameData"],
     }
+    for k in ("waitNote", "waitSeconds", "noQuestions", "plusTool", "btnText"):
+        if k in c: cfg[k] = c[k]
     pct = (f'      <div class="pct-wrap" id="pctWrap" style="display:none;">\n        <div class="pct" id="pctnum">0%</div>\n'
            f'        <div class="pct-label">{c["pctLabel"]}</div>\n      </div>\n') if c["pctLabel"] else ""
     title_plain = c["title"]
@@ -219,7 +272,7 @@ def build(tool, c):
 <script src="/reviews.js" defer></script>
 <script src="/vitals.js" defer></script>
 </head>
-<body{' data-adult2="1"' if c["kind"] == "astro2" else ""}>
+<body{' data-adult2="1"' if c["kind"] == "astro2" else ""}{' data-natal="1"' if c["kind"] == "natal" else ""}>
 <div class="stars"></div>
 
 <div class="cover" id="cover">
@@ -228,12 +281,12 @@ def build(tool, c):
     <h1>{c["h1"]}</h1>
     <img class="illus" src="{c["img"]}" alt="{html.escape(title_plain)}" onerror="this.style.display='none'">
     <p class="sub">{c["sub"]}</p>
-    <p class="price-line" style="margin-bottom:10px;">Η αρχή του χρησμού σου δωρεάν</p>
+    <p class="price-line" style="margin-bottom:10px;">{c.get("pricePrefix", "Η αρχή του χρησμού σου δωρεάν")}</p>
     <p class="ask-line" style="font-size:15px;line-height:1.5;color:var(--muted);margin:0 auto 22px;max-width:340px;">{c["ask"]}</p>
-    <p class="trust-line">{STAR}Εμπιστεύονται ήδη πάνω από 33.000 άνθρωποι στο Facebook</p>
-    <div class="enter-btn" id="enterBtn">Δες τον χρησμό σου</div>
+    <p class="trust-line">{STAR}Εμπιστεύονται ήδη πάνω από 40.000 άνθρωποι στο Facebook</p>
+    <div class="enter-btn" id="enterBtn">{c.get("enterText", "Δες τον χρησμό σου")}</div>
     <div class="secure-note">{LOCK} Χωρίς κάρτα για το δωρεάν άνοιγμα</div>
-  </div>
+{c.get("coverExtra", "")}  </div>
 </div>
 
 <div class="card" id="card">
@@ -257,7 +310,7 @@ def build(tool, c):
         </div>
       </div>
     <p class="error" id="err"></p>
-    <button type="submit" class="submit" id="btn">Δες δωρεάν τον χρησμό σου</button>
+    <button type="submit" class="submit" id="btn">{c.get("btnText", "Δες δωρεάν τον χρησμό σου")}</button>
     <p class="adult-note">Οι χρησμοί απευθύνονται μόνο σε ενήλικες (18+). Συνεχίζοντας δηλώνεις ότι είσαι ενήλικας.</p>
   </form>
 
@@ -276,9 +329,7 @@ def build(tool, c):
         <div class="wax">Μ</div>
         <div class="seal-title">Ο χρησμός σου συνεχίζεται</div>
         <div class="seal-sub">{c["sealSub"]}</div>
-        <div class="enter-btn" id="unlockBtn">Δες τη συνέχεια · 4,99€</div>
-        <p class="value-note" style="font-size:12.5px;line-height:1.55;color:var(--muted);max-width:320px;margin:10px auto 18px;text-align:center;">Μια τέτοια πρόβλεψη κοστίζει περίπου 100€. Εδώ γράφεται μόνο για σένα, με 4,99€. Χρεώνεσαι μόνο όταν ολοκληρωθεί ο χρησμός σου.</p>
-        <div class="secure-note">{LOCK} Ασφαλής πληρωμή μέσω Stripe</div>
+{c.get("unlock", DEFAULT_UNLOCK)}        <div class="secure-note">{LOCK} Ασφαλής πληρωμή μέσω Stripe</div>
       </div>
     </div>
     <div id="socialProof"></div>
