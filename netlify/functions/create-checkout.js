@@ -88,8 +88,11 @@ exports.handler = async function (event) {
     // ΜΟΝΟ για δοκιμή στην προεπισκόπηση (deploy-preview): ο Γενέθλιος Χάρτης χρεώνεται 0,50€, για να
     // δοκιμαστεί ολόκληρη η ανάλυση με πραγματική πληρωμή. Στο manteio.live η τιμή μένει κανονική.
     // ΑΦΑΙΡΕΙΤΑΙ πριν ανέβει live.
-    const host = String((event.headers && (event.headers.host || event.headers.Host)) || "");
-    const previewTest = /^deploy-preview-\d+--/.test(host) && /^xartis/.test(tool);
+    const h = event.headers || {};
+    let pageHost = "";
+    try { pageHost = new URL(returnUrl).host; } catch (e) {}
+    const hosts = [h.host, h.Host, h["x-forwarded-host"], h["x-nf-site-host"], pageHost].map(x => String(x || ""));
+    const previewTest = hosts.some(x => /^deploy-preview-\d+--manteio-epistrofi\.netlify\.app$/.test(x)) && /^xartis/.test(tool);
     const unitAmount = previewTest ? 50 : product.price;
 
     const body = toFormBody({
