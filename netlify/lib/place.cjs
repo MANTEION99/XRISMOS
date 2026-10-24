@@ -1,7 +1,11 @@
 // Τόπος γέννησης: από το κείμενο που γράφει η πελάτισσα («Θεσσαλονίκη», «Χανιά Κρήτης», «Λονδίνο»)
-// βρίσκουμε πραγματικές συντεταγμένες και ζώνη ώρας μέσω του geo_details του AstrologyAPI.
-// Αν κάτι δεν πάει καλά (δεν βρέθηκε, αργεί, σφάλμα), επιστρέφουμε null και ο χάρτης
-// υπολογίζεται με Αθήνα, όπως πριν. Ο χρησμός δεν σταματά ποτέ εξαιτίας του τόπου.
+// βρίσκουμε πραγματικές συντεταγμένες και ζώνη ώρας.
+// 1. Πρώτα στη δική μας λίστα (data/places.json, από το GeoNames): όλες οι πόλεις και κωμοπόλεις
+//    της Ελλάδας και της Κύπρου με τα ελληνικά τους ονόματα, και οι πόλεις του εξωτερικού.
+//    Δεν χρειάζεται καμία εξωτερική υπηρεσία.
+// 2. Αν δεν βρεθεί εκεί, μέσω του geo_details του AstrologyAPI (αν υπάρχει ενεργό κλειδί).
+// Αν δεν βρεθεί πουθενά, επιστρέφουμε null και ο χάρτης υπολογίζεται με Αθήνα.
+// Ο χρησμός δεν σταματά ποτέ εξαιτίας του τόπου.
 
 const cache = new Map();
 
@@ -45,6 +49,89 @@ function translit(text) {
     .replace(/^μπ|(\s)μπ/g, "$1b").replace(/^ντ|(\s)ντ/g, "$1d").replace(/^γκ|(\s)γκ/g, "$1g")
     .replace(/μπ/g, "mp").replace(/ντ/g, "nt").replace(/γκ/g, "gk")
     .split("").map(c => GR[c] !== undefined ? GR[c] : c).join("");
+}
+
+/* ---------- Η δική μας λίστα πόλεων ---------- */
+
+let INDEX = null, DATA = null;
+const fold = (t) => String(t || "").normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase().replace(/ς/g, "σ").replace(/\s+/g, " ").trim();
+function loadIndex() {
+  if (INDEX) return INDEX;
+  DATA = require("./data/places.json");
+  INDEX = new Map();
+  DATA.rows.forEach((r, i) => {
+    for (const n of String(r[6]).split("|")) {
+      if (!n) continue;
+      const list = INDEX.get(n);
+      if (list) list.push(i); else INDEX.set(n, [i]);
+    }
+  });
+  return INDEX;
+}
+
+// Χώρες που γράφει ο κόσμος μαζί με την πόλη («Μελβούρνη Αυστραλίας», «Stuttgart Germany»).
+const COUNTRY = {
+  "ελλαδα": "GR", "ελλαδοσ": "GR", "κυπροσ": "CY", "κυπρου": "CY", "γερμανια": "DE", "γερμανιασ": "DE", "αυστραλια": "AU", "αυστραλιασ": "AU",
+  "αμερικη": "US", "αμερικησ": "US", "ηπα": "US", "καναδασ": "CA", "καναδα": "CA", "αγγλια": "GB", "αγγλιασ": "GB", "βελγιο": "BE", "βελγιου": "BE",
+  "σουηδια": "SE", "σουηδιασ": "SE", "ελβετια": "CH", "ελβετιασ": "CH", "γαλλια": "FR", "γαλλιασ": "FR", "ιταλια": "IT", "ιταλιασ": "IT",
+  "αλβανια": "AL", "αλβανιασ": "AL", "τουρκια": "TR", "τουρκιασ": "TR", "αιγυπτοσ": "EG", "αιγυπτου": "EG", "ρωσια": "RU", "ρωσιασ": "RU",
+  "γεωργια": "GE", "γεωργιασ": "GE", "ουκρανια": "UA", "ουκρανιασ": "UA", "ολλανδια": "NL", "ολλανδιασ": "NL", "αυστρια": "AT", "αυστριασ": "AT",
+  "βουλγαρια": "BG", "βουλγαριασ": "BG", "ρουμανια": "RO", "ρουμανιασ": "RO", "νοτια αφρικη": "ZA",
+  "greece": "GR", "cyprus": "CY", "germany": "DE", "deutschland": "DE", "australia": "AU", "usa": "US", "america": "US", "canada": "CA",
+  "england": "GB", "uk": "GB", "belgium": "BE", "sweden": "SE", "switzerland": "CH", "france": "FR", "italy": "IT", "albania": "AL", "turkey": "TR"
+};
+
+function countryHint(text) {
+  const f = fold(text);
+  for (const [k, v] of Object.entries(COUNTRY)) {
+    if (new RegExp(`(^|[\\s,/])${k}($|[\\s,/])`).test(f)) return v;
+  }
+  return null;
+}
+
+// Νησιά που ο κόσμος γράφει με το όνομα του νησιού: αντιστοιχίζονται στην πρωτεύουσά τους.
+const ISLANDS = {
+  "συροσ": "Ερμούπολη", "σαντορινη": "Θήρα", "λεσβοσ": "Μυτιλήνη", "λημνοσ": "Μύρινα", "κεφαλονια": "Αργοστόλι", "κεφαλληνια": "Αργοστόλι",
+  "ιθακη": "Ιθάκη", "καλυμνοσ": "Κάλυμνος", "παροσ": "Παροικιά", "ανδροσ": "Άνδρος", "τηνοσ": "Τήνος", "κυθηρα": "Κύθηρα",
+  "αιγινα": "Αίγινα", "υδρα": "Ύδρα", "σκιαθοσ": "Σκιάθος", "σκοπελοσ": "Σκόπελος", "θασοσ": "Θάσος", "σαμοθρακη": "Σαμοθράκη",
+  "ικαρια": "Άγιος Κήρυκος", "καρπαθοσ": "Κάρπαθος", "κρητη": "Ηράκλειο", "ευβοια": "Χαλκίδα", "λευκαδα": "Λευκάδα", "κωσ": "Κως",
+  "μηλοσ": "Μήλος", "κεα": "Ιουλίδα", "αμοργοσ": "Αμοργός", "πατμοσ": "Πάτμος", "συμη": "Σύμη",
+ "σαλαμινα": "Σαλαμίνα", "σπετσεσ": "Σπέτσες", "ποροσ": "Πόρος", "σκυροσ": "Σκύρος",
+  "παξοι": "Γάιος", "αστυπαλαια": "Αστυπάλαια", "φολεγανδροσ": "Φολέγανδρος",
+  "σεριφοσ": "Σέριφος", "κυθνοσ": "Κύθνος"
+};
+
+// Μικρά νησιά που λείπουν από τη λίστα (κάτω από 1.000 κατοίκους στην πρωτεύουσα): συντεταγμένες της πρωτεύουσάς τους.
+const SMALL_ISLANDS = {
+  "σιφνοσ": ["Apollonia, Sifnos", 36.973, 24.722], "λεροσ": ["Platanos, Leros", 37.149, 26.851], "κασοσ": ["Fry, Kasos", 35.416, 26.925],
+  "αλοννησοσ": ["Patitiri, Alonnisos", 39.142, 23.865], "τηλοσ": ["Livadia, Tilos", 36.418, 27.383], "νισυροσ": ["Mandraki, Nisyros", 36.611, 27.134],
+  "χαλκη δωδεκανησου": ["Emporeio, Chalki", 36.223, 27.613]
+};
+
+function offlineLookup(text, tries) {
+  for (const t of tries) {
+    const sm = SMALL_ISLANDS[fold(t)];
+    if (sm) return { name: sm[0], country: "GR", lat: sm[1], lon: sm[2], tzName: "Europe/Athens", source: "local" };
+  }
+  const idx = loadIndex();
+  const hint = countryHint(text);
+  const seen = new Set();
+  const withIslands = [];
+  for (const t of tries) { withIslands.push(t); const isl = ISLANDS[fold(t)]; if (isl) withIslands.push(isl); }
+  for (const t of withIslands) {
+    const key = fold(t);
+    if (!key || seen.has(key)) continue;
+    seen.add(key);
+    let ids = idx.get(key);
+    if (!ids) continue;
+    let rows = ids.map(i => DATA.rows[i]);
+    if (hint) { const h = rows.filter(r => r[1] === hint); if (h.length) rows = h; }
+    // Χωρίς χώρα: προτιμάμε Ελλάδα και Κύπρο, μετά τη μεγαλύτερη πόλη.
+    rows.sort((a, b) => ((b[1] === "GR" || b[1] === "CY") - (a[1] === "GR" || a[1] === "CY")) || (b[5] - a[5]));
+    const r = rows[0];
+    return { name: r[0], country: r[1], lat: r[2], lon: r[3], tzName: DATA.tz[r[4]], source: "local" };
+  }
+  return null;
 }
 
 const DROP = new Set(["ελλάδα", "ελλαδα", "ελλάς", "greece", "νομός", "νομος", "ν.", "δήμος", "δημος"]);
@@ -155,7 +242,15 @@ async function resolvePlace(pob) {
   for (const t of [...tries]) { const v = simpler(t); if (v !== t) tries.push(v); }
   const uniq = [...new Set(tries.map(t => t.trim()))].filter(t => t.length >= 2 && /^[a-z .'-]+$/i.test(t));
 
-  let found = null;
+  // Πρώτα η δική μας λίστα, με τα ελληνικά ονόματα όπως τα γράφει η πελάτισσα και μετά με λατινικά.
+  const regionless = first.replace(/\s+(νομού|νομου|κρήτης|κρητης|κέρκυρας|ρόδου|ροδου|αττικής|αττικης|μακεδονίας|θράκης|ηπείρου|πελοποννήσου|αιτωλοακαρνανίας)$/i, "");
+  const localTries = [text, first, regionless, ...parts.slice(1), (words.length > 1 && !PREFIX.has(words[0].toLowerCase())) ? words[0] : "", ...uniq];
+  let found = offlineLookup(text, localTries.filter(Boolean));
+  if (found) {
+    if (cache.size > 500) cache.clear();
+    cache.set(key, found);
+    return found;
+  }
   for (const t of uniq) {
     found = await lookup(t);
     if (found) break;
