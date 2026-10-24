@@ -241,6 +241,9 @@
     transition:transform 0.2s ease;
   }
   .fb-strip img:hover{ transform:translateY(-3px); }
+  .fb-card{ text-align:left; background:rgba(255,255,255,0.04); border:1px solid var(--line); border-radius:12px; padding:1rem 1.1rem; box-shadow:0 20px 50px rgba(0,0,0,0.35); }
+  .fb-who{ font-size:0.9rem; color:var(--gold); font-weight:600; margin-bottom:0.35rem; }
+  .fb-what{ font-family:'Cormorant Garamond', serif; font-size:1.3rem; line-height:1.4; color:var(--ink); }
   .fb-note{
     margin:1.4rem auto 0;
     max-width:52ch;
@@ -267,7 +270,7 @@
       scrollbar-width:none;
     }
     .fb-strip::-webkit-scrollbar{ display:none; }
-    .fb-strip img{ flex:0 0 86%; scroll-snap-align:center; }
+    .fb-strip img, .fb-strip .fb-card{ flex:0 0 80%; scroll-snap-align:center; }
     .swipe-hint{ display:block; }
   }
 
@@ -730,12 +733,13 @@
     <h2>Αυτό γράφουν κάτω από τις αναρτήσεις μας</h2>
     <p class="swipe-hint">Σύρε για περισσότερα σχόλια</p>
     <div class="fb-strip">
-      <img src="manteio-sxolia-1.jpg" alt="Σχόλια αναγνωστριών στη σελίδα του Μαντείου στο Facebook" loading="lazy">
-      <img src="manteio-sxolia-2.jpg" alt="Σχόλια αναγνωστριών στη σελίδα του Μαντείου στο Facebook" loading="lazy">
-      <img src="manteio-sxolia-3.jpg" alt="Σχόλια αναγνωστριών στη σελίδα του Μαντείου στο Facebook" loading="lazy">
-      <img src="manteio-sxolia-4.jpg" alt="Σχόλια αναγνωστών στη σελίδα του Μαντείου στο Facebook" loading="lazy">
+      <div class="fb-card"><div class="fb-who">Dimitrios A.</div><div class="fb-what">«Ότι γράφει είναι απλά αλήθεια......!!!»</div></div>
+      <div class="fb-card"><div class="fb-who">Olga K.</div><div class="fb-what">«Αλήθεια κ ικανοποίηση ταυτόχρονα!!!»</div></div>
+      <div class="fb-card"><div class="fb-who">Πέτρος Τ.</div><div class="fb-what">«Είμαι Τοξότης και γίνεται όπως το γράφεις»</div></div>
+      <div class="fb-card"><div class="fb-who">Ελένη Ζ.</div><div class="fb-what">«Ακριβώς έτσι είναι, είμαι μια Αιγόκερως!!!!»</div></div>
+      <div class="fb-card"><div class="fb-who">Lume L.</div><div class="fb-what">«Μπράβο Έτσι ακριβώς είναι ο ζυγός Είμαι ζυγός και το ξέρω»</div></div>
     </div>
-    <p class="fb-note">Πραγματικά σχόλια από τη σελίδα μας στο Facebook. Τα ονόματα συντομεύτηκαν και οι φωτογραφίες θολώθηκαν για την ιδιωτικότητα των αναγνωστών.</p>
+    <p class="fb-note">Πραγματικά σχόλια από τη σελίδα μας στο Facebook, αυτούσια. Φαίνεται μόνο το μικρό όνομα και το αρχικό του επωνύμου.</p>
   </section>
 
   <section class="asked" aria-label="Τι ρωτούν στο Μαντείο">
