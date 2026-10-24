@@ -26,7 +26,9 @@ const PRODUCTS = {
   numerology_q3: { name: "Ο Χρησμός της Αριθμολογίας, 3η ερώτηση", price: 199 },
   taro: { name: "Το Τρίφυλλο Ταρώ", price: 499 },
   taro_q2: { name: "Το Τρίφυλλο Ταρώ — 2η ερώτηση", price: 299 },
-  taro_q3: { name: "Το Τρίφυλλο Ταρώ — 3η ερώτηση", price: 199 }
+  taro_q3: { name: "Το Τρίφυλλο Ταρώ — 3η ερώτηση", price: 199 },
+  xartis: { name: "Ο Γενέθλιος Χάρτης σου, πλήρης ανάλυση", price: 3900 },
+  xartis_plus: { name: "Ο Γενέθλιος Χάρτης σου, πλήρης ανάλυση και πρόβλεψη 12 μηνών", price: 5900 }
 };
 
 // Το Stripe REST API περιμένουν form-urlencoded body με bracket notation για nested δεδομένα
@@ -83,6 +85,13 @@ exports.handler = async function (event) {
       metadata.reading_id = String(reading_id);
     }
 
+    // ΜΟΝΟ για δοκιμή στην προεπισκόπηση (deploy-preview): ο Γενέθλιος Χάρτης χρεώνεται 0,50€, για να
+    // δοκιμαστεί ολόκληρη η ανάλυση με πραγματική πληρωμή. Στο manteio.live η τιμή μένει κανονική.
+    // ΑΦΑΙΡΕΙΤΑΙ πριν ανέβει live.
+    const host = String((event.headers && (event.headers.host || event.headers.Host)) || "");
+    const previewTest = /^deploy-preview-\d+--/.test(host) && /^xartis/.test(tool);
+    const unitAmount = previewTest ? 50 : product.price;
+
     const body = toFormBody({
       mode: "payment",
       success_url: successUrl,
@@ -92,7 +101,7 @@ exports.handler = async function (event) {
           quantity: 1,
           price_data: {
             currency: "eur",
-            unit_amount: product.price,
+            unit_amount: unitAmount,
             product_data: { name: product.name }
           }
         }

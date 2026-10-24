@@ -114,7 +114,11 @@ export async function computeCharts(p) {
     p.dob2 ? safeChart(p.dob2, p.tob2, place2, (x) => { place2 = x; }) : Promise.resolve(null)
   ]);
   console.log(`[place] 1="${p.pob1 || ""}" -> ${place1.label} | 2="${p.pob2 || ""}" -> ${place2.label}`);
-  return { chart1, chart2, tz1: place1.tzName, tz2: place2.tzName, place1: place1.label, place2: place2.label };
+  return {
+    chart1, chart2, tz1: place1.tzName, tz2: place2.tzName, place1: place1.label, place2: place2.label,
+    // Οι συντεταγμένες χρειάζονται για τον χάρτη της ηλιακής επιστροφής (Γενέθλιος Χάρτης).
+    lat1: place1.lat, lon1: place1.lon
+  };
 }
 
 // Χωρίς ώρα γέννησης οι οίκοι και ο Ωροσκόπος βγαίνουν λάθος (υπολογίζονται για τις 12:00),
@@ -452,4 +456,4 @@ export function streamResponse(producer, headers = {}) {
     }
   });
 }
-export { moonChangesSign };
+export { moonChangesSign, zoneOffset };

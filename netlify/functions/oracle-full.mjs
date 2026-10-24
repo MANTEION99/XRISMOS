@@ -6,13 +6,20 @@
 // Απάντηση: { status: "generating" | "done" | "error" | "released" | "redirect", teaser, text, question, data }
 
 import { json, verifyStripeSession, releasePayment } from "../lib/epistrofi-common.mjs";
-import { publicData } from "../lib/oracle-tools.mjs";
+import { publicData, paidToolsFor } from "../lib/oracle-tools.mjs";
 import { oracleStore } from "../lib/oracle-store.mjs";
 
 const STALE_MS = 45 * 1000;
 const MAX_ATTEMPTS = 6;
 
-const paidToolFor = (r) => r.kind === "question" ? `${r.tool}_${r.stage}` : r.tool;
+// Η πληρωμή ελέγχεται για κάθε προϊόν που μπορεί να πληρώνει αυτόν τον χρησμό (π.χ. οι δύο εκδοχές του Γενέθλιου Χάρτη).
+async function verifyAny(sessionId, reading) {
+  for (const tool of paidToolsFor(reading)) {
+    const s = await verifyStripeSession(sessionId, tool, reading.id);
+    if (s) return s;
+  }
+  return null;
+}
 
 export default async (req) => {
   if (req.method !== "POST") return json(405, { error: "Method Not Allowed" });
@@ -36,13 +43,14 @@ export default async (req) => {
   if (reading.released) return json(200, { ...base, status: "released", text: "" });
 
   if (reading.paidSession !== sessionId) {
-    const paid = await verifyStripeSession(sessionId, paidToolFor(reading), readingId);
+    const paid = await verifyAny(sessionId, { ...reading, id: readingId });
     if (!paid) return json(402, { error: "Δεν βρέθηκε έγκυρη πληρωμή για αυτόν τον χρησμό." });
     const pi = paid.payment_intent;
     reading.paymentIntent = pi && (pi.id || pi);
     reading.firstPaidAt = reading.firstPaidAt || Date.now();
     // Η πληρωμή κρατιέται αμέσως, ώστε και η «ανακατεύθυνση» να γνωρίζει την πληρωμή.
     reading.paidSession = sessionId;
+    reading.variant = paid.metadata && paid.metadata.tool;
     await readings.setJSON(readingId, reading);
   }
 
