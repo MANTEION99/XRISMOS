@@ -96,7 +96,7 @@ NATAL_TIME = '<div class="time-note">Η ώρα κάνει την ανάλυση 
 
 COVER_PROOF = (
     '    <div class="cover-proof">\n'
-    '      <p class="cp-title">Αυτά γράφουν για τον Ιάκωβο στο Facebook</p>\n'
+    '      <p class="cp-title">Αυτά γράφουν για το Μαντείο στο Facebook</p>\n'
     '      <div class="cp-strip">\n'
     + "".join(f'        <img src="manteio-sxolia-{i}.jpg" alt="Σχόλια αναγνωστριών στη σελίδα του Μαντείου στο Facebook" loading="lazy" width="1000" height="840">\n' for i in range(1, 5))
     + '      </div>\n    </div>\n')
