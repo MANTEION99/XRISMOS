@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+<meta charset="UTF-8">
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Η συνομιλία σου με Το Μαντείο | Μαντείο</title>
+<meta name="description" content="Η μηνιαία προσωπική συνομιλία των συνδρομητριών με Το Μαντείο, πάνω στον δικό τους γενέθλιο χάρτη και τον πραγματικό ουρανό.">
+<meta name="robots" content="noindex">
+<meta property="og:title" content="Η συνομιλία σου με Το Μαντείο">
+<meta property="og:description" content="Μόνο για τις συνδρομήτριες: η προσωπική σου συνομιλία του μήνα, πάνω στον χάρτη σου.">
+<meta property="og:image" content="https://manteio.live/images/iakovos.jpg">
+<meta property="og:url" content="https://manteio.live/synomilia">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,500&family=Inter:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{ --paper:#F5F1E8; --muted:#9C96AE; --gold:#D9B25C; --gold-deep:#8C6420; --ruby:#B4576B; --line:rgba(217,178,92,0.35); }
+  *{ box-sizing:border-box; }
+  html,body{ height:100%; }
+  body{ margin:0; background:radial-gradient(ellipse at 50% 10%, #1a1730 0%, #0B0A16 65%); background-attachment:fixed; font-family:'Inter',sans-serif; color:var(--paper); }
+  .stars{ position:fixed; inset:0; pointer-events:none; z-index:0; background-image:
+    radial-gradient(1px 1px at 10% 20%, rgba(255,255,255,0.5), transparent), radial-gradient(1px 1px at 80% 15%, rgba(255,255,255,0.4), transparent),
+    radial-gradient(1px 1px at 30% 70%, rgba(255,255,255,0.5), transparent), radial-gradient(1px 1px at 60% 85%, rgba(255,255,255,0.3), transparent),
+    radial-gradient(1px 1px at 90% 60%, rgba(255,255,255,0.4), transparent); }
+  .wrap{ position:relative; z-index:1; max-width:560px; margin:0 auto; min-height:100%; display:flex; flex-direction:column; }
+
+  /* Κεφαλίδα */
+  header{ position:sticky; top:0; z-index:5; display:flex; align-items:center; gap:12px; padding:12px 16px; padding-top:max(12px, env(safe-area-inset-top));
+    background:rgba(11,10,22,0.92); backdrop-filter:blur(8px); border-bottom:1px solid var(--line); }
+  header img{ width:46px; height:46px; border-radius:50%; object-fit:cover; object-position:center top; border:1.5px solid var(--gold); flex-shrink:0; }
+  header .t{ flex:1; min-width:0; }
+  header .t b{ display:block; font-family:'Cormorant Garamond',serif; font-size:21px; color:var(--gold); font-weight:600; letter-spacing:0.5px; }
+  header .t small{ display:block; font-size:11.5px; color:var(--muted); }
+  .count{ font-size:12px; color:var(--gold); border:1px solid var(--line); border-radius:14px; padding:5px 10px; white-space:nowrap; display:none; }
+
+  /* Κάρτες εισόδου */
+  .panel{ margin:28px 16px; border:1.5px solid var(--gold); border-radius:22px; padding:3px; box-shadow:0 0 50px rgba(217,178,92,0.12); display:none; }
+  .panel.show{ display:block; animation:fadein 0.5s ease; }
+  .panel-inner{ border:1px solid rgba(217,178,92,0.5); border-radius:19px; padding:28px 22px 24px; background:linear-gradient(180deg, #14122380, #0B0A1680); }
+  .hero{ width:132px; height:165px; object-fit:cover; object-position:center top; border-radius:12px; border:1px solid var(--gold); display:block; margin:0 auto 18px;
+    box-shadow:0 0 0 4px rgba(217,178,92,0.08), 0 18px 40px rgba(0,0,0,0.45); }
+  .eyebrow{ text-align:center; letter-spacing:3px; font-size:11.5px; color:var(--gold); text-transform:uppercase; margin-bottom:8px; }
+  h1{ font-family:'Cormorant Garamond',serif; font-weight:600; text-align:center; font-size:26px; line-height:1.2; margin:0 0 12px; color:var(--gold); text-transform:uppercase; }
+  p.sub{ font-size:14.5px; line-height:1.65; color:var(--muted); margin:0 0 20px; text-align:center; }
+  .field{ margin-bottom:14px; }
+  .field label{ display:block; font-size:12.5px; color:var(--gold); margin-bottom:6px; }
+  .field input{ width:100%; background:rgba(255,255,255,0.03); border:1px solid var(--line); border-radius:9px; padding:12px 13px; color:var(--paper); font-size:16px; font-family:'Inter',sans-serif; color-scheme:dark; }
+  .field input.code{ text-align:center; letter-spacing:6px; font-size:22px; text-transform:uppercase; }
+  .field input:focus{ outline:none; border-color:var(--gold); }
+  .hint{ font-size:12px; color:var(--muted); margin-top:5px; line-height:1.5; }
+  .error{ color:var(--ruby); font-size:13.5px; margin:4px 0 12px; display:none; line-height:1.5; }
+  button.submit{ width:100%; padding:15px; margin-top:4px; background:linear-gradient(135deg, var(--gold), var(--gold-deep)); color:#241A08; border:none; border-radius:9px;
+    font-family:'Cormorant Garamond',serif; font-weight:600; font-size:19px; cursor:pointer; }
+  button.submit:disabled{ opacity:0.55; }
+  .small{ font-size:12px; color:var(--muted); text-align:center; line-height:1.6; margin-top:16px; }
+  .small a{ color:var(--gold); }
+
+  /* Συνομιλία */
+  #chat{ flex:1; display:none; flex-direction:column; }
+  #chat.show{ display:flex; }
+  .msgs{ flex:1; padding:16px 14px 8px; }
+  .disclose{ font-size:12px; color:var(--muted); text-align:center; line-height:1.55; margin:4px 10px 16px; }
+  .chips{ display:flex; gap:6px; justify-content:center; flex-wrap:wrap; margin:0 0 16px; }
+  .chips span{ font-size:12px; border:1px solid var(--line); border-radius:14px; padding:5px 10px; color:var(--paper); }
+  .chips span em{ font-style:normal; color:var(--muted); }
+  .m{ display:flex; gap:9px; margin:0 0 14px; animation:fadein 0.4s ease; }
+  .m .av{ width:30px; height:30px; border-radius:50%; object-fit:cover; object-position:center top; border:1px solid var(--gold); flex-shrink:0; margin-top:2px; }
+  .m .b{ max-width:86%; padding:12px 14px; border-radius:16px; font-size:15.5px; line-height:1.65; white-space:pre-wrap; word-wrap:break-word; }
+  .m.oracle .b{ background:rgba(217,178,92,0.07); border:1px solid rgba(217,178,92,0.28); border-top-left-radius:4px; }
+  .m.user{ justify-content:flex-end; }
+  .m.user .b{ background:linear-gradient(135deg, rgba(217,178,92,0.92), rgba(140,100,32,0.92)); color:#1e1606; border-top-right-radius:4px; }
+  .typing{ display:inline-flex; gap:4px; padding:4px 2px; }
+  .typing i{ width:7px; height:7px; border-radius:50%; background:var(--gold); opacity:0.3; animation:blink 1.2s infinite; }
+  .typing i:nth-child(2){ animation-delay:0.2s; } .typing i:nth-child(3){ animation-delay:0.4s; }
+  @keyframes blink{ 0%,100%{ opacity:0.25; } 50%{ opacity:1; } }
+  .retry{ display:block; margin:0 auto 14px; padding:10px 22px; border:1px solid var(--gold); border-radius:20px; color:var(--gold); background:transparent; font-size:14px; cursor:pointer; }
+  .composer{ position:sticky; bottom:0; display:flex; gap:8px; align-items:flex-end; padding:10px 12px; padding-bottom:max(10px, env(safe-area-inset-bottom));
+    background:rgba(11,10,22,0.95); border-top:1px solid var(--line); }
+  .composer textarea{ flex:1; resize:none; max-height:140px; min-height:46px; background:rgba(255,255,255,0.04); border:1px solid var(--line); border-radius:14px;
+    padding:12px 13px; color:var(--paper); font-size:16px; font-family:'Inter',sans-serif; line-height:1.4; }
+  .composer textarea:focus{ outline:none; border-color:var(--gold); }
+  .composer button{ width:46px; height:46px; border-radius:50%; border:none; background:linear-gradient(135deg, var(--gold), var(--gold-deep)); color:#241A08; font-size:20px; cursor:pointer; flex-shrink:0; }
+  .composer button:disabled{ opacity:0.45; }
+  .ended{ text-align:center; padding:16px 18px 22px; font-size:14px; line-height:1.6; color:var(--muted); border-top:1px solid var(--line); display:none; }
+  .ended b{ color:var(--gold); font-family:'Cormorant Garamond',serif; font-size:19px; display:block; margin-bottom:4px; }
+  @keyframes fadein{ from{ opacity:0; transform:translateY(6px); } to{ opacity:1; transform:none; } }
+</style>
+</head>
+<body>
+<div class="stars"></div>
+<div class="wrap">
+  <header>
+    <img src="/images/iakovos.jpg" alt="Το Μαντείο">
+    <div class="t"><b>Το Μαντείο</b><small>Η προσωπική σου συνομιλία του μήνα</small></div>
+    <div class="count" id="count"></div>
+  </header>
+
+  <!-- 1. Κωδικός -->
+  <div class="panel" id="pCode"><div class="panel-inner">
+    <img class="hero" src="/images/iakovos.jpg" alt="Το Μαντείο">
+    <div class="eyebrow">Μόνο για συνδρομήτριες</div>
+    <h1>Η συνομιλία σου με Το Μαντείο</h1>
+    <p class="sub">Κάθε μήνα έχεις μια προσωπική συνομιλία με Το Μαντείο, πάνω στον δικό σου γενέθλιο χάρτη και τον πραγματικό ουρανό των επόμενων μηνών. Γράψε τον κωδικό που σου στείλαμε στο Messenger.</p>
+    <form id="fCode" novalidate>
+      <div class="field"><input class="code" id="code" type="text" maxlength="12" autocomplete="off" autocapitalize="characters" placeholder="ΚΩΔΙΚΟΣ"></div>
+      <div class="error" id="eCode"></div>
+      <button class="submit" id="bCode" type="submit">Μπαίνω</button>
+    </form>
+    <div class="small">Δεν έχεις κωδικό; Η συνομιλία είναι προνόμιο των συνδρομητριών της σελίδας μας στο Facebook. Αν είσαι ήδη συνδρομήτρια, στείλε μας μήνυμα στο Messenger.<br><br>Το Μαντείο είναι τεχνητή νοημοσύνη. Ο Ιάκωβος είναι το πρόσωπο της σελίδας.<br><a href="/oroskopos">Βρες δωρεάν τον Ωροσκόπο σου</a></div>
+  </div></div>
+
+  <!-- 2. Στοιχεία γέννησης -->
+  <div class="panel" id="pProfile"><div class="panel-inner">
+    <div class="eyebrow" id="hello">Καλώς ήρθες</div>
+    <h1>Ο χάρτης σου</h1>
+    <p class="sub">Για να σου μιλήσει Το Μαντείο με ακρίβεια, χρειάζεται τη στιγμή που γεννήθηκες. Τα στοιχεία κλειδώνουν για αυτή τη συνομιλία, γι' αυτό έλεγξέ τα πριν συνεχίσεις.</p>
+    <form id="fProfile" novalidate>
+      <div class="field"><label for="name">Το όνομά σου</label><input id="name" type="text" maxlength="40" autocomplete="given-name"></div>
+      <div class="field"><label for="dob">Ημερομηνία γέννησης</label><input id="dob" type="date" min="1920-01-01" max="2010-12-31"></div>
+      <div class="field"><label for="tob">Ώρα γέννησης</label><input id="tob" type="time">
+        <div class="hint">Αν δεν την ξέρεις, άφησέ την κενή. Με την ώρα όμως Το Μαντείο βλέπει και τον Ωροσκόπο και τους οίκους, δηλαδή σε ποιον τομέα της ζωής σου πέφτει κάθε κίνηση του ουρανού.</div></div>
+      <div class="field"><label for="pob">Τόπος γέννησης</label><input id="pob" type="text" maxlength="80" placeholder="π.χ. Λάρισα" autocomplete="off"></div>
+      <div class="error" id="eProfile"></div>
+      <button class="submit" id="bProfile" type="submit">Ξεκινά η συνομιλία</button>
+    </form>
+  </div></div>
+
+  <!-- 3. Συνομιλία -->
+  <div id="chat">
+    <div class="msgs" id="msgs">
+      <div class="disclose">Μιλάς με Το Μαντείο, μια τεχνητή νοημοσύνη που διαβάζει τον πραγματικό σου χάρτη και τις πραγματικές κινήσεις των πλανητών. Δεν απαντά σε θέματα υγείας, νομικά ή επενδύσεων.</div>
+      <div class="chips" id="chips"></div>
+      <div id="list"></div>
+    </div>
+    <div class="ended" id="ended"><b>Η συνομιλία του μήνα ολοκληρώθηκε</b>Ο ουρανός αλλάζει κάθε μήνα. Με τον κωδικό του επόμενου μήνα τα ξαναλέμε.</div>
+    <form class="composer" id="fAsk">
+      <textarea id="q" rows="1" maxlength="500" placeholder="Γράψε την ερώτησή σου..."></textarea>
+      <button id="bAsk" type="submit" aria-label="Αποστολή">➤</button>
+    </form>
+  </div>
+</div>
+
+<script>
+const $ = (id) => document.getElementById(id);
+const KEY = "manteio-synomilia-code";
+let code = "";
+let state = null;
+let pollTimer = null;
+
+function store(v) { try { v ? localStorage.setItem(KEY, v) : localStorage.removeItem(KEY); } catch {} }
+function stored() { try { return localStorage.getItem(KEY) || ""; } catch { return ""; } }
+
+async function api(body) {
+  const r = await fetch("/api/synomilia", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ code, ...body }) });
+  let d = {};
+  try { d = await r.json(); } catch {}
+  if (!r.ok) { const e = new Error(d.error || "Κάτι πήγε στραβά. Δοκίμασε ξανά."); e.status = r.status; throw e; }
+  return d;
+}
+
+function showPanel(id) {
+  ["pCode", "pProfile"].forEach(p => $(p).classList.toggle("show", p === id));
+  $("chat").classList.toggle("show", id === "chat");
+}
+
+function err(el, m) { $(el).textContent = m || ""; $(el).style.display = m ? "block" : "none"; }
+
+function render(d) {
+  state = d;
+  if (!d.profile) {
+    showPanel("pProfile");
+    $("hello").textContent = d.name ? "Καλώς ήρθες, " + d.name.split(" ")[0] : "Καλώς ήρθες";
+    if (!$("name").value && d.name) $("name").value = d.name.split(" ")[0];
+    return;
+  }
+  showPanel("chat");
+  const c = $("count");
+  c.style.display = "block";
+  c.textContent = `Ερωτήσεις ${d.used} από ${d.max}`;
+
+  const chips = [];
+  if (d.big3) {
+    if (d.big3.sun) chips.push(`<span><em>Ήλιος</em> ${d.big3.sun}</span>`);
+    if (d.big3.moon) chips.push(`<span><em>Σελήνη</em> ${d.big3.moon}</span>`);
+    if (d.big3.asc) chips.push(`<span><em>Ωροσκόπος</em> ${d.big3.asc}</span>`);
+  }
+  $("chips").innerHTML = chips.join("");
+
+  const list = $("list");
+  list.innerHTML = "";
+  for (const m of d.messages) list.appendChild(bubble(m.role, m.text));
+  if (d.pending) list.appendChild(bubble("oracle", d.partial, true));
+  if (d.error) {
+    const b = document.createElement("button");
+    b.className = "retry"; b.type = "button"; b.textContent = "Ξαναδοκίμασε";
+    b.onclick = async () => { b.disabled = true; try { render(await api({ action: "retry" })); schedule(); } catch (x) { alert(x.message); b.disabled = false; } };
+    const note = bubble("oracle", d.error);
+    list.appendChild(note); list.appendChild(b);
+  }
+
+  const closed = d.done;
+  $("ended").style.display = closed ? "block" : "none";
+  $("fAsk").style.display = closed ? "none" : "flex";
+  $("bAsk").disabled = d.pending;
+  $("q").placeholder = d.pending ? "Το Μαντείο γράφει..." : "Γράψε την ερώτησή σου...";
+  window.scrollTo({ top: document.body.scrollHeight, behavior: "smooth" });
+}
+
+function bubble(role, text, typing) {
+  const m = document.createElement("div");
+  m.className = "m " + (role === "user" ? "user" : "oracle");
+  if (role !== "user") {
+    const av = document.createElement("img");
+    av.className = "av"; av.src = "/images/iakovos.jpg"; av.alt = "";
+    m.appendChild(av);
+  }
+  const b = document.createElement("div");
+  b.className = "b";
+  b.textContent = text || "";
+  if (typing) {
+    const t = document.createElement("span");
+    t.className = "typing"; t.innerHTML = "<i></i><i></i><i></i>";
+    if (text) b.appendChild(document.createTextNode(" "));
+    b.appendChild(t);
+  }
+  m.appendChild(b);
+  return m;
+}
+
+function schedule() {
+  clearTimeout(pollTimer);
+  if (!state || !state.pending) return;
+  pollTimer = setTimeout(async () => {
+    try { render(await api({ action: "poll" })); } catch {}
+    schedule();
+  }, 1500);
+}
+
+async function enter(c) {
+  code = c;
+  const d = await api({ action: "open" });
+  store(code);
+  render(d);
+  schedule();
+}
+
+$("fCode").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  err("eCode");
+  const c = $("code").value.trim();
+  if (c.length < 4) return err("eCode", "Γράψε τον κωδικό σου.");
+  $("bCode").disabled = true;
+  try { await enter(c); } catch (x) { err("eCode", x.message); }
+  $("bCode").disabled = false;
+});
+
+$("fProfile").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  err("eProfile");
+  const body = { action: "profile", name: $("name").value.trim(), dob: $("dob").value, tob: $("tob").value, pob: $("pob").value.trim() };
+  if (body.name.length < 2) return err("eProfile", "Γράψε το όνομά σου.");
+  if (!body.dob) return err("eProfile", "Γράψε την ημερομηνία γέννησης.");
+  if (body.pob.length < 2) return err("eProfile", "Γράψε τον τόπο γέννησης.");
+  $("bProfile").disabled = true; $("bProfile").textContent = "Το Μαντείο ανοίγει τον χάρτη σου...";
+  try { render(await api(body)); schedule(); }
+  catch (x) { err("eProfile", x.message); }
+  $("bProfile").disabled = false; $("bProfile").textContent = "Ξεκινά η συνομιλία";
+});
+
+$("fAsk").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const text = $("q").value.trim();
+  if (text.length < 3 || (state && state.pending)) return;
+  $("bAsk").disabled = true;
+  $("list").appendChild(bubble("user", text));
+  $("list").appendChild(bubble("oracle", "", true));
+  $("q").value = ""; grow();
+  window.scrollTo({ top: document.body.scrollHeight, behavior: "smooth" });
+  try { render(await api({ action: "ask", text })); schedule(); }
+  catch (x) { $("q").value = text; alert(x.message); try { render(await api({ action: "poll" })); } catch {} }
+});
+
+const grow = () => { const t = $("q"); t.style.height = "auto"; t.style.height = Math.min(t.scrollHeight, 140) + "px"; };
+$("q").addEventListener("input", grow);
+$("q").addEventListener("keydown", (e) => { if (e.key === "Enter" && !e.shiftKey && window.matchMedia("(min-width: 700px)").matches) { e.preventDefault(); $("fAsk").requestSubmit(); } });
+
+(async () => {
+  const fromUrl = new URLSearchParams(location.search).get("k");
+  const c = fromUrl || stored();
+  if (c) {
+    $("code").value = c;
+    try { await enter(c); return; } catch (x) { store(""); err("eCode", x.message); }
+  }
+  showPanel("pCode");
+})();
+</script>
+</body>
+</html>

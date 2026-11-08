@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+<meta charset="UTF-8">
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Βρες τον Ωροσκόπο σου δωρεάν | Μαντείο</title>
+<meta name="description" content="Γράψε ημερομηνία, ώρα και τόπο γέννησης και Το Μαντείο υπολογίζει με ακρίβεια τον Ωροσκόπο σου, τον Ήλιο και τη Σελήνη σου. Δωρεάν, για όλους.">
+<meta property="og:title" content="Βρες τον Ωροσκόπο σου δωρεάν | Μαντείο">
+<meta property="og:description" content="Το ζώδιό σου λέει ποιος είσαι. Ο Ωροσκόπος λέει πώς σε βλέπει ο κόσμος. Υπολόγισέ τον με ακρίβεια, δωρεάν.">
+<meta property="og:image" content="https://manteio.live/images/iakovos.jpg">
+<meta property="og:url" content="https://manteio.live/oroskopos">
+<meta property="og:type" content="website">
+<meta property="og:locale" content="el_GR">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,500&family=Inter:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{ --navy:#0B0A16; --paper:#F5F1E8; --muted:#9C96AE; --gold:#D9B25C; --gold-deep:#8C6420; --ruby:#B4576B; --line:rgba(217,178,92,0.35); }
+  *{ box-sizing:border-box; }
+  body{ margin:0; background:radial-gradient(ellipse at 50% 20%, #1a1730 0%, #0B0A16 65%); font-family:'Inter',sans-serif; color:var(--paper);
+    min-height:100vh; display:flex; align-items:flex-start; justify-content:center; padding:32px 16px 48px; overflow-x:hidden; }
+  .stars{ position:fixed; inset:0; pointer-events:none; z-index:0; background-image:
+    radial-gradient(1px 1px at 10% 20%, rgba(255,255,255,0.5), transparent), radial-gradient(1px 1px at 80% 15%, rgba(255,255,255,0.4), transparent),
+    radial-gradient(1px 1px at 30% 70%, rgba(255,255,255,0.5), transparent), radial-gradient(1px 1px at 60% 85%, rgba(255,255,255,0.3), transparent),
+    radial-gradient(1px 1px at 90% 60%, rgba(255,255,255,0.4), transparent), radial-gradient(1px 1px at 45% 35%, rgba(255,255,255,0.4), transparent); }
+  .card{ max-width:460px; width:100%; position:relative; z-index:1; border:1.5px solid var(--gold); border-radius:22px; padding:3px; box-shadow:0 0 50px rgba(217,178,92,0.12); }
+  .card-inner{ border:1px solid rgba(217,178,92,0.5); border-radius:19px; padding:30px 24px 28px; background:linear-gradient(180deg, #14122380, #0B0A1680); }
+  .eyebrow{ text-align:center; letter-spacing:3px; font-size:12px; color:var(--gold); text-transform:uppercase; margin-bottom:10px; }
+  h1{ font-family:'Cormorant Garamond',serif; font-weight:600; text-align:center; font-size:28px; line-height:1.2; margin:0 0 14px; color:var(--gold); text-transform:uppercase; letter-spacing:0.5px; }
+  p.sub{ font-size:14.5px; line-height:1.65; color:var(--muted); margin:0 0 22px; text-align:center; }
+  .field{ margin-bottom:15px; }
+  .field label{ display:block; font-size:12.5px; color:var(--gold); letter-spacing:0.5px; margin-bottom:6px; }
+  .field input{ width:100%; background:rgba(255,255,255,0.03); border:1px solid var(--line); border-radius:9px; padding:12px 13px; color:var(--paper); font-size:16px; font-family:'Inter',sans-serif; color-scheme:dark; }
+  .field input:focus{ outline:none; border-color:var(--gold); }
+  .hint{ font-size:12px; color:var(--muted); margin-top:5px; line-height:1.5; }
+  .error{ color:var(--ruby); font-size:13.5px; margin:4px 0 12px; display:none; }
+  button.submit{ width:100%; padding:15px; margin-top:6px; background:linear-gradient(135deg, var(--gold), var(--gold-deep)); color:#241A08; border:none; border-radius:9px;
+    font-family:'Cormorant Garamond',serif; font-weight:600; font-size:19px; letter-spacing:0.5px; cursor:pointer; }
+  button.submit:disabled{ opacity:0.55; }
+  .result{ display:none; text-align:center; animation:fadein 0.6s ease; }
+  .result.show{ display:block; }
+  .glyph{ width:110px; height:110px; margin:6px auto 12px; border-radius:50%; display:flex; align-items:center; justify-content:center;
+    font-size:58px; color:#2a1c06; background:radial-gradient(circle at 35% 30%, #f3d98b, #b8862f 60%, #6d4a14);
+    box-shadow:0 0 26px rgba(232,192,104,0.55), 0 0 70px rgba(232,192,104,0.22); font-family:'Segoe UI Symbol','Noto Sans Symbols2','DejaVu Sans',sans-serif; }
+  .asc-label{ letter-spacing:3px; font-size:12px; color:var(--gold); text-transform:uppercase; }
+  .asc-sign{ font-family:'Cormorant Garamond',serif; font-weight:600; font-size:40px; color:var(--gold); margin:4px 0 2px; text-transform:uppercase; }
+  .asc-deg{ font-size:13px; color:var(--muted); margin-bottom:18px; }
+  .big3{ display:flex; gap:8px; justify-content:center; margin:0 0 20px; }
+  .big3 div{ flex:1; border:1px solid var(--line); border-radius:12px; padding:10px 6px; }
+  .big3 small{ display:block; font-size:11px; color:var(--muted); letter-spacing:1px; text-transform:uppercase; margin-bottom:4px; }
+  .big3 b{ font-family:'Cormorant Garamond',serif; font-size:19px; color:var(--paper); font-weight:600; }
+  .meaning{ text-align:left; font-size:15px; line-height:1.7; color:var(--paper); margin:0 0 16px; }
+  .note{ text-align:left; font-size:13px; line-height:1.6; color:var(--muted); border-left:2px solid var(--gold); padding:4px 0 4px 12px; margin:0 0 18px; }
+  .place-line{ font-size:12px; color:var(--muted); margin:0 0 18px; }
+  .cta{ border:1px solid var(--line); border-radius:14px; padding:18px 16px; margin-top:8px; text-align:center; background:rgba(217,178,92,0.04); }
+  .cta h3{ font-family:'Cormorant Garamond',serif; font-size:21px; color:var(--gold); margin:0 0 8px; font-weight:600; }
+  .cta p{ font-size:14px; line-height:1.6; color:var(--muted); margin:0 0 14px; }
+  .btn{ display:inline-block; padding:12px 26px; border:1px solid var(--gold); border-radius:24px; color:var(--gold); text-decoration:none;
+    font-family:'Cormorant Garamond',serif; font-size:17px; letter-spacing:1px; background:transparent; cursor:pointer; }
+  .btn.solid{ background:linear-gradient(135deg, var(--gold), var(--gold-deep)); color:#241A08; border:none; font-weight:600; }
+  .row{ display:flex; gap:10px; justify-content:center; flex-wrap:wrap; margin:6px 0 18px; }
+  .what{ margin-top:24px; font-size:13.5px; line-height:1.65; color:var(--muted); }
+  .what b{ color:var(--gold); font-weight:500; }
+  .spinner{ width:26px; height:26px; margin:16px auto; border:2px solid var(--line); border-top-color:var(--gold); border-radius:50%; animation:spin 1s linear infinite; display:none; }
+  @keyframes spin{ to{ transform:rotate(360deg); } }
+  @keyframes fadein{ from{ opacity:0; transform:translateY(8px); } to{ opacity:1; transform:none; } }
+  footer{ text-align:center; font-size:11.5px; color:var(--muted); margin-top:22px; }
+  footer a{ color:var(--muted); }
+</style>
+</head>
+<body>
+<div class="stars"></div>
+<div class="card"><div class="card-inner">
+
+  <div id="formBox">
+    <div class="eyebrow">Δωρεάν εργαλείο</div>
+    <h1>Βρες τον Ωροσκόπο σου</h1>
+    <p class="sub">Το ζώδιό σου λέει ποια είσαι. Ο Ωροσκόπος λέει πώς σε βλέπει ο κόσμος από την πρώτη ματιά. Γράψε τα στοιχεία της γέννησής σου και Το Μαντείο τον υπολογίζει με ακρίβεια λεπτού.</p>
+
+    <form id="f" novalidate>
+      <div class="field"><label for="dob">Ημερομηνία γέννησης</label><input id="dob" type="date" min="1920-01-01" max="2015-12-31" required></div>
+      <div class="field"><label for="tob">Ώρα γέννησης</label><input id="tob" type="time" required>
+        <div class="hint">Όσο πιο ακριβής η ώρα, τόσο πιο σίγουρο το αποτέλεσμα. Θα τη βρεις στη ληξιαρχική πράξη γέννησης.</div></div>
+      <div class="field"><label for="pob">Τόπος γέννησης</label><input id="pob" type="text" placeholder="π.χ. Λάρισα" autocomplete="off" required></div>
+      <div class="error" id="err"></div>
+      <button class="submit" id="go" type="submit">Υπολόγισε τον Ωροσκόπο μου</button>
+      <div class="spinner" id="spin"></div>
+    </form>
+
+    <div class="what"><b>Τι είναι ο Ωροσκόπος;</b> Είναι το ζώδιο που ανέτειλε στον ανατολικό ορίζοντα τη στιγμή ακριβώς που γεννήθηκες. Αλλάζει περίπου κάθε δύο ώρες, γι' αυτό δύο άνθρωποι με την ίδια μέρα γέννησης μπορεί να έχουν τελείως διαφορετικό Ωροσκόπο. Είναι το πρόσωπό σου προς τα έξω, η πρώτη εντύπωση και ο τρόπος που ξεκινάς κάθε τι καινούριο.</div>
+  </div>
+
+  <div class="result" id="res">
+    <div class="asc-label">Ο Ωροσκόπος σου είναι</div>
+    <div class="glyph" id="rGlyph"></div>
+    <div class="asc-sign" id="rSign"></div>
+    <div class="asc-deg" id="rDeg"></div>
+    <div class="big3">
+      <div><small>Ήλιος</small><b id="rSun"></b></div>
+      <div><small>Σελήνη</small><b id="rMoon"></b></div>
+      <div><small>Μεσουράνημα</small><b id="rMc"></b></div>
+    </div>
+    <p class="meaning" id="rText"></p>
+    <div class="note" id="rNear" style="display:none"></div>
+    <div class="place-line" id="rPlace"></div>
+    <div class="row">
+      <button class="btn" id="share" type="button">Στείλ' το σε φίλη</button>
+      <button class="btn" id="again" type="button">Νέος υπολογισμός</button>
+    </div>
+    <div class="cta">
+      <h3>Αυτό είναι μόνο η πόρτα</h3>
+      <p>Ο Ωροσκόπος είναι ένα από τα σημεία του χάρτη σου. Στον Γενέθλιο Χάρτη Το Μαντείο διαβάζει όλο τον ουρανό της γέννησής σου: πώς αγαπάς, τι δουλειά σε γεμίζει, πού βρίσκεται η τύχη σου.</p>
+      <a class="btn solid" href="/xartis">Δες τον Γενέθλιο Χάρτη σου</a>
+    </div>
+    <div class="cta">
+      <h3>Είσαι συνδρομήτρια της σελίδας;</h3>
+      <p>Κάθε μήνα έχεις τη δική σου προσωπική συνομιλία με Το Μαντείο, πάνω στον χάρτη σου.</p>
+      <a class="btn" href="/synomilia">Μπες στη συνομιλία σου</a>
+    </div>
+  </div>
+
+  <footer>Το Μαντείο είναι τεχνητή νοημοσύνη. Ο υπολογισμός γίνεται με αστρονομικά δεδομένα, τροπικό ζωδιακό. <a href="/">manteio.live</a></footer>
+</div></div>
+
+<script>
+const GLYPH = { Aries:"♈", Taurus:"♉", Gemini:"♊", Cancer:"♋", Leo:"♌", Virgo:"♍", Libra:"♎", Scorpio:"♏", Sagittarius:"♐", Capricorn:"♑", Aquarius:"♒", Pisces:"♓" };
+const ASC_TEXT = {
+  Aries: "Μπαίνεις σε ένα δωμάτιο και ο κόσμος σε νιώθει πριν σε δει. Δείχνεις αποφασιστική, γρήγορη, έτοιμη να κινηθείς. Οι άλλοι σε βλέπουν δυνατή, ακόμα κι όταν μέσα σου διστάζεις. Το ξεκίνημα είναι το χάρισμά σου: εσύ ανοίγεις τον δρόμο και οι άλλοι ακολουθούν.",
+  Taurus: "Η πρώτη εντύπωση που αφήνεις είναι ηρεμία και σιγουριά. Δείχνεις άνθρωπος που δεν βιάζεται και δεν παρασύρεται, και αυτό εμπνέει εμπιστοσύνη. Σε βλέπουν ζεστή, γήινη, με γούστο. Δεν αλλάζεις εύκολα γνώμη, και όταν δίνεις τον λόγο σου τον κρατάς.",
+  Gemini: "Ο κόσμος σε γνωρίζει από τη ματιά και την κουβέντα σου. Δείχνεις ζωηρή, περίεργη, πάντα με μια ερώτηση έτοιμη. Πιάνεις κουβέντα με όλους και μοιάζεις νεότερη από την ηλικία σου. Το μυαλό σου τρέχει γρήγορα, και οι άλλοι σε θυμούνται για το πνεύμα σου.",
+  Cancer: "Δείχνεις τρυφερή και προσιτή, άνθρωπος που σε κάνει να νιώθεις σαν στο σπίτι σου. Οι άλλοι σε εμπιστεύονται γρήγορα και σου λένε πράγματα που δεν λένε αλλού. Πίσω από την ευγένεια όμως υπάρχει ένα προστατευτικό καβούκι. Ανοίγεσαι μόνο όταν νιώσεις ασφαλής.",
+  Leo: "Δεν περνάς απαρατήρητη. Ακόμα κι όταν σωπαίνεις, έχεις παρουσία και ζεστασιά που τραβά τα βλέμματα. Οι άλλοι σε βλέπουν περήφανη, γενναιόδωρη, με αξιοπρέπεια. Θέλεις να σε σέβονται, και όταν σε εκτιμούν δίνεις τα πάντα.",
+  Virgo: "Η πρώτη εντύπωση που δίνεις είναι προσεγμένη, σεμνή και έξυπνη. Ο κόσμος σε βλέπει άνθρωπο που προσέχει τη λεπτομέρεια και ξέρει τι λέει. Βοηθάς χωρίς να το διαφημίζεις. Δείχνεις συγκρατημένη στην αρχή, αλλά όποιος σε γνωρίσει βρίσκει μεγάλη καρδιά.",
+  Libra: "Έχεις χάρη και ευγένεια που αφοπλίζουν. Ο κόσμος σε βλέπει γλυκιά, κοινωνική, με αίσθηση του ωραίου. Ξέρεις να ηρεμείς τα πνεύματα και να βρίσκεις τη μέση λύση. Το δύσκολο για σένα είναι να πεις όχι χωρίς να νιώσεις ότι πληγώνεις.",
+  Scorpio: "Η ματιά σου διαπερνά. Οι άλλοι νιώθουν ότι καταλαβαίνεις περισσότερα απ' όσα λες, και συνήθως έχουν δίκιο. Δείχνεις μυστηριακή, δυνατή, με βάθος. Δεν εμπιστεύεσαι εύκολα, αλλά όταν δεθείς είσαι πιστή μέχρι το τέλος.",
+  Sagittarius: "Φέρνεις φως και αισιοδοξία όπου μπαίνεις. Ο κόσμος σε βλέπει ανοιχτή, ειλικρινή, με χιούμορ και δίψα για ζωή. Λες αυτό που σκέφτεσαι, και αυτό άλλοτε γοητεύει και άλλοτε ξαφνιάζει. Χρειάζεσαι ελευθερία και ορίζοντα για να ανθίσεις.",
+  Capricorn: "Δείχνεις σοβαρή, ώριμη και αξιόπιστη από την πρώτη στιγμή. Ο κόσμος σε βλέπει άνθρωπο που τα βγάζει πέρα μόνος του. Συχνά σου αναθέτουν ευθύνες πριν καν τις ζητήσεις. Με τα χρόνια μαλακώνεις και γίνεσαι πιο ανάλαφρη απ' ό,τι ήσουν στα νιάτα σου.",
+  Aquarius: "Έχεις κάτι διαφορετικό που δεν μπαίνει σε καλούπι. Ο κόσμος σε βλέπει φιλική αλλά ανεξάρτητη, με δικές σου ιδέες. Είσαι ίδια με όλους, χωρίς να κάνεις διακρίσεις. Δένεσαι με τον τρόπο σου, και χρειάζεσαι χώρο για να μείνεις κοντά.",
+  Pisces: "Δείχνεις ονειροπόλα, ευαίσθητη, με μια γλυκύτητα που αγγίζει. Ο κόσμος σε νιώθει πριν σε ακούσει, και συχνά σου ανοίγει την καρδιά του. Πιάνεις τη διάθεση ενός χώρου αμέσως. Πρέπει να προσέχεις να μην απορροφάς τον πόνο των άλλων σαν να ήταν δικός σου."
+};
+
+const $ = (id) => document.getElementById(id);
+let last = null;
+
+$("f").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const err = $("err"); err.style.display = "none";
+  const body = { dob: $("dob").value, tob: $("tob").value, pob: $("pob").value.trim() };
+  if (!body.dob) return showErr("Γράψε την ημερομηνία γέννησης.");
+  if (!body.tob) return showErr("Ο Ωροσκόπος χρειάζεται την ώρα γέννησης.");
+  if (body.pob.length < 2) return showErr("Γράψε τον τόπο γέννησης.");
+  $("go").disabled = true; $("spin").style.display = "block";
+  try {
+    const r = await fetch("/api/oroskopos", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
+    const d = await r.json();
+    if (!r.ok) throw new Error(d.error || "Κάτι πήγε στραβά.");
+    show(d);
+  } catch (x) {
+    showErr(x.message || "Κάτι πήγε στραβά. Δοκίμασε ξανά.");
+  } finally {
+    $("go").disabled = false; $("spin").style.display = "none";
+  }
+});
+
+function showErr(m) { const err = $("err"); err.textContent = m; err.style.display = "block"; }
+
+function show(d) {
+  last = d;
+  $("rGlyph").textContent = GLYPH[d.asc.key] || "";
+  $("rSign").textContent = d.asc.sign;
+  $("rDeg").textContent = `στις ${d.asc.deg}° και ${d.asc.min}′ του ζωδίου`;
+  $("rSun").textContent = d.sun;
+  $("rMoon").textContent = d.moon;
+  $("rMc").textContent = d.mc;
+  $("rText").textContent = ASC_TEXT[d.asc.key] || "";
+  $("rPlace").textContent = "Τόπος υπολογισμού: " + d.place;
+  if (d.near) {
+    $("rNear").style.display = "block";
+    $("rNear").textContent = `Ο Ωροσκόπος σου είναι πολύ κοντά στην αλλαγή ζωδίου. Αν η ώρα γέννησής σου διαφέρει ένα τέταρτο από αυτή που έγραψες, μπορεί να είναι ${d.near}. Έλεγξε την ώρα στη ληξιαρχική πράξη.`;
+  } else $("rNear").style.display = "none";
+  $("formBox").style.display = "none";
+  $("res").classList.add("show");
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}
+
+$("again").addEventListener("click", () => { $("res").classList.remove("show"); $("formBox").style.display = "block"; });
+$("share").addEventListener("click", async () => {
+  const text = last ? `Ο Ωροσκόπος μου είναι ${last.asc.sign}! Βρες κι εσύ τον δικό σου δωρεάν:` : "Βρες τον Ωροσκόπο σου δωρεάν:";
+  const url = "https://manteio.live/oroskopos";
+  if (navigator.share) { try { await navigator.share({ title: "Ο Ωροσκόπος μου", text, url }); } catch {} return; }
+  try { await navigator.clipboard.writeText(text + " " + url); $("share").textContent = "Αντιγράφηκε!"; } catch {}
+});
+</script>
+</body>
+</html>

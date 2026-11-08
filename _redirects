@@ -8,6 +8,9 @@
 /arithmologia   /numerology-tool-agora.html    200
 /taro           /taro-tool-agora.html          200
 /xartis         /xartis-tool-agora.html        200
+/oroskopos      /oroskopos.html                200
+/synomilia      /synomilia.html                200
+/synomilia-admin /synomilia-admin.html         200
 
 # Οι παλιές δωρεάν σελίδες (για τη μελλοντική συνδρομή) οδηγούν στις κανονικές σελίδες των εργαλείων
 /agapi-tool.html            /agapi            301!
