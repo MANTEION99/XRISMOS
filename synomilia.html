@@ -54,6 +54,8 @@
   button.submit:disabled{ opacity:0.55; }
   .join{ display:flex; gap:10px; align-items:center; justify-content:center; margin:18px 0 6px; padding:13px 14px; border:1px solid var(--gold); border-radius:14px; text-decoration:none; color:var(--paper); font-size:14.5px; line-height:1.45; background:rgba(217,178,92,0.07); }
   .join strong{ color:var(--gold); }
+  .buy{ display:block; width:100%; margin:10px 0 6px; padding:13px 14px; border:1px solid var(--line); border-radius:14px; background:transparent; color:var(--paper); font:inherit; font-size:14.5px; line-height:1.45; cursor:pointer; }
+  .buy strong{ color:var(--gold); }
   .join-note{ font-size:12px; color:var(--muted); text-align:center; line-height:1.5; }
   .small{ font-size:12px; color:var(--muted); text-align:center; line-height:1.6; margin-top:16px; }
   .small a{ color:var(--gold); }
@@ -101,7 +103,7 @@
   <!-- 1. Κωδικός -->
   <div class="panel" id="pCode"><div class="panel-inner">
     <img class="hero" src="/images/iakovos.jpg" alt="Το Μαντείο">
-    <div class="eyebrow">Μόνο για συνδρομήτριες</div>
+    <div class="eyebrow">Για συνδρομήτριες, ή μία φορά με 29,99€</div>
     <h1>Η συνομιλία σου με Το Μαντείο</h1>
     <p class="sub">Κάθε μήνα έχεις μια προσωπική συνομιλία με Το Μαντείο, πάνω στον δικό σου γενέθλιο χάρτη και τον πραγματικό ουρανό των επόμενων μηνών. Γράψε τον κωδικό που σου στείλαμε στο Messenger.</p>
     <form id="fCode" novalidate>
@@ -111,6 +113,8 @@
     </form>
     <a class="join" href="https://www.facebook.com/61573958341176/support" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" width="18" height="18" fill="#D9B25C" aria-hidden="true" style="flex-shrink:0"><path d="M3 18h18l-1.5-9-4.5 4-3-7-3 7-4.5-4z"/><rect x="3" y="19.5" width="18" height="2" rx="1"/></svg><span>Θέλεις κι εσύ τη δική σου συνομιλία με Το Μαντείο κάθε μήνα; <strong>Γίνε συνδρομήτρια</strong></span></a>
     <div class="join-note">Μετά την εγγραφή σου στείλε μας μήνυμα στο Messenger και παίρνεις αμέσως τον κωδικό σου.</div>
+    <button class="buy" id="bBuy" type="button">Δεν είσαι συνδρομήτρια; Κάνε τη συνομιλία μία φορά, <strong>29,99€</strong></button>
+    <div class="error" id="eBuy"></div>
     <div class="small">Είσαι ήδη συνδρομήτρια και δεν έχεις κωδικό; Στείλε μας μήνυμα στο Messenger.<br><br>Το Μαντείο είναι τεχνητή νοημοσύνη. Ο Ιάκωβος είναι το πρόσωπο της σελίδας.<br><a href="/oroskopos">Βρες δωρεάν τον Ωροσκόπο σου</a></div>
   </div></div>
 
@@ -289,7 +293,28 @@ const grow = () => { const t = $("q"); t.style.height = "auto"; t.style.height =
 $("q").addEventListener("input", grow);
 $("q").addEventListener("keydown", (e) => { if (e.key === "Enter" && !e.shiftKey && window.matchMedia("(min-width: 700px)").matches) { e.preventDefault(); $("fAsk").requestSubmit(); } });
 
+$("bBuy").addEventListener("click", async () => {
+  err("eBuy");
+  $("bBuy").disabled = true;
+  try {
+    const r = await fetch("/.netlify/functions/create-checkout", { method: "POST", body: JSON.stringify({ tool: "synomilia", returnUrl: location.origin + "/synomilia" }) });
+    const d = await r.json();
+    if (!d.url) throw new Error("Η πληρωμή δεν άνοιξε. Δοκίμασε ξανά.");
+    location.href = d.url;
+  } catch (x) { err("eBuy", x.message); $("bBuy").disabled = false; }
+});
+
 (async () => {
+  const sid = new URLSearchParams(location.search).get("session_id");
+  if (sid) {
+    try {
+      const r = await fetch("/api/synomilia-buy", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ session_id: sid }) });
+      const d = await r.json();
+      if (!r.ok) throw new Error(d.error || "Η πληρωμή δεν επιβεβαιώθηκε.");
+      history.replaceState(null, "", "/synomilia");
+      await enter(d.code); return;
+    } catch (x) { showPanel("pCode"); err("eCode", x.message); return; }
+  }
   const fromUrl = new URLSearchParams(location.search).get("k");
   const c = fromUrl || stored();
   if (c) {

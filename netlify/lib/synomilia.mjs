@@ -1,6 +1,6 @@
 // Η μηνιαία προσωπική συνομιλία των συνδρομητριών με Το Μαντείο.
 // Κάθε συνδρομήτρια παίρνει από το Messenger έναν προσωπικό κωδικό. Ο κωδικός ισχύει 35 μέρες,
-// ανοίγει ΜΙΑ συνομιλία, κλειδώνει στα στοιχεία γέννησης της πρώτης φοράς και δέχεται έως 10 ερωτήσεις.
+// ανοίγει ΜΙΑ συνομιλία, κλειδώνει στα στοιχεία γέννησης της πρώτης φοράς και δέχεται έως 5 ερωτήσεις.
 //
 // Αποθήκη "manteio-chat":
 //   code/<ΚΩΔΙΚΟΣ>     { code, name, createdAt, expiresAt }
@@ -13,7 +13,7 @@ const { REDIRECT_RULES } = safety;
 
 export const chatStore = () => getStore({ name: "manteio-chat", consistency: "strong" });
 
-export const MAX_QUESTIONS = 10;
+export const MAX_QUESTIONS = 5;
 export const CODE_DAYS = 35;
 const ALPHABET = "ACDEFHJKMNPRTWXY34679";   // χωρίς γράμματα που μπερδεύονται (0/O, 1/I, 8/B)
 

@@ -1,6 +1,6 @@
 // Background function: γράφει το επόμενο μήνυμα του Μαντείου στη μηνιαία συνομιλία
 // και το αποθηκεύει όσο γράφεται, ώστε η σελίδα να το δείχνει σταδιακά.
-// Μια ερώτηση που πήρε ανακατεύθυνση (υγεία, νομικά, απόγνωση κ.λπ.) δεν μετρά στις 10.
+// Μια ερώτηση που πήρε ανακατεύθυνση (υγεία, νομικά, απόγνωση κ.λπ.) δεν μετρά στις 5.
 
 import { streamClaude } from "../lib/epistrofi-common.mjs";
 import { chatStore, chatPrompt, cleanCode, isRedirect, stripRedirect, MAX_QUESTIONS } from "../lib/synomilia.mjs";

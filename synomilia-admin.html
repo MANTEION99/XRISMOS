@@ -69,7 +69,7 @@ $("create").onclick = async () => {
   try {
     const rec = await api({ action: "create", name: $("name").value });
     const first = rec.name.split(" ")[0];
-    $("msg").textContent = `Καλησπέρα ${first}! Ο προσωπικός σου κωδικός για τη συνομιλία του μήνα με Το Μαντείο είναι:\n\n${rec.code}\n\nΜπες εδώ και ξεκίνα: https://manteio.live/synomilia?k=${rec.code}\n\nΈχεις 10 ερωτήσεις πάνω στον δικό σου χάρτη. Ο κωδικός ισχύει έως ${fmt(rec.expiresAt)} και είναι μόνο για σένα.`;
+    $("msg").textContent = `Καλησπέρα ${first}! Ο προσωπικός σου κωδικός για τη συνομιλία του μήνα με Το Μαντείο είναι:\n\n${rec.code}\n\nΜπες εδώ και ξεκίνα: https://manteio.live/synomilia?k=${rec.code}\n\nΈχεις 5 ερωτήσεις πάνω στον δικό σου χάρτη. Ο κωδικός ισχύει έως ${fmt(rec.expiresAt)} και είναι μόνο για σένα.`;
     $("out").style.display = "block";
     $("name").value = "";
     load();
