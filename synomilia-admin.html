@@ -46,6 +46,17 @@
   </div>
 
   <div class="card">
+    <label for="cnt">Πολλοί κωδικοί μαζί, χωρίς όνομα</label>
+    <input id="cnt" type="number" min="1" max="30" value="10">
+    <button id="batch">Φτιάξε κωδικούς</button>
+    <div class="err" id="err2"></div>
+    <div id="out2" style="display:none">
+      <div class="msg" id="msg2"></div>
+      <button class="ghost" id="copy2">Αντιγραφή λίστας</button>
+    </div>
+  </div>
+
+  <div class="card">
     <div style="display:flex;justify-content:space-between;align-items:center"><label style="margin:0">Όλοι οι κωδικοί</label><button class="ghost" id="refresh">Ανανέωση</button></div>
     <div id="list" class="muted" style="margin-top:8px">Πάτησε «Ανανέωση».</div>
   </div>
@@ -76,6 +87,17 @@ $("create").onclick = async () => {
   } catch (e) { $("err").textContent = e.message; }
 };
 $("copy").onclick = async () => { try { await navigator.clipboard.writeText($("msg").textContent); $("copy").textContent = "Αντιγράφηκε!"; setTimeout(() => $("copy").textContent = "Αντιγραφή μηνύματος για το Messenger", 1500); } catch {} };
+
+$("batch").onclick = async () => {
+  $("err2").textContent = "";
+  try {
+    const { codes } = await api({ action: "batch", count: $("cnt").value });
+    $("msg2").textContent = codes.map(c => c.code + "   https://manteio.live/synomilia?k=" + c.code).join("\n");
+    $("out2").style.display = "block";
+    load();
+  } catch (e) { $("err2").textContent = e.message; }
+};
+$("copy2").onclick = async () => { try { await navigator.clipboard.writeText($("msg2").textContent); $("copy2").textContent = "Αντιγράφηκε!"; setTimeout(() => $("copy2").textContent = "Αντιγραφή λίστας", 1500); } catch {} };
 
 async function load() {
   try {
