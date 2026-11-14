@@ -1,7 +1,6 @@
 // Διαχείριση των κωδικών της μηνιαίας συνομιλίας (μόνο για τον διαχειριστή).
 // Κλειδί πρόσβασης: η μεταβλητή περιβάλλοντος CHAT_ADMIN_KEY στο Netlify.
 // { key, action: "create", name }   νέος κωδικός για μια συνδρομήτρια
-// { key, action: "batch", count }  πολλούς κωδικούς χωρίς όνομα (έως 30)
 // { key, action: "list" }           όλοι οι κωδικοί με την κατάστασή τους
 // { key, action: "revoke", code }   ακυρώνει έναν κωδικό
 
@@ -38,23 +37,6 @@ export default async (req) => {
     const rec = { code, name, createdAt: now.toISOString(), expiresAt: new Date(now.getTime() + CODE_DAYS * 86400000).toISOString() };
     await store.setJSON(`code/${code}`, rec);
     return json(200, rec);
-  }
-
-  if (action === "batch") {
-    const n = Math.min(30, Math.max(1, parseInt(b.count, 10) || 1));
-    const out = [];
-    const now = new Date();
-    for (let k = 0; k < n; k++) {
-      let code = "";
-      for (let i = 0; i < 8; i++) {
-        code = newCode();
-        if (!(await store.get(`code/${code}`))) break;
-      }
-      const rec = { code, name: "", createdAt: now.toISOString(), expiresAt: new Date(now.getTime() + CODE_DAYS * 86400000).toISOString() };
-      await store.setJSON(`code/${code}`, rec);
-      out.push(rec);
-    }
-    return json(200, { codes: out });
   }
 
   if (action === "revoke") {
