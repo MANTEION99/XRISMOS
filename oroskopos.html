@@ -59,6 +59,15 @@
     font-family:'Cormorant Garamond',serif; font-size:17px; letter-spacing:1px; background:transparent; cursor:pointer; }
   .btn.solid{ background:linear-gradient(135deg, var(--gold), var(--gold-deep)); color:#241A08; border:none; font-weight:600; }
   .row{ display:flex; gap:10px; justify-content:center; flex-wrap:wrap; margin:6px 0 18px; }
+  .ask{ margin:6px 0 18px; text-align:left; }
+  .ask h3{ font-family:'Cormorant Garamond',serif; font-size:23px; color:var(--gold); margin:0 0 4px; font-weight:600; text-align:center; }
+  .ask .lead{ font-size:13.5px; color:var(--muted); text-align:center; margin:0 0 14px; line-height:1.55; }
+  .q{ display:block; text-decoration:none; border:1px solid var(--line); border-radius:14px; padding:14px 16px; margin-bottom:10px; background:rgba(217,178,92,0.05); color:var(--paper); }
+  .q:active{ background:rgba(217,178,92,0.14); }
+  .q .qt{ font-family:'Cormorant Garamond',serif; font-size:21px; font-weight:600; color:var(--paper); display:flex; justify-content:space-between; align-items:center; }
+  .q .qt span{ color:var(--gold); font-size:22px; }
+  .q .qd{ font-size:13.5px; color:var(--muted); line-height:1.5; margin:3px 0 6px; }
+  .q .free{ font-size:13px; font-weight:700; color:var(--gold); letter-spacing:0.3px; }
   .what{ margin-top:24px; font-size:13.5px; line-height:1.65; color:var(--muted); }
   .what b{ color:var(--gold); font-weight:500; }
   .spinner{ width:26px; height:26px; margin:16px auto; border:2px solid var(--line); border-top-color:var(--gold); border-radius:50%; animation:spin 1s linear infinite; display:none; }
@@ -103,6 +112,16 @@
     <p class="meaning" id="rText"></p>
     <div class="note" id="rNear" style="display:none"></div>
     <div class="place-line" id="rPlace"></div>
+    <div class="ask" id="ask">
+      <h3>Ρώτα τώρα Το Μαντείο</h3>
+      <p class="lead">Διάλεξε αυτό που σε απασχολεί. Τα στοιχεία της γέννησής σου είναι ήδη συμπληρωμένα.</p>
+      <a class="q" data-href="/epistrofi"><div class="qt">Θα επιστρέψει; <span>›</span></div><div class="qd">Ο χάρτης σου και ο δικός του δείχνουν αν υπάρχει δρόμος επιστροφής και πότε ανοίγει.</div><div class="free">Η πρώτη απάντηση είναι δωρεάν</div></a>
+      <a class="q" data-href="/agapi"><div class="qt">Με σκέφτεται ακόμα; <span>›</span></div><div class="qd">Τι νιώθει πραγματικά για σένα, όπως το δείχνει η Αφροδίτη του.</div><div class="free">Η πρώτη απάντηση είναι δωρεάν</div></a>
+      <a class="q" data-href="/oikonomika"><div class="qt">Το οικονομικό μου μέλλον <span>›</span></div><div class="qd">Τι δείχνει ο χάρτης σου για τα χρήματα και πότε έρχεται η ανακούφιση.</div><div class="free">Η πρώτη απάντηση είναι δωρεάν</div></a>
+      <a class="q" data-href="/symvatotita"><div class="qt">Ταιριάζουμε; <span>›</span></div><div class="qd">Τι λένε οι δύο χάρτες σας μαζί, πέρα από αμφιβολίες και σιωπές.</div><div class="free">Η πρώτη απάντηση είναι δωρεάν</div></a>
+      <a class="q" data-href="/alitheia"><div class="qt">Μου κρύβει κάτι; <span>›</span></div><div class="qd">Ο χάρτης του δεν κρύβεται, ακόμα κι όταν εκείνος προσπαθεί.</div><div class="free">Η πρώτη απάντηση είναι δωρεάν</div></a>
+      <a class="q" data-href="/erotima"><div class="qt">Κάτι άλλο με απασχολεί <span>›</span></div><div class="qd">Γράψε την ερώτησή σου με δικά σου λόγια.</div><div class="free">Η πρώτη απάντηση είναι δωρεάν</div></a>
+    </div>
     <div class="row">
       <button class="btn" id="share" type="button">Στείλ' το σε φίλη</button>
       <button class="btn" id="again" type="button">Νέος υπολογισμός</button>
@@ -178,6 +197,10 @@ function show(d) {
     $("rNear").style.display = "block";
     $("rNear").textContent = `Ο Ωροσκόπος σου είναι πολύ κοντά στην αλλαγή ζωδίου. Αν η ώρα γέννησής σου διαφέρει ένα τέταρτο από αυτή που έγραψες, μπορεί να είναι ${d.near}. Έλεγξε την ώρα στη ληξιαρχική πράξη.`;
   } else $("rNear").style.display = "none";
+  document.querySelectorAll(".q").forEach(a => {
+    const q = new URLSearchParams({ d: $("dob").value, t: $("tob").value, p: $("pob").value.trim(), src: "oroskopos" });
+    a.href = a.dataset.href + "?" + q.toString();
+  });
   $("formBox").style.display = "none";
   $("res").classList.add("show");
   window.scrollTo({ top: 0, behavior: "smooth" });
