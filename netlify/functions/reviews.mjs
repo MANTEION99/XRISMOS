@@ -3,9 +3,13 @@
 // POST /api/reviews          { reading_id, session_id, rating 1-5, text, name, publish }
 //   Δεκτή μόνο αν ο χρησμός πληρώθηκε με αυτό ακριβώς το session του Stripe (επιβεβαιωμένη αγορά).
 //   Μία κριτική ανά χρησμό. Δημοσιεύεται μόνο αν η πελάτισσα το επιτρέψει.
-// Για να κρυφτεί μια κριτική: διαγραφή του αντίστοιχου blob στο store "reviews" από το Netlify.
+// Για να κρυφτεί μια κριτική: από τη σελίδα /metrisi (με τον κωδικό), ενότητα «Κριτικές».
+// Ο μέσος όρος αστεριών μετράει ΟΛΕΣ τις βαθμολογίες, και τις κρυμμένες, ώστε το κρύψιμο να μην αλλάζει τη βαθμολογία.
 
 import { getStore } from "@netlify/blobs";
+import { createHash } from "node:crypto";
+const KEY_HASH = "a3bfa830fa037de76ee54ebe1d5320fac7d8f48d65e4629a030bee9588ad1e42";
+const isAdmin = (k) => createHash("sha256").update(String(k || "")).digest("hex") === KEY_HASH;
 
 const reviewsStore = () => getStore({ name: "reviews", consistency: "strong" });
 const STORES = ["oracle-readings", "epistrofi-readings"];
@@ -28,17 +32,23 @@ export default async (req) => {
 
   if (req.method === "GET") {
     const { blobs } = await store.list();
-    const items = [];
+    const all = [];
     for (const b of blobs) {
       try {
         const r = await store.get(b.key, { type: "json" });
-        if (r && r.publish) items.push(r);
+        if (r && r.rating) all.push(r);
       } catch {}
     }
-    items.sort((a, b) => String(b.createdAt).localeCompare(String(a.createdAt)));
-    const avg = items.length ? items.reduce((s, r) => s + r.rating, 0) / items.length : 0;
+    all.sort((a, b) => String(b.createdAt).localeCompare(String(a.createdAt)));
+    const k = new URL(req.url).searchParams.get("k");
+    if (k) {
+      if (!isAdmin(k)) return json(403, { error: "Λάθος κωδικός" });
+      return json(200, { items: all.map(r => ({ id: r.readingId, name: r.name, rating: r.rating, text: r.text, tool: TOOL_NAMES[r.tool] || "", date: r.createdAt, publish: !!r.publish, hidden: !!r.hidden })) }, { "Cache-Control": "no-store" });
+    }
+    const items = all.filter(r => r.publish && !r.hidden);
+    const avg = all.length ? all.reduce((s, r) => s + r.rating, 0) / all.length : 0;
     return json(200, {
-      count: items.length,
+      count: all.length,
       avg: Math.round(avg * 10) / 10,
       items: items.slice(0, 12).map(r => ({ name: r.name, rating: r.rating, text: r.text, tool: TOOL_NAMES[r.tool] || "", date: r.createdAt }))
     }, { "Cache-Control": "public, max-age=60" });
@@ -48,6 +58,15 @@ export default async (req) => {
 
   let b;
   try { b = await req.json(); } catch { return json(400, { error: "Λάθος αίτημα." }); }
+  if (b && b.k !== undefined) {
+    if (!isAdmin(b.k)) return json(403, { error: "Λάθος κωδικός" });
+    const id = String(b.id || "");
+    const r = await store.get(id, { type: "json" });
+    if (!r) return json(404, { error: "Δεν βρέθηκε" });
+    r.hidden = !!b.hidden;
+    await store.setJSON(id, r);
+    return json(200, { ok: true, hidden: r.hidden });
+  }
   const readingId = String(b.reading_id || "");
   const sessionId = String(b.session_id || "");
   const rating = Math.round(Number(b.rating));

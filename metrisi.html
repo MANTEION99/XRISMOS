@@ -32,6 +32,7 @@
   </div>
   <div id="err"></div>
   <div id="out"></div>
+  <div id="rev"></div>
   <p class="muted">Μετράει όλες τις επισκέψεις χωρίς cookies και χωρίς προσωπικά στοιχεία. Οι μέρες είναι με ώρα Ελλάδας.</p>
 </div>
 <script>
@@ -65,8 +66,29 @@ async function load() {
   if (r > 2) html += `<div class="card"><h2>Ανά μέρα</h2><table>${d.days.slice(0, r).map(x => `<tr><td>${x.day.split("-").reverse().join("/")}</td><td class="n">${Object.values(x.s || {}).reduce((a, b) => a + b, 0)}</td></tr>`).join("")}</table></div>`;
   $("out").innerHTML = html;
 }
-$("go").onclick = load;
-if ($("k").value) load();
+async function loadRev() {
+  const k = $("k").value.trim();
+  const r = await fetch("/api/reviews?k=" + encodeURIComponent(k)); if (!r.ok) { $("rev").innerHTML = ""; return; }
+  const d = await r.json();
+  const esc = (t) => String(t || "").replace(/[&<>"]/g, c => ({ "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;" }[c]));
+  let h = '<div class="card"><h2>Κριτικές από πελάτισσες (' + d.items.length + ')</h2>';
+  if (!d.items.length) h += '<p class="muted">Καμία ακόμα.</p>';
+  d.items.forEach(it => {
+    const st = !it.publish ? "Δεν επέτρεψε δημοσίευση" : it.hidden ? "Κρυμμένη" : "Φαίνεται στη σελίδα";
+    h += '<div style="border-top:1px solid rgba(255,255,255,.08);padding:10px 0">' +
+      '<b>' + esc(it.name) + '</b> · ' + "★★★★★".slice(0, it.rating) + ' · <span class="muted">' + esc(it.tool) + ' · ' + esc((it.date || "").slice(0, 10)) + '</span>' +
+      '<div style="margin:4px 0">' + esc(it.text) + '</div><span class="muted">' + st + '</span>' +
+      (it.publish ? ' <button data-id="' + esc(it.id) + '" data-h="' + (it.hidden ? 0 : 1) + '" style="padding:6px 12px;font-size:14px;margin-left:8px">' + (it.hidden ? "Εμφάνισε" : "Κρύψε") + '</button>' : '') + '</div>';
+  });
+  $("rev").innerHTML = h + '<p class="muted">Κρύβε μόνο προσβλητικές, διαφημίσεις, άσχετες ή με προσωπικά στοιχεία. Η βαθμολογία με τα αστέρια μετράει όλες τις κριτικές, και τις κρυμμένες.</p></div>';
+  $("rev").querySelectorAll("button[data-id]").forEach(b => b.onclick = async () => {
+    b.disabled = true;
+    await fetch("/api/reviews", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ k, id: b.dataset.id, hidden: b.dataset.h === "1" }) });
+    loadRev();
+  });
+}
+$("go").onclick = () => { load(); loadRev(); };
+if ($("k").value) { load(); loadRev(); }
 </script>
 </body>
 </html>
