@@ -20,7 +20,7 @@
       "#mcb .y{background:linear-gradient(135deg,#D9B25C,#8C6420);color:#241A08;border:none}#mcb .n{background:transparent;color:#D9B25C}";
     document.head.appendChild(css);
     var d = document.createElement("div"); d.id = "mcb"; d.setAttribute("role", "dialog"); d.setAttribute("aria-label", "Cookies");
-    d.innerHTML = "<p>Το Μαντείο χρησιμοποιεί cookies για να βλέπει πώς χρησιμοποιείται η σελίδα και να τη βελτιώνει. Τα δέχεσαι;</p>" +
+    d.innerHTML = "<p>Το Μαντείο χρησιμοποιεί cookies για να βλέπει πώς χρησιμοποιείται η σελίδα και να τη βελτιώνει.</p>" +
       "<div class='r'><button class='n' type='button'>Όχι, ευχαριστώ</button><button class='y' type='button'>Αποδέχομαι</button></div>";
     document.body.appendChild(d);
     d.querySelector(".y").onclick = function () { set("yes"); d.remove(); loadClarity(); };
