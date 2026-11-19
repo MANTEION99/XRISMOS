@@ -1325,7 +1325,7 @@ form.addEventListener('submit', (e) => {
 </script>
 <script>
 /* Συμπληρώνει μόνο του τα στοιχεία γέννησης όταν έρχεται από τον Ωροσκόπο (?d=&t=&p=) */
-(function(){ try{ var q=new URLSearchParams(location.search); var m={d:"dob1",t:"tob1",p:"pob1"};
+(function(){ try{ var q=new URLSearchParams(location.search); var m={n:"name1",d:"dob1",t:"tob1",p:"pob1"};
   function fill(){ Object.keys(m).forEach(function(k){ var v=q.get(k), el=document.getElementById(m[k]); if(v && el && !el.value){ el.value=v; el.dispatchEvent(new Event("input",{bubbles:true})); el.dispatchEvent(new Event("change",{bubbles:true})); } }); }
   if(document.readyState==="loading") document.addEventListener("DOMContentLoaded",fill); else fill(); }catch(e){} })();
 </script>

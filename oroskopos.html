@@ -42,6 +42,7 @@
   .glyph{ width:110px; height:110px; margin:6px auto 12px; border-radius:50%; display:flex; align-items:center; justify-content:center;
     font-size:58px; color:#2a1c06; background:radial-gradient(circle at 35% 30%, #f3d98b, #b8862f 60%, #6d4a14);
     box-shadow:0 0 26px rgba(232,192,104,0.55), 0 0 70px rgba(232,192,104,0.22); font-family:'Segoe UI Symbol','Noto Sans Symbols2','DejaVu Sans',sans-serif; }
+  .hello{ font-family:'Cormorant Garamond',serif; font-size:26px; color:var(--paper); margin:0 0 6px; }
   .asc-label{ letter-spacing:3px; font-size:12px; color:var(--gold); text-transform:uppercase; }
   .asc-sign{ font-family:'Cormorant Garamond',serif; font-weight:600; font-size:40px; color:var(--gold); margin:4px 0 2px; text-transform:uppercase; }
   .asc-deg{ font-size:13px; color:var(--muted); margin-bottom:18px; }
@@ -89,6 +90,7 @@
     <p class="sub">Το ζώδιό σου λέει ποια είσαι. Ο Ωροσκόπος λέει πώς σε βλέπει ο κόσμος από την πρώτη ματιά. Γράψε τα στοιχεία της γέννησής σου και Το Μαντείο τον υπολογίζει με ακρίβεια λεπτού.</p>
 
     <form id="f" novalidate>
+      <div class="field"><label for="nm">Το όνομά σου</label><input id="nm" type="text" placeholder="π.χ. Μαρία" autocomplete="given-name" maxlength="30" required></div>
       <div class="field"><label for="dob">Ημερομηνία γέννησης</label><input id="dob" type="date" min="1920-01-01" max="2015-12-31" required></div>
       <div class="field"><label for="tob">Ώρα γέννησης</label><input id="tob" type="time" required>
         <div class="hint">Όσο πιο ακριβής η ώρα, τόσο πιο σίγουρο το αποτέλεσμα. Θα τη βρεις στη ληξιαρχική πράξη γέννησης.</div></div>
@@ -102,6 +104,7 @@
   </div>
 
   <div class="result" id="res">
+    <div class="hello" id="rHello"></div>
     <div class="asc-label">Ο Ωροσκόπος σου είναι</div>
     <div class="glyph" id="rGlyph"></div>
     <div class="asc-sign" id="rSign"></div>
@@ -167,6 +170,7 @@ $("f").addEventListener("submit", async (e) => {
   e.preventDefault();
   const err = $("err"); err.style.display = "none";
   const body = { dob: $("dob").value, tob: $("tob").value, pob: $("pob").value.trim() };
+  if ($("nm").value.trim().length < 2) return showErr("Γράψε το όνομά σου.");
   if (!body.dob) return showErr("Γράψε την ημερομηνία γέννησης.");
   if (!body.tob) return showErr("Ο Ωροσκόπος χρειάζεται την ώρα γέννησης.");
   if (body.pob.length < 2) return showErr("Γράψε τον τόπο γέννησης.");
@@ -187,6 +191,8 @@ function showErr(m) { const err = $("err"); err.textContent = m; err.style.displ
 
 function show(d) {
   last = d;
+  const nm = $("nm").value.trim();
+  $("rHello").textContent = nm ? nm + " μου," : "";
   $("rGlyph").textContent = GLYPH[d.asc.key] || "";
   $("rSign").textContent = d.asc.sign;
   $("rDeg").textContent = `στις ${d.asc.deg}° και ${d.asc.min}′ του ζωδίου`;
@@ -200,7 +206,7 @@ function show(d) {
     $("rNear").textContent = `Ο Ωροσκόπος σου είναι πολύ κοντά στην αλλαγή ζωδίου. Αν η ώρα γέννησής σου διαφέρει ένα τέταρτο από αυτή που έγραψες, μπορεί να είναι ${d.near}. Έλεγξε την ώρα στη ληξιαρχική πράξη.`;
   } else $("rNear").style.display = "none";
   document.querySelectorAll(".q").forEach(a => {
-    const q = new URLSearchParams({ d: $("dob").value, t: $("tob").value, p: $("pob").value.trim(), src: "oroskopos" });
+    const q = new URLSearchParams({ n: $("nm").value.trim(), d: $("dob").value, t: $("tob").value, p: $("pob").value.trim(), src: "oroskopos" });
     a.href = a.dataset.href + "?" + q.toString();
   });
   $("formBox").style.display = "none";
