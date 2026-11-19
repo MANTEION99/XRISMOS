@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>Μέτρηση | Μαντείο</title>
+<style>
+  body{ margin:0; background:#0B0A16; color:#F5F1E8; font:15px/1.5 Inter,Arial,sans-serif; padding:18px 14px 40px; }
+  h1{ font-family:Georgia,serif; color:#D9B25C; font-size:24px; margin:0 0 12px; }
+  .box{ max-width:560px; margin:0 auto; }
+  input,select,button{ font-size:16px; padding:10px 12px; border-radius:10px; border:1px solid #D9B25C; background:#14122a; color:#F5F1E8; }
+  button{ background:#D9B25C; color:#241A08; font-weight:700; }
+  .row{ display:flex; gap:8px; flex-wrap:wrap; margin-bottom:14px; }
+  .card{ border:1px solid rgba(217,178,92,.4); border-radius:14px; padding:14px; margin-bottom:12px; background:rgba(217,178,92,.04); }
+  .card h2{ font-size:16px; color:#D9B25C; margin:0 0 8px; }
+  .big{ font-size:30px; font-weight:700; }
+  table{ width:100%; border-collapse:collapse; font-size:14.5px; }
+  td{ padding:5px 2px; border-bottom:1px solid rgba(255,255,255,.07); }
+  td.n{ text-align:right; font-weight:700; color:#D9B25C; }
+  .muted{ color:#9C96AE; font-size:13px; }
+  #err{ color:#e07a8c; }
+</style>
+</head>
+<body>
+<div class="box">
+  <h1>Μέτρηση του Μαντείου</h1>
+  <div class="row">
+    <input id="k" type="password" placeholder="Κωδικός" style="flex:1">
+    <select id="r"><option value="1">Σήμερα</option><option value="2">Χθες</option><option value="7" selected>7 μέρες</option><option value="30">30 μέρες</option><option value="90">90 μέρες</option></select>
+    <button id="go">Δείξε</button>
+  </div>
+  <div id="err"></div>
+  <div id="out"></div>
+  <p class="muted">Μετράει όλες τις επισκέψεις χωρίς cookies και χωρίς προσωπικά στοιχεία. Οι μέρες είναι με ώρα Ελλάδας.</p>
+</div>
+<script>
+const SRC = { tiktok:"TikTok", instagram:"Instagram", facebook:"Facebook", messenger:"Messenger", google:"Google", youtube:"YouTube", esoteriki:"Από άλλη σελίδα του manteio.live", agnosti:"Χωρίς πηγή (συνήθως από εφαρμογή)", alli:"Άλλη" };
+const PAGE = { "/":"Αρχική", "/index":"Αρχική", "/oroskopos":"Ωροσκόπος", "/synomilia":"Συνομιλία", "/epistrofi":"Επιστροφή", "/agapi":"Αγάπη", "/alitheia":"Αλήθεια", "/oikonomika":"Οικονομικά", "/symvatotita":"Ταιριάζετε", "/erotima":"Ερώτημα", "/arithmologia":"Αριθμολογία", "/numerology":"Αριθμολογία", "/taro":"Ταρώ", "/xartis":"Γενέθλιος Χάρτης" };
+const EV = { oroskopos:"Υπολόγισαν Ωροσκόπο", dorean:"Δωρεάν απάντηση", "pliromi-koumpi":"Πάτησαν πληρωμή", pliromeni:"Πλήρωσαν και πήραν απάντηση" };
+const $ = (id) => document.getElementById(id);
+try { $("k").value = localStorage.getItem("metrisi_k") || ""; } catch (e) {}
+function add(a, b) { for (const k in b) a[k] = (a[k] || 0) + b[k]; }
+function table(obj, names) {
+  const rows = Object.entries(obj).sort((a, b) => b[1] - a[1]);
+  if (!rows.length) return '<p class="muted">Τίποτα ακόμα.</p>';
+  return "<table>" + rows.map(([k, v]) => `<tr><td>${names(k)}</td><td class="n">${v}</td></tr>`).join("") + "</table>";
+}
+function evName(k) { const [a, b] = k.split(":"); return (EV[a] || a) + (b ? " · " + (PAGE["/" + b] || b) : ""); }
+async function load() {
+  $("err").textContent = ""; $("out").innerHTML = '<p class="muted">Φόρτωση…</p>';
+  const k = $("k").value.trim(); const r = +$("r").value;
+  try { localStorage.setItem("metrisi_k", k); } catch (e) {}
+  const res = await fetch("/api/metrisi?days=" + Math.max(r, 2) + "&k=" + encodeURIComponent(k));
+  const d = await res.json();
+  if (!res.ok) { $("out").innerHTML = ""; $("err").textContent = d.error || "Σφάλμα"; return; }
+  const days = r === 2 ? [d.days[1]] : d.days.slice(0, r);
+  const V = {}, S = {}, E = {};
+  days.forEach(x => { add(V, x.v || {}); add(S, x.s || {}); add(E, x.e || {}); });
+  const total = Object.values(S).reduce((a, b) => a + b, 0);
+  let html = `<div class="card"><h2>Επισκέψεις</h2><div class="big">${total}</div></div>`;
+  html += `<div class="card"><h2>Από πού ήρθαν</h2>${table(S, k => SRC[k] || k)}</div>`;
+  html += `<div class="card"><h2>Τι έκαναν</h2>${table(E, evName)}</div>`;
+  html += `<div class="card"><h2>Σελίδες</h2>${table(V, k => PAGE[k] || k)}</div>`;
+  if (r > 2) html += `<div class="card"><h2>Ανά μέρα</h2><table>${d.days.slice(0, r).map(x => `<tr><td>${x.day.split("-").reverse().join("/")}</td><td class="n">${Object.values(x.s || {}).reduce((a, b) => a + b, 0)}</td></tr>`).join("")}</table></div>`;
+  $("out").innerHTML = html;
+}
+$("go").onclick = load;
+if ($("k").value) load();
+</script>
+</body>
+</html>
