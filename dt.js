@@ -51,7 +51,7 @@
     const write = () => {
       y.value = y.value.replace(/\D/g, '').slice(0, 4);
       const yr = +y.value; const okY = y.value.length === 4 && yr >= 1920 && yr <= maxYear;
-      hint.textContent = (y.value.length === 4 && !okY) ? `Γράψε το έτος με 4 ψηφία, από 1920 έως ${maxYear}.` : '';
+      hint.textContent = (y.value.length === 4 && !okY) ? (yr > maxYear && adult ? 'Το Μαντείο απευθύνεται μόνο σε ενήλικες. ' : '') + `Γράψε το έτος με 4 ψηφία, από 1920 έως ${maxYear}.` : '';
       if (d.value && m.value && okY) {
         const last = new Date(yr, +m.value, 0).getDate();
         if (+d.value > last) d.value = pad(last);

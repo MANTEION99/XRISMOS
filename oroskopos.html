@@ -87,6 +87,7 @@
   .chips{ display:flex; flex-wrap:wrap; gap:8px; justify-content:center; }
   .chips a{ font-size:15px; color:var(--paper); text-decoration:none; border:1px solid rgba(217,178,92,0.55); border-radius:20px; padding:9px 13px; background:rgba(255,255,255,0.03); }
   .chips a:active{ background:rgba(217,178,92,0.18); }
+  .adult{ font-size:12.5px; color:var(--muted); text-align:center; margin-top:10px; line-height:1.5; }
   .what{ margin-top:24px; font-size:13.5px; line-height:1.65; color:var(--muted); }
   .what b{ color:var(--gold); font-weight:500; }
   .spinner{ width:26px; height:26px; margin:16px auto; border:2px solid var(--line); border-top-color:var(--gold); border-radius:50%; animation:spin 1s linear infinite; display:none; }
@@ -95,6 +96,7 @@
   footer{ text-align:center; font-size:11.5px; color:var(--muted); margin-top:22px; }
   footer a{ color:var(--muted); }
 </style>
+<script src="/agegate.js"></script>
 <script src="/consent.js" defer></script>
 <script src="/metrisi.js"></script>
 <script src="/reviews.js" defer></script>
@@ -118,6 +120,7 @@
       <div class="error" id="err"></div>
       <button class="submit" id="go" type="submit">Υπολόγισε τον Ωροσκόπο μου</button>
       <div class="spinner" id="spin"></div>
+      <div class="adult">Ο Ωροσκόπος απευθύνεται μόνο σε ενήλικες (18+). Συνεχίζοντας δηλώνεις ότι είσαι ενήλικας.</div>
     </form>
     <script src="/dt.js"></script>
 
