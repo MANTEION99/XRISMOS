@@ -25,6 +25,11 @@
       bg.querySelectorAll("button").forEach(function (b) { b.onclick = function () { bg.remove(); res(b.getAttribute("data-p")); }; });
     });
   }
+  function toast(t) {
+    var d = document.createElement("div");
+    d.style.cssText = "position:fixed;left:12px;right:12px;top:12px;z-index:99999;max-width:520px;margin:0 auto;background:#3a1420;border:1px solid #e07a8c;border-radius:14px;padding:12px 14px;color:#fff;font:14px/1.45 Inter,Arial,sans-serif";
+    d.textContent = t; document.body.appendChild(d); setTimeout(function () { d.remove(); }, 15000);
+  }
   var of = window.fetch;
   if (of) window.fetch = function (u, opts) {
     try {
@@ -34,8 +39,15 @@
         if (!b.provider) {
           var self = this;
           return choose().then(function (p) {
-            if (p === "viva") { b.provider = "viva"; opts = Object.assign({}, opts, { body: JSON.stringify(b) }); }
-            return of.call(self, u, opts);
+            if (p !== "viva") return of.call(self, u, opts);
+            b.provider = "viva"; opts = Object.assign({}, opts, { body: JSON.stringify(b) });
+            return of.call(self, u, opts).then(function (r) {
+              // Αν η Viva δεν δώσει σελίδα πληρωμής, δείχνουμε τι έγινε αντί να μη γίνεται τίποτα
+              r.clone().json().then(function (d) {
+                if (!d || !d.url) toast("Η πληρωμή με IRIS δεν άνοιξε. " + ((d && (d.details || d.error)) || ("Σφάλμα " + r.status)) + " Δοκίμασε με κάρτα.");
+              }).catch(function () { toast("Η πληρωμή με IRIS δεν άνοιξε (σφάλμα " + r.status + "). Δοκίμασε με κάρτα."); });
+              return r;
+            });
           });
         }
       }

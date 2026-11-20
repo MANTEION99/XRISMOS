@@ -11,6 +11,16 @@ const H = () => demo()
 export const vivaReady = () => !!(process.env.VIVA_CLIENT_ID && process.env.VIVA_CLIENT_SECRET && process.env.VIVA_SOURCE_CODE);
 export const vivaOrders = () => getStore({ name: "viva-orders", consistency: "strong" });
 
+export async function vivaOrderCheck() {
+  try {
+    const t = await token();
+    const r = await fetch(`${H().api}/checkout/v2/orders`, { method: "POST", headers: { Authorization: `Bearer ${t}`, "Content-Type": "application/json" },
+      body: JSON.stringify({ amount: 100, customerTrns: "Δοκιμή", merchantTrns: "check", sourceCode: String(process.env.VIVA_SOURCE_CODE || "").trim(), paymentTimeout: 300 }) });
+    const txt = await r.text();
+    return r.ok && /orderCode/.test(txt) ? "ok" : `order ${r.status} ${txt.slice(0, 300)}`;
+  } catch (e) { return String(e.message || e); }
+}
+
 export async function vivaTokenCheck() { try { await token(); return "ok"; } catch (e) { return String(e.message || e); } }
 
 async function token() {
@@ -43,7 +53,7 @@ export async function vivaCreateOrder({ tool, name, priceCents, readingId, retur
       amount: priceCents,
       customerTrns: name,
       merchantTrns: `${tool}${readingId ? " " + readingId : ""}`.slice(0, 100),
-      sourceCode: process.env.VIVA_SOURCE_CODE,
+      sourceCode: String(process.env.VIVA_SOURCE_CODE || "").trim(),
       paymentTimeout: 1800,
       disableExactAmount: true,
       allowRecurring: false
