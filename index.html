@@ -169,6 +169,15 @@
   .sigil-divider svg{ width:28px; height:28px; flex-shrink:0; }
 
   /* ============ HERO PORTRAIT ============ */
+  /* Πρώτη ερώτηση κάτω από τη φωτογραφία */
+  .feat{ max-width:440px; margin:0 auto 2rem; border:1.5px solid var(--gold); border-radius:18px; padding:16px 16px 18px; background:linear-gradient(180deg, rgba(217,178,92,0.10), rgba(217,178,92,0.03)); text-align:center; box-shadow:0 0 40px rgba(212,175,55,0.15); }
+  .feat .top{ display:inline-block; font-family:'Cinzel',serif; font-size:0.78rem; letter-spacing:0.12em; text-transform:uppercase; color:#1a1408; background:linear-gradient(135deg, var(--gold-bright), var(--gold)); padding:6px 12px; border-radius:20px; margin-bottom:12px; font-weight:700; }
+  .feat .row{ display:flex; gap:14px; align-items:center; text-align:left; }
+  .feat img{ width:96px; height:120px; object-fit:cover; object-position:center top; border-radius:12px; border:1px solid var(--gold); flex-shrink:0; }
+  .feat h2{ font-family:'Cormorant Garamond',serif; font-size:1.7rem; line-height:1.15; color:var(--gold-bright); margin:0 0 6px; }
+  .feat p{ font-size:0.98rem; line-height:1.5; color:var(--ink); margin:0; }
+  .feat .free{ margin:14px 0 10px; font-weight:700; color:var(--gold-bright); font-size:1rem; }
+  .feat a{ display:block; text-decoration:none; font-weight:700; font-size:1.05rem; color:#1a1408; background:linear-gradient(135deg, var(--gold-bright), var(--gold)); padding:14px; border-radius:12px; }
   .hero-portrait{
     width:clamp(150px, 38vw, 210px);
     aspect-ratio:4/5;
@@ -679,6 +688,16 @@
     </div>
 
     <img class="hero-portrait" src="manteio-advisor.jpg" alt="Το πρόσωπο του Μαντείου" onerror="this.style.display='none'">
+
+    <div class="feat">
+      <div class="top">Η ερώτηση που κάνουν οι περισσότεροι</div>
+      <div class="row">
+        <img src="images/iakovos.jpg" alt="Ο Ιάκωβος, το πρόσωπο του Μαντείου">
+        <div><h2>Θα επιστρέψει;</h2><p>Ο χάρτης σου και ο δικός του δείχνουν αν υπάρχει δρόμος επιστροφής και πότε ανοίγει.</p></div>
+      </div>
+      <div class="free">Η πρώτη απάντηση είναι δωρεάν</div>
+      <a href="/epistrofi?src=arxiki-proti" onclick="window.manteioEvent&&manteioEvent('arxiki-proti:epistrofi')">Ρώτα Το Μαντείο</a>
+    </div>
 
     <div class="hero-eyebrow">Το Μαντείο</div>
     <h1>7 χρησμοί που φανερώνουν την αλήθεια</h1>
