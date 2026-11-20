@@ -4,7 +4,10 @@ import { vivaConfirm } from "../lib/viva.mjs";
 
 export default async (req) => {
   const u = new URL(req.url);
-  const t = u.searchParams.get("t") || "", s = (u.searchParams.get("s") || "").replace(/\D/g, "");
+  // Ανθεκτικό αν η Viva κολλήσει τις παραμέτρους με δεύτερο «?» (π.χ. ?ok=1?t=...&s=...)
+  const raw = decodeURIComponent(u.search || "");
+  const pick = (k) => u.searchParams.get(k) || ((raw.match(new RegExp("[?&]" + k + "=([^&?#]*)")) || [])[1] || "");
+  const t = pick("t"), s = pick("s").replace(/\D/g, "");
   let target = "/";
   try {
     const { rec, ok } = await vivaConfirm(t, s);
