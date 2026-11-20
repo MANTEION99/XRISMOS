@@ -176,6 +176,9 @@
   .feat img{ width:96px; height:120px; object-fit:cover; object-position:center top; border-radius:12px; border:1px solid var(--gold); flex-shrink:0; }
   .feat h2{ font-family:'Cormorant Garamond',serif; font-size:1.7rem; line-height:1.15; color:var(--gold-bright); margin:0 0 6px; }
   .feat p{ font-size:0.98rem; line-height:1.5; color:var(--ink); margin:0; }
+  .feat .glyph{ width:96px; height:120px; flex-shrink:0; border-radius:12px; border:1px solid var(--gold); display:flex; align-items:center; justify-content:center; font-size:46px; color:var(--gold-bright); background:radial-gradient(circle, rgba(246,221,138,0.25), rgba(10,8,20,0.9) 70%); }
+  .feat + .feat{ margin-top:-0.6rem; }
+  .feat .row > div:only-child{ text-align:center; width:100%; }
   .feat .free{ margin:14px 0 10px; font-weight:700; color:var(--gold-bright); font-size:1rem; }
   .feat a{ display:block; text-decoration:none; font-weight:700; font-size:1.05rem; color:#1a1408; background:linear-gradient(135deg, var(--gold-bright), var(--gold)); padding:14px; border-radius:12px; }
   .hero-portrait{
@@ -699,12 +702,27 @@
       <a href="/epistrofi?src=arxiki-proti" onclick="window.manteioEvent&&manteioEvent('arxiki-proti:epistrofi')">Ρώτα Το Μαντείο</a>
     </div>
 
-    <div class="hero-eyebrow">Το Μαντείο</div>
-    <h1>7 χρησμοί που φανερώνουν την αλήθεια</h1>
-    <p class="sub">Ο αστρολογικός σου χάρτης δεν λέει ψέματα, ακόμα κι όταν εσύ προσπαθείς να μην τον ακούσεις.</p>
-    <a href="#oracles" class="cta">
-      <span>Δες τους χρησμούς</span>
-    </a>
+    <div class="feat">
+      <div class="row">
+        <div><h2>Ποιος είναι ο Ωροσκόπος σου;</h2><p>Το ζώδιό σου δείχνει τον χαρακτήρα σου. Ο Ωροσκόπος δείχνει πώς σε βλέπουν οι άλλοι από την πρώτη ματιά.</p></div>
+      </div>
+      <div class="free">Εντελώς δωρεάν, σε ένα λεπτό</div>
+      <a href="/oroskopos?src=arxiki" onclick="window.manteioEvent&&manteioEvent('arxiki-kouti:oroskopos')">Βρες τον Ωροσκόπο σου</a>
+    </div>
+    <div class="feat">
+      <div class="row">
+        <div><h2>Πότε έρχεται η ανακούφιση στα οικονομικά;</h2><p>Τι δείχνει ο χάρτης σου για τα χρήματα και πότε αλλάζει ο δρόμος τους.</p></div>
+      </div>
+      <div class="free">Η πρώτη απάντηση είναι δωρεάν</div>
+      <a href="/oikonomika?src=arxiki" onclick="window.manteioEvent&&manteioEvent('arxiki-kouti:oikonomika')">Ρώτα Το Μαντείο</a>
+    </div>
+    <div class="feat">
+      <div class="row">
+        <div><h2>Ταιριάζουμε;</h2><p>Τι λένε οι δύο χάρτες σας μαζί, πέρα από αμφιβολίες και σιωπές.</p></div>
+      </div>
+      <div class="free">Η πρώτη απάντηση είναι δωρεάν</div>
+      <a href="/symvatotita?src=arxiki" onclick="window.manteioEvent&&manteioEvent('arxiki-kouti:symvatotita')">Ρώτα Το Μαντείο</a>
+    </div>
 
     <div class="sigil-divider">
       <span class="line"></span>

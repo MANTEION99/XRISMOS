@@ -38,7 +38,7 @@
 <script>
 const SRC = { tiktok:"TikTok", instagram:"Instagram", facebook:"Facebook", messenger:"Messenger", google:"Google", youtube:"YouTube", esoteriki:"Από άλλη σελίδα του manteio.live", agnosti:"Χωρίς πηγή (συνήθως από εφαρμογή)", alli:"Άλλη" };
 const PAGE = { "/":"Αρχική", "/index":"Αρχική", "/oroskopos":"Ωροσκόπος", "/synomilia":"Συνομιλία", "/epistrofi":"Θα επιστρέψει;", "/agapi":"Με σκέφτεται ακόμα;", "/alitheia":"Μου κρύβει κάτι;", "/oikonomika":"Οικονομικά", "/symvatotita":"Ταιριάζουμε;", "/erotima":"Η δική μου ερώτηση", "/arxiki":"Αρχική", "/oles":"Όλες οι προβλέψεις", "/arithmologia":"Αριθμολογία", "/numerology":"Αριθμολογία", "/taro":"Ταρώ", "/xartis":"Γενέθλιος Χάρτης" };
-const EV = { oroskopos:"Υπολόγισαν Ωροσκόπο", dorean:"Δωρεάν απάντηση", "pliromi-koumpi":"Πάτησαν πληρωμή", pliromeni:"Πλήρωσαν και πήραν απάντηση", "oroskopos-mpara":"Ωροσκόπος, πάτησαν πάνω", "oroskopos-plaisio":"Ωροσκόπος, πάτησαν στο πλαίσιο", "oroskopos-apotelesma":"Ωροσκόπος, πάτησαν στο αποτέλεσμα", "arxiki-proti":"Αρχική, πάτησαν την πρώτη ερώτηση" };
+const EV = { oroskopos:"Υπολόγισαν Ωροσκόπο", dorean:"Δωρεάν απάντηση", "pliromi-koumpi":"Πάτησαν πληρωμή", pliromeni:"Πλήρωσαν και πήραν απάντηση", "oroskopos-mpara":"Ωροσκόπος, πάτησαν πάνω", "oroskopos-plaisio":"Ωροσκόπος, πάτησαν στο πλαίσιο", "oroskopos-apotelesma":"Ωροσκόπος, πάτησαν στο αποτέλεσμα", "arxiki-proti":"Αρχική, πάτησαν την πρώτη ερώτηση", "arxiki-kouti":"Αρχική, πάτησαν πλαίσιο" };
 const $ = (id) => document.getElementById(id);
 try { $("k").value = localStorage.getItem("metrisi_k") || ""; } catch (e) {}
 function add(a, b) { for (const k in b) a[k] = (a[k] || 0) + b[k]; }
