@@ -25,6 +25,18 @@
       bg.querySelectorAll("button").forEach(function (b) { b.onclick = function () { bg.remove(); res(b.getAttribute("data-p")); }; });
     });
   }
+  // Μήνυμα αναμονής όσο ανοίγει η σελίδα πληρωμής IRIS της Viva
+  function wait() {
+    var w = document.createElement("div");
+    w.style.cssText = "position:fixed;inset:0;z-index:99997;background:rgba(5,4,12,.85);display:flex;align-items:center;justify-content:center;padding:20px";
+    w.innerHTML = "<div style='max-width:420px;background:#14122a;border:1px solid #D9B25C;border-radius:16px;padding:22px 18px;text-align:center;color:#F5F1E8;font:15px/1.55 Inter,Arial,sans-serif'>" +
+      "<div style='width:34px;height:34px;margin:0 auto 12px;border:3px solid rgba(217,178,92,.3);border-top-color:#D9B25C;border-radius:50%;animation:pcspin 1s linear infinite'></div>" +
+      "<b style='color:#D9B25C;font-size:17px'>Ανοίγει η ασφαλής πληρωμή IRIS</b><br>Περίμενε λίγα δευτερόλεπτα." +
+      "<div style='margin-top:10px;color:#cfc8b8'>Πληρώνεις από το e-banking ή την εφαρμογή της τράπεζάς σου. Μόλις ολοκληρωθεί η πληρωμή, επιστρέφεις αυτόματα εδώ και η απάντησή σου αρχίζει να γράφεται. Μην κλείσεις τη σελίδα πληρωμής πριν ολοκληρωθεί.</div></div>" +
+      "<style>@keyframes pcspin{to{transform:rotate(360deg)}}</style>";
+    document.body.appendChild(w);
+    return w;
+  }
   function toast(t) {
     var d = document.createElement("div");
     d.style.cssText = "position:fixed;left:12px;right:12px;top:12px;z-index:99999;max-width:520px;margin:0 auto;background:#3a1420;border:1px solid #e07a8c;border-radius:14px;padding:12px 14px;color:#fff;font:14px/1.45 Inter,Arial,sans-serif";
@@ -41,7 +53,9 @@
           return choose().then(function (p) {
             if (p !== "viva") return of.call(self, u, opts);
             b.provider = "viva"; opts = Object.assign({}, opts, { body: JSON.stringify(b) });
+            var w = wait();
             return of.call(self, u, opts).then(function (r) {
+              r.clone().json().then(function (d) { if (!d || !d.url) w.remove(); }).catch(function () { w.remove(); });
               // Αν η Viva δεν δώσει σελίδα πληρωμής, δείχνουμε τι έγινε αντί να μη γίνεται τίποτα
               r.clone().json().then(function (d) {
                 if (!d || !d.url) toast("Η πληρωμή με IRIS δεν άνοιξε. " + ((d && (d.details || d.error)) || ("Σφάλμα " + r.status)) + " Δοκίμασε με κάρτα.");
