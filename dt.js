@@ -57,10 +57,22 @@
         if (+d.value > last) d.value = pad(last);
         input.value = `${y.value}-${m.value}-${d.value}`;
       } else input.value = '';
-      input.dispatchEvent(new Event('change', { bubbles: true }));
+      input.dispatchEvent(new Event('input', { bubbles: true })); input.dispatchEvent(new Event('change', { bubbles: true }));
     };
     [d, m].forEach(s => s.addEventListener('change', write));
     y.addEventListener('input', write);
+    y.addEventListener('blur', () => {
+      if (y.value && y.value.length < 4) hint.textContent = 'Γράψε το έτος ολόκληρο, με 4 ψηφία, π.χ. 1975.';
+    });
+    row.dtCheck = () => {
+      const started = d.value || m.value || y.value;
+      const req = input.id === 'dob1' || input.id === 'dob';
+      if (input.value || (!started && !req)) return '';
+      if (!d.value) return 'Διάλεξε τη μέρα γέννησης.';
+      if (!m.value) return 'Διάλεξε τον μήνα γέννησης.';
+      if (y.value.length < 4) return 'Γράψε το έτος γέννησης ολόκληρο, με 4 ψηφία, π.χ. 1975.';
+      return hint.textContent || 'Έλεγξε την ημερομηνία γέννησης.';
+    };
     // Όταν διαλέξει μήνα, πάει κατευθείαν στο έτος να το γράψει.
     m.addEventListener('change', () => { if (m.value && !y.value) setTimeout(() => y.focus(), 50); });
     const read = () => {
@@ -80,7 +92,7 @@
     const write = () => {
       if (h.value && !mi.value) mi.value = '00';
       input.value = h.value ? `${h.value}:${mi.value || '00'}` : '';
-      input.dispatchEvent(new Event('change', { bubbles: true }));
+      input.dispatchEvent(new Event('input', { bubbles: true })); input.dispatchEvent(new Event('change', { bubbles: true }));
     };
     [h, mi].forEach(s => s.addEventListener('change', write));
     const read = () => {
@@ -95,4 +107,23 @@
   document.querySelectorAll('input[type="date"]').forEach(upgradeDate);
   document.querySelectorAll('input[type="time"]').forEach(upgradeTime);
   window.syncDateFields = () => syncers.forEach(f => f());
+  // Αν η σελίδα δείξει γενικό μήνυμα λάθους ενώ λείπει κάτι από την ημερομηνία, λέμε ακριβώς τι λείπει
+  // και φωτίζουμε τη γραμμή, ώστε να μη νομίζει ότι φταίνε τα ονόματα.
+  window.addEventListener('load', () => {
+    const orig = window.showError;
+    if (typeof orig !== 'function') return;
+    window.showError = function (t) {
+      const rows = [...document.querySelectorAll('.dt-row')].filter(r => r.dtCheck && r.offsetParent);
+      for (const r of rows) {
+        const msg = r.dtCheck();
+        if (msg) {
+          r.style.outline = '2px solid #e9a3a3'; r.style.borderRadius = '10px';
+          setTimeout(() => { r.style.outline = ''; }, 4000);
+          r.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          return orig.call(this, msg);
+        }
+      }
+      return orig.apply(this, arguments);
+    };
+  });
 })();
