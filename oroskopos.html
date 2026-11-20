@@ -18,7 +18,7 @@
   :root{ --navy:#0B0A16; --paper:#F5F1E8; --muted:#9C96AE; --gold:#D9B25C; --gold-deep:#8C6420; --ruby:#B4576B; --line:rgba(217,178,92,0.35); }
   *{ box-sizing:border-box; }
   body{ margin:0; background:radial-gradient(ellipse at 50% 20%, #1a1730 0%, #0B0A16 65%); font-family:'Inter',sans-serif; color:var(--paper);
-    min-height:100vh; display:flex; align-items:flex-start; justify-content:center; padding:32px 16px 48px; overflow-x:hidden; }
+    min-height:100vh; display:flex; flex-direction:column; align-items:center; justify-content:flex-start; padding:0 16px 48px; box-sizing:border-box; overflow-x:hidden; }
   .stars{ position:fixed; inset:0; pointer-events:none; z-index:0; background-image:
     radial-gradient(1px 1px at 10% 20%, rgba(255,255,255,0.5), transparent), radial-gradient(1px 1px at 80% 15%, rgba(255,255,255,0.4), transparent),
     radial-gradient(1px 1px at 30% 70%, rgba(255,255,255,0.5), transparent), radial-gradient(1px 1px at 60% 85%, rgba(255,255,255,0.3), transparent),
@@ -77,6 +77,16 @@
   .rv textarea{ width:100%; box-sizing:border-box; min-height:70px; border-radius:10px; border:1px solid var(--line); background:rgba(0,0,0,.25); color:var(--paper); padding:10px; font:inherit; font-size:15px; }
   .rv label.pc{ display:flex; gap:8px; align-items:flex-start; font-size:13.5px; color:var(--muted); margin:8px 0 10px; }
   .rv .ok{ text-align:center; color:var(--gold); font-size:15px; }
+  .topbar{ position:sticky; top:0; z-index:5; box-sizing:border-box; display:flex; justify-content:space-between; align-items:center; max-width:460px; width:100%; margin:0 auto 10px; padding:9px 4px; background:linear-gradient(180deg,#0B0A16 70%,#0B0A1600); }
+  .topbar .lg{ font-family:'Cormorant Garamond',serif; font-size:20px; font-weight:700; color:var(--gold); letter-spacing:1px; text-decoration:none; }
+  .topbar .all{ font-size:14px; font-weight:700; color:#241A08; background:linear-gradient(135deg, var(--gold), var(--gold-deep)); padding:9px 14px; border-radius:20px; text-decoration:none; }
+  .more{ margin-top:22px; border:1px solid var(--line); border-radius:14px; padding:16px; background:rgba(217,178,92,0.05); }
+  .more h3{ font-family:'Cormorant Garamond',serif; font-size:22px; color:var(--paper); margin:0 0 4px; text-align:center; }
+  .more p{ font-size:13.5px; color:var(--muted); text-align:center; margin:0 0 12px; line-height:1.5; }
+  .more p b{ color:var(--gold); }
+  .chips{ display:flex; flex-wrap:wrap; gap:8px; justify-content:center; }
+  .chips a{ font-size:15px; color:var(--paper); text-decoration:none; border:1px solid rgba(217,178,92,0.55); border-radius:20px; padding:9px 13px; background:rgba(255,255,255,0.03); }
+  .chips a:active{ background:rgba(217,178,92,0.18); }
   .what{ margin-top:24px; font-size:13.5px; line-height:1.65; color:var(--muted); }
   .what b{ color:var(--gold); font-weight:500; }
   .spinner{ width:26px; height:26px; margin:16px auto; border:2px solid var(--line); border-top-color:var(--gold); border-radius:50%; animation:spin 1s linear infinite; display:none; }
@@ -91,6 +101,7 @@
 </head>
 <body>
 <div class="stars"></div>
+<div class="topbar"><a class="lg" href="/">Το Μαντείο</a><a class="all" href="/#oracles" id="allBtn">Όλες οι προβλέψεις</a></div>
 <div class="card"><div class="card-inner">
 
   <div id="formBox">
@@ -108,6 +119,21 @@
       <button class="submit" id="go" type="submit">Υπολόγισε τον Ωροσκόπο μου</button>
       <div class="spinner" id="spin"></div>
     </form>
+    <script src="/dt.js"></script>
+
+    <div class="more" id="more">
+      <h3>Στο Μαντείο θα βρεις και</h3>
+      <p>Ερωτήσεις πάνω στον δικό σου χάρτη. <b>Η πρώτη απάντηση είναι δωρεάν.</b></p>
+      <div class="chips">
+        <a href="/epistrofi?src=oroskopos-top">Θα επιστρέψει;</a>
+        <a href="/agapi?src=oroskopos-top">Με σκέφτεται ακόμα;</a>
+        <a href="/oikonomika?src=oroskopos-top">Τα οικονομικά μου</a>
+        <a href="/symvatotita?src=oroskopos-top">Ταιριάζουμε;</a>
+        <a href="/alitheia?src=oroskopos-top">Μου κρύβει κάτι;</a>
+        <a href="/erotima?src=oroskopos-top">Η δική μου ερώτηση</a>
+        <a href="/xartis?src=oroskopos-top">Γενέθλιος Χάρτης</a>
+      </div>
+    </div>
 
     <div class="what"><b>Τι είναι ο Ωροσκόπος;</b> Είναι το ζώδιο που ανέτειλε στον ανατολικό ορίζοντα τη στιγμή ακριβώς που γεννήθηκες. Αλλάζει περίπου κάθε δύο ώρες, γι' αυτό δύο άνθρωποι με την ίδια μέρα γέννησης μπορεί να έχουν τελείως διαφορετικό Ωροσκόπο. Είναι το πρόσωπό σου προς τα έξω, η πρώτη εντύπωση και ο τρόπος που ξεκινάς κάθε τι καινούριο.</div>
   </div>
@@ -257,6 +283,16 @@ $("share").addEventListener("click", async () => {
     } catch (x) { go.disabled = false; e.textContent = "Κάτι πήγε στραβά, δοκίμασε ξανά."; e.style.display = "block"; }
   };
 })();
+</script>
+<script>
+/* Μέτρηση: πού πατάνε από τον Ωροσκόπο (μπάρα πάνω, πλαίσιο κάτω από τη φόρμα, κάρτες στο αποτέλεσμα) */
+document.addEventListener("click", function (e) {
+  var a = e.target.closest && e.target.closest("a"); if (!a || !window.manteioEvent) return;
+  var h = (a.getAttribute("href") || a.getAttribute("data-href") || "").split("?")[0].replace(/^\//, "").replace(/#.*/, "") || "arxiki";
+  if (a.id === "allBtn") manteioEvent("oroskopos-mpara:oles");
+  else if (a.closest("#more")) manteioEvent("oroskopos-plaisio:" + h);
+  else if (a.closest("#ask")) manteioEvent("oroskopos-apotelesma:" + h);
+}, true);
 </script>
 </body>
 </html>

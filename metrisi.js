@@ -29,6 +29,7 @@
   var tool = page.replace(/^\//, "") || "arxiki";
   var once = {};
   function ev(name) { if (once[name]) return; once[name] = 1; send({ t: "e", e: name }); }
+  window.manteioEvent = ev;
   var of = window.fetch;
   if (of) window.fetch = function (u) {
     try {
