@@ -11,6 +11,8 @@ const H = () => demo()
 export const vivaReady = () => !!(process.env.VIVA_CLIENT_ID && process.env.VIVA_CLIENT_SECRET && process.env.VIVA_SOURCE_CODE);
 export const vivaOrders = () => getStore({ name: "viva-orders", consistency: "strong" });
 
+export async function vivaTokenCheck() { try { await token(); return "ok"; } catch (e) { return String(e.message || e); } }
+
 async function token() {
   // Το Client ID της Viva τελειώνει σε ".apps.vivapayments.com". Αν μπήκε χωρίς αυτό στο Netlify, το προσθέτουμε εδώ.
   let cid = String(process.env.VIVA_CLIENT_ID || "").trim();
