@@ -17,8 +17,8 @@
     var o = document.createElement("div");
     o.id = "mag"; o.setAttribute("role", "dialog"); o.setAttribute("aria-modal", "true");
     o.innerHTML = '<div class="bx"><h2>Είσαι άνω των 18;</h2>' +
-      '<p>Το Μαντείο απευθύνεται μόνο σε ενήλικες. Πατώντας «Ναι» δηλώνεις ότι είσαι 18 ετών ή μεγαλύτερη.</p>' +
-      '<button class="y" type="button">Ναι, είμαι 18 ή μεγαλύτερη</button>' +
+      '<p>Το Μαντείο απευθύνεται μόνο σε ενήλικες. Πατώντας «Ναι» δηλώνεις ότι είσαι άνω των 18.</p>' +
+      '<button class="y" type="button">Ναι, είμαι άνω των 18</button>' +
       '<button class="n" type="button">Όχι, είμαι κάτω από 18</button></div>';
     document.body.appendChild(o);
     document.documentElement.style.overflow = "hidden";
