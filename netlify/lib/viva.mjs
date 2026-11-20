@@ -14,18 +14,23 @@ export const vivaOrders = () => getStore({ name: "viva-orders", consistency: "st
 export async function vivaTokenCheck() { try { await token(); return "ok"; } catch (e) { return String(e.message || e); } }
 
 async function token() {
-  // Το Client ID της Viva τελειώνει σε ".apps.vivapayments.com". Αν μπήκε χωρίς αυτό στο Netlify, το προσθέτουμε εδώ.
-  let cid = String(process.env.VIVA_CLIENT_ID || "").trim();
-  if (cid && !cid.includes(".")) cid += ".apps.vivapayments.com";
-  const auth = Buffer.from(`${cid}:${String(process.env.VIVA_CLIENT_SECRET || "").trim()}`).toString("base64");
-  const r = await fetch(`${H().accounts}/connect/token`, {
-    method: "POST",
-    headers: { Authorization: `Basic ${auth}`, "Content-Type": "application/x-www-form-urlencoded" },
-    body: "grant_type=client_credentials"
-  });
-  const d = await r.json().catch(() => ({}));
-  if (!d.access_token) throw new Error("Viva token: " + r.status);
-  return d.access_token;
+  // Δοκιμάζουμε το Client ID όπως μπήκε στο Netlify και, αν δεν περάσει, με/χωρίς την κατάληξη .apps.vivapayments.com
+  const raw = String(process.env.VIVA_CLIENT_ID || "").trim();
+  const sec = String(process.env.VIVA_CLIENT_SECRET || "").trim();
+  const suf = ".apps.vivapayments.com";
+  const ids = [...new Set([raw, raw.endsWith(suf) ? raw.slice(0, -suf.length) : raw + suf])].filter(Boolean);
+  let last = "";
+  for (const cid of ids) {
+    const r = await fetch(`${H().accounts}/connect/token`, {
+      method: "POST",
+      headers: { Authorization: `Basic ${Buffer.from(`${cid}:${sec}`).toString("base64")}`, "Content-Type": "application/x-www-form-urlencoded" },
+      body: "grant_type=client_credentials"
+    });
+    const d = await r.json().catch(() => ({}));
+    if (d.access_token) return d.access_token;
+    last = `Viva token: ${r.status} ${d.error || ""} ${d.error_description || ""}`.trim();
+  }
+  throw new Error(last || "Viva token: no client id");
 }
 
 // Δημιουργεί παραγγελία και επιστρέφει τη διεύθυνση της σελίδας πληρωμής της Viva.
