@@ -12,7 +12,10 @@ export const vivaReady = () => !!(process.env.VIVA_CLIENT_ID && process.env.VIVA
 export const vivaOrders = () => getStore({ name: "viva-orders", consistency: "strong" });
 
 async function token() {
-  const auth = Buffer.from(`${process.env.VIVA_CLIENT_ID}:${process.env.VIVA_CLIENT_SECRET}`).toString("base64");
+  // Το Client ID της Viva τελειώνει σε ".apps.vivapayments.com". Αν μπήκε χωρίς αυτό στο Netlify, το προσθέτουμε εδώ.
+  let cid = String(process.env.VIVA_CLIENT_ID || "").trim();
+  if (cid && !cid.includes(".")) cid += ".apps.vivapayments.com";
+  const auth = Buffer.from(`${cid}:${String(process.env.VIVA_CLIENT_SECRET || "").trim()}`).toString("base64");
   const r = await fetch(`${H().accounts}/connect/token`, {
     method: "POST",
     headers: { Authorization: `Basic ${auth}`, "Content-Type": "application/x-www-form-urlencoded" },
