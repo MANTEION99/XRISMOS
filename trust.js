@@ -8,7 +8,7 @@
     // Δαχτυλίδι στα χρώματα του IRIS (κόκκινο, μπλε, πορτοκαλί, πετρόλ)
     var ring = '<span style="display:inline-block;width:14px;height:14px;border-radius:50%;vertical-align:-2px;margin:0 5px 0 4px;' +
       'background:radial-gradient(circle,#0B0A16 0 33%,transparent 35%),conic-gradient(#2670b5 0 25%,#169c96 0 50%,#f68d22 0 75%,#ee3b38 0)"></span>';
-    b.innerHTML = LOCK + "Ασφαλείς πληρωμές με" + ring + '<b style="color:#fff;letter-spacing:.5px">IRIS</b> ή κάρτα';
+    b.innerHTML = LOCK + "Ασφαλείς πληρωμές με" + ring + '<b style="color:#fff;letter-spacing:.5px">IRIS</b>';
     document.body.insertBefore(b, document.body.firstChild);
     var bs = getComputedStyle(document.body);
     if (bs.display.indexOf("flex") > -1 && bs.flexDirection.indexOf("row") === 0) document.body.style.flexWrap = "wrap";
@@ -30,7 +30,7 @@
       'background:radial-gradient(circle,#14122a 0 33%,transparent 35%),conic-gradient(#2670b5 0 25%,#169c96 0 50%,#f68d22 0 75%,#ee3b38 0)"></span>';
     var d = document.createElement("div"); d.className = "tbadge";
     d.style.cssText = "text-align:center;font:600 15px/1.5 Inter,Arial,sans-serif;color:#E9E3D3;margin:14px 0 10px";
-    d.innerHTML = LOCK.replace('width="13" height="13"', 'width="15" height="15"') + "Πληρώνεις με ασφάλεια με" + r + '<b style="color:#fff;letter-spacing:.5px">IRIS</b> ή κάρτα' +
+    d.innerHTML = LOCK.replace('width="13" height="13"', 'width="15" height="15"') + "Πληρώνεις με ασφάλεια με" + r + '<b style="color:#fff;letter-spacing:.5px">IRIS</b>' +
       '<div style="font-size:12.5px;font-weight:400;color:#a8a2bf;margin-top:2px">Από την τράπεζά σου, χωρίς να δώσεις στοιχεία κάρτας</div>';
     el.insertAdjacentElement(where, d);
   }
