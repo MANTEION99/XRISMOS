@@ -30,8 +30,7 @@
       'background:radial-gradient(circle,#14122a 0 33%,transparent 35%),conic-gradient(#2670b5 0 25%,#169c96 0 50%,#f68d22 0 75%,#ee3b38 0)"></span>';
     var d = document.createElement("div"); d.className = "tbadge";
     d.style.cssText = "text-align:center;font:600 15px/1.5 Inter,Arial,sans-serif;color:#E9E3D3;margin:14px 0 10px";
-    d.innerHTML = LOCK.replace('width="13" height="13"', 'width="15" height="15"') + "Πληρώνεις με ασφάλεια με" + r + '<b style="color:#fff;letter-spacing:.5px">IRIS</b>' +
-      '<div style="font-size:12.5px;font-weight:400;color:#a8a2bf;margin-top:2px">Από την τράπεζά σου, χωρίς να δώσεις στοιχεία κάρτας</div>';
+    d.innerHTML = LOCK.replace('width="13" height="13"', 'width="15" height="15"') + "Πληρώνεις με ασφάλεια με" + r + '<b style="color:#fff;letter-spacing:.5px">IRIS</b>';
     el.insertAdjacentElement(where, d);
   }
   function run() { bar(); badge(document.getElementById("more"), "afterbegin"); var a = document.getElementById("ask"); if (a) badge(a, "beforebegin"); note(document.getElementById("unlockBtn")); note(document.getElementById("bBuy")); }
