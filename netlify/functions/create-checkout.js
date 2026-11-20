@@ -62,7 +62,7 @@ exports.handler = async function (event) {
   }
 
   try {
-    const { tool, returnUrl, reading_id, src } = JSON.parse(event.body);
+    const { tool, returnUrl, reading_id, src, provider } = JSON.parse(event.body);
     const product = PRODUCTS[tool];
 
     if (!product || !returnUrl) {
@@ -84,6 +84,15 @@ exports.handler = async function (event) {
         return { statusCode: 400, body: JSON.stringify({ error: "Λάθος χρησμός." }) };
       }
       metadata.reading_id = String(reading_id);
+    }
+
+    // IRIS και άλλοι τρόποι μέσω Viva, όταν η πελάτισσα το διαλέξει.
+    if (provider === "viva") {
+      require("@netlify/blobs").connectLambda(event);
+      const { vivaReady, vivaCreateOrder } = await import("../lib/viva.mjs");
+      if (!vivaReady()) return { statusCode: 400, body: JSON.stringify({ error: "Η πληρωμή με IRIS δεν είναι ακόμα διαθέσιμη." }) };
+      const url = await vivaCreateOrder({ tool, name: product.name, priceCents: product.price, readingId: metadata.reading_id, returnUrl, src: metadata.src });
+      return { statusCode: 200, headers: { "Content-Type": "application/json" }, body: JSON.stringify({ url }) };
     }
 
     const body = toFormBody({

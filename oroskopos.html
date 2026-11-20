@@ -69,6 +69,14 @@
   .q .qt span{ color:var(--gold); font-size:22px; }
   .q .qd{ font-size:13.5px; color:var(--muted); line-height:1.5; margin:3px 0 6px; }
   .q .free{ font-size:13px; font-weight:700; color:var(--gold); letter-spacing:0.3px; }
+  .rv{ border:1px solid var(--line); border-radius:14px; padding:14px 16px; margin:4px 0 18px; text-align:left; background:rgba(217,178,92,0.04); }
+  .rv h4{ font-family:'Cormorant Garamond',serif; font-size:20px; color:var(--gold); margin:0 0 8px; font-weight:600; text-align:center; }
+  .rv .st{ display:flex; justify-content:center; gap:6px; margin-bottom:10px; }
+  .rv .st button{ background:none; border:none; font-size:30px; color:#5a5470; cursor:pointer; padding:0 2px; }
+  .rv .st button.on{ color:var(--gold); }
+  .rv textarea{ width:100%; box-sizing:border-box; min-height:70px; border-radius:10px; border:1px solid var(--line); background:rgba(0,0,0,.25); color:var(--paper); padding:10px; font:inherit; font-size:15px; }
+  .rv label.pc{ display:flex; gap:8px; align-items:flex-start; font-size:13.5px; color:var(--muted); margin:8px 0 10px; }
+  .rv .ok{ text-align:center; color:var(--gold); font-size:15px; }
   .what{ margin-top:24px; font-size:13.5px; line-height:1.65; color:var(--muted); }
   .what b{ color:var(--gold); font-weight:500; }
   .spinner{ width:26px; height:26px; margin:16px auto; border:2px solid var(--line); border-top-color:var(--gold); border-radius:50%; animation:spin 1s linear infinite; display:none; }
@@ -131,6 +139,14 @@
     <div class="row">
       <button class="btn" id="share" type="button">Στείλ' το σε φίλη</button>
       <button class="btn" id="again" type="button">Νέος υπολογισμός</button>
+    </div>
+    <div class="rv" id="rv">
+      <h4>Σου άρεσε ο Ωροσκόπος σου;</h4>
+      <div class="st" id="rvSt"><button type="button" aria-label="1 αστέρι">★</button><button type="button" aria-label="2 αστέρια">★</button><button type="button" aria-label="3 αστέρια">★</button><button type="button" aria-label="4 αστέρια">★</button><button type="button" aria-label="5 αστέρια">★</button></div>
+      <textarea id="rvTx" maxlength="400" placeholder="Γράψε δυο λόγια, αν θέλεις"></textarea>
+      <label class="pc"><input type="checkbox" id="rvPub" checked> Να φαίνεται η κριτική μου στη σελίδα, μόνο με το μικρό μου όνομα.</label>
+      <button class="btn" id="rvGo" type="button">Στείλε την κριτική</button>
+      <p class="err" id="rvErr" style="display:none"></p>
     </div>
     <div id="socialProof"></div>
     <div class="cta">
@@ -223,6 +239,24 @@ $("share").addEventListener("click", async () => {
   if (navigator.share) { try { await navigator.share({ title: "Ο Ωροσκόπος μου", text, url }); } catch {} return; }
   try { await navigator.clipboard.writeText(text + " " + url); $("share").textContent = "Αντιγράφηκε!"; } catch {}
 });
+
+(function () {
+  let rating = 0;
+  const bs = Array.from(document.querySelectorAll("#rvSt button"));
+  bs.forEach((b, i) => b.onclick = () => { rating = i + 1; bs.forEach((x, k) => x.classList.toggle("on", k < rating)); });
+  const go = document.getElementById("rvGo");
+  go.onclick = async () => {
+    const e = document.getElementById("rvErr"); e.style.display = "none";
+    if (!rating) { e.textContent = "Διάλεξε πρώτα τα αστέρια."; e.style.display = "block"; return; }
+    go.disabled = true;
+    try {
+      const r = await fetch("/api/reviews", { method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ kind: "oroskopos", rating, text: document.getElementById("rvTx").value, name: document.getElementById("nm").value, publish: document.getElementById("rvPub").checked }) });
+      if (!r.ok) throw new Error();
+      document.getElementById("rv").innerHTML = '<p class="ok">Ευχαριστούμε! Το Μαντείο διαβάζει κάθε κριτική.</p>';
+    } catch (x) { go.disabled = false; e.textContent = "Κάτι πήγε στραβά, δοκίμασε ξανά."; e.style.display = "block"; }
+  };
+})();
 </script>
 </body>
 </html>

@@ -21,7 +21,7 @@ const json = (status, body, extra = {}) => new Response(JSON.stringify(body), {
 const TOOL_NAMES = {
   epistrofi: "Η Επιστροφή της Χαμένης Αγάπης", erotima: "Ρώτα το Μαντείο", agapi: "Ο Χρησμός της Αγάπης",
   alitheia: "Ο Χρησμός της Αλήθειας", symvatotita: "Ταιριάζετε;", oikonomika: "Οικονομική Αρχή",
-  numerology: "Αριθμολογία", taro: "Το Τρίφυλλο Ταρώ"
+  numerology: "Αριθμολογία", taro: "Το Τρίφυλλο Ταρώ", oroskopos: "Δωρεάν Ωροσκόπος"
 };
 
 const firstName = (v) => String(v || "").trim().split(/\s+/)[0].slice(0, 20)
@@ -67,11 +67,23 @@ export default async (req) => {
     await store.setJSON(id, r);
     return json(200, { ok: true, hidden: r.hidden });
   }
+  // Κριτική για τον δωρεάν Ωροσκόπο: χωρίς αγορά, φαίνεται με την ένδειξη «Δωρεάν Ωροσκόπος».
+  if (b && b.kind === "oroskopos") {
+    const rating = Math.round(Number(b.rating));
+    const text = String(b.text || "").replace(/\s+/g, " ").trim().slice(0, 400);
+    if (!(rating >= 1 && rating <= 5)) return json(400, { error: "Διάλεξε από 1 έως 5 αστέρια." });
+    const hasLink = /(https?:\/\/|www\.|\.com|\.gr|@)/i.test(text);
+    const publish = b.publish === true && text.length >= 3 && !hasLink;
+    const id = "free-" + crypto.randomUUID();
+    await store.setJSON(id, { readingId: id, tool: "oroskopos", rating, text, name: firstName(b.name) || "Επισκέπτρια", publish, free: true, createdAt: new Date().toISOString() });
+    return json(200, { ok: true, published: publish });
+  }
+
   const readingId = String(b.reading_id || "");
   const sessionId = String(b.session_id || "");
   const rating = Math.round(Number(b.rating));
   const text = String(b.text || "").replace(/\s+/g, " ").trim().slice(0, 400);
-  if (!/^[0-9a-f-]{36}$/.test(readingId) || !/^cs_[A-Za-z0-9_]+$/.test(sessionId)) return json(400, { error: "Λάθος στοιχεία." });
+  if (!/^[0-9a-f-]{36}$/.test(readingId) || !/^(cs_[A-Za-z0-9_]+|vv_\d{6,20})$/.test(sessionId)) return json(400, { error: "Λάθος στοιχεία." });
   if (!(rating >= 1 && rating <= 5)) return json(400, { error: "Διάλεξε από 1 έως 5 αστέρια." });
 
   // Επιβεβαίωση αγοράς: ο χρησμός υπάρχει και πληρώθηκε με αυτό το session.

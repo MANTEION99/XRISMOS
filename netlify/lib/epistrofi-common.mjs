@@ -388,6 +388,7 @@ async function streamClaudeOnceInner(prompt, maxTokens, onText, signal, bump, us
 // Επαληθεύει στο Stripe ότι η πληρωμή έγινε, ότι αφορά αυτό το εργαλείο
 // και, όταν δίνεται, ότι αφορά ΑΥΤΟΝ τον συγκεκριμένο χρησμό.
 export async function verifyStripeSession(sessionId, tool, readingId) {
+  if (/^vv_/.test(String(sessionId || ""))) { const { vivaSession } = await import("./viva.mjs"); return vivaSession(sessionId, tool, readingId); }
   if (!sessionId || !/^cs_[A-Za-z0-9_]+$/.test(sessionId)) return null;
   try {
     const res = await fetch(`https://api.stripe.com/v1/checkout/sessions/${sessionId}?expand[]=payment_intent`, {

@@ -23,7 +23,10 @@ async function getSession(sessionId) {
 async function verifyPaidSession(sessionId, expectedTool) {
   if (!sessionId) return null;
   try {
-    const session = await getSession(sessionId);
+    const session = /^vv_/.test(String(sessionId))
+      ? await (await import("../lib/viva.mjs")).vivaSession(sessionId)
+      : await getSession(sessionId);
+    if (!session) return null;
     const pi = session.payment_intent;
     const piStatus = pi && typeof pi === "object" ? pi.status : null;
     const ok = session.payment_status === "paid" || piStatus === "requires_capture" || piStatus === "succeeded";
@@ -140,6 +143,7 @@ ${question ? "ΔΕΝ γράφεις ποσοστό: η πιθανότητα επ
 exports.generate = generate;
 
 exports.handler = async function (event) {
+  try { connectLambda(event); } catch (e) {}
   if (event.httpMethod !== "POST") {
     return { statusCode: 405, body: "Method Not Allowed" };
   }
