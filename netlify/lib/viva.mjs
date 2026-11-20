@@ -9,7 +9,14 @@ const H = () => demo()
   : { accounts: "https://accounts.vivapayments.com", api: "https://api.vivapayments.com", web: "https://www.vivapayments.com" };
 
 export const vivaReady = () => !!(process.env.VIVA_CLIENT_ID && process.env.VIVA_CLIENT_SECRET && process.env.VIVA_SOURCE_CODE);
-export const vivaOrders = () => getStore({ name: "viva-orders", consistency: "strong" });
+// Strong όπου υποστηρίζεται (functions v2). Στις παλιές lambda (create-checkout, epistrofi-agora) δεν υποστηρίζεται, οπότε πέφτουμε σε κανονική.
+const isStrongErr = (e) => /strong consistency|uncachedEdgeURL/i.test(String(e && e.message || e));
+export const vivaOrders = () => {
+  const strong = getStore({ name: "viva-orders", consistency: "strong" });
+  const plain = () => getStore({ name: "viva-orders" });
+  const wrap = (fn) => async (...a) => { try { return await strong[fn](...a); } catch (e) { if (isStrongErr(e)) return plain()[fn](...a); throw e; } };
+  return { get: wrap("get"), setJSON: wrap("setJSON") };
+};
 
 export async function vivaOrderCheck() {
   try {
