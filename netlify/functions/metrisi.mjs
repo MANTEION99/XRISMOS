@@ -23,13 +23,18 @@ export default async (req) => {
     const p = clean(b.p, 40) || "/";
     const s = SOURCES.has(b.s) ? b.s : "alli";
     const e = clean(b.e, 40);
+    // Για τις πληρωμές κρατάμε μόνο ένα σύντομο αποτύπωμα της πληρωμής, για να μη μετριέται δύο φορές
+    const u = b.u ? createHash("sha256").update(String(b.u)).digest("hex").slice(0, 16) : "";
     const day = athensDay();
     const st = store();
     for (let i = 0; i < 3; i++) {
       const cur = await st.getWithMetadata(day, { type: "json" });
       const data = (cur && cur.data) || { v: {}, s: {}, e: {} };
       if (t === "v") { data.v[p] = (data.v[p] || 0) + 1; data.s[s] = (data.s[s] || 0) + 1; }
-      else if (e) { data.e[e] = (data.e[e] || 0) + 1; }
+      else if (e) {
+        if (u) { data.u = data.u || {}; if (data.u[u]) break; data.u[u] = 1; }
+        data.e[e] = (data.e[e] || 0) + 1;
+      }
       const opt = cur && cur.etag ? { onlyIfMatch: cur.etag } : { onlyIfNew: true };
       const r = await st.setJSON(day, data, opt);
       if (!r || r.modified !== false) break;
@@ -45,7 +50,8 @@ export default async (req) => {
     for (let i = 0; i < days; i++) {
       const d = athensDay(new Date(Date.now() - i * 86400000));
       const data = await st.get(d, { type: "json" });
-      out.push({ day: d, ...(data || { v: {}, s: {}, e: {} }) });
+      const x = data || { v: {}, s: {}, e: {} }; delete x.u;
+      out.push({ day: d, ...x });
     }
     return json(200, { days: out });
   }

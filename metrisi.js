@@ -37,7 +37,18 @@
       if (/\/api\/oroskopos/.test(s)) ev("oroskopos");
       else if (/teaser/.test(s)) ev("dorean:" + tool);
       else if (/create-checkout|synomilia-buy/.test(s)) ev("pliromi-koumpi:" + tool);
-      else if (/-full|epistrofi-agora/.test(s)) ev("pliromeni:" + tool);
+      else if (/-full|epistrofi-agora/.test(s)) {
+        // Πληρωμένη απάντηση: μετριέται μία φορά ανά πληρωμή (όχι σε κάθε άνοιγμα ή ανανέωση της σελίδας)
+        var sid = new URLSearchParams(location.search).get("session_id") || "";
+        var p = of.apply(this, arguments);
+        p.then(function (r) {
+          if (!r.ok || !sid) return;
+          var key = "manteio_paid_" + sid;
+          try { if (localStorage.getItem(key)) return; localStorage.setItem(key, "1"); } catch (e) {}
+          send({ t: "e", e: "pliromeni:" + tool, u: sid });
+        }).catch(function () {});
+        return p;
+      }
     } catch (e) {}
     return of.apply(this, arguments);
   };
