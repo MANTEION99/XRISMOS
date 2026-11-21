@@ -4,7 +4,7 @@
   function bar() {
     if (document.getElementById("tbar")) return;
     var b = document.createElement("div"); b.id = "tbar";
-    b.style.cssText = "position:relative;z-index:5;width:100%;box-sizing:border-box;flex:0 0 100%;text-align:center;font:600 13px/1.4 Inter,Arial,sans-serif;color:#E9E3D3;background:transparent;padding:9px 10px 4px;letter-spacing:.2px";
+    b.style.cssText = "position:sticky;top:0;z-index:50;background:rgba(11,10,22,.92);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);width:100%;box-sizing:border-box;flex:0 0 100%;text-align:center;font:600 13px/1.4 Inter,Arial,sans-serif;color:#E9E3D3;padding:8px 10px 7px;letter-spacing:.2px";
     // Δαχτυλίδι στα χρώματα του IRIS (κόκκινο, μπλε, πορτοκαλί, πετρόλ)
     var ring = '<span style="display:inline-block;width:14px;height:14px;border-radius:50%;vertical-align:-2px;margin:0 5px 0 4px;' +
       'background:radial-gradient(circle,#0B0A16 0 33%,transparent 35%),conic-gradient(#2670b5 0 25%,#169c96 0 50%,#f68d22 0 75%,#ee3b38 0)"></span>';
