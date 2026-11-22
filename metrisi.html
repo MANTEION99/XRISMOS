@@ -56,8 +56,9 @@ async function load() {
   const d = await res.json();
   if (!res.ok) { $("out").innerHTML = ""; $("err").textContent = d.error || "Σφάλμα"; return; }
   const days = r === 2 ? [d.days[1]] : d.days.slice(0, r);
-  const V = {}, S = {}, E = {};
-  days.forEach(x => { add(V, x.v || {}); add(S, x.s || {}); add(E, x.e || {}); });
+  const V = {}, S = {}, E = {}, VR = {}, SR = {}, PR = {};
+  days.forEach(x => { add(V, x.v || {}); add(S, x.s || {}); add(E, x.e || {}); add(VR, x.vr || {}); add(SR, x.sr || {}); add(PR, x.pr || {}); });
+  const nr = (o) => (o.n || o.r) ? `<p class="muted" style="margin:6px 0 0">Νέοι <b style="color:#F5F1E8">${o.n || 0}</b> · Ξαναήρθαν <b style="color:#F5F1E8">${o.r || 0}</b></p>` : "";
   const total = Object.values(S).reduce((a, b) => a + b, 0);
   const PT = {}, PM = {}, REST = {};
   for (const k in E) {
@@ -72,11 +73,14 @@ async function load() {
   if (paid) {
     html += `<p class="muted" style="margin:10px 0 4px">Για ποια πρόβλεψη</p>${table(PT, k => PAGE["/" + k] || k)}`;
     html += `<p class="muted" style="margin:10px 0 4px">Με τι πλήρωσαν</p>${table(PM, k => MET[k] || k)}`;
+    html += nr(PR).replace("Νέοι", "Με την πρώτη επίσκεψη").replace("Ξαναήρθαν", "Όταν ξαναήρθαν");
     if (r > 2) html += `<p class="muted" style="margin:10px 0 4px">Ανά μέρα</p><table>${d.days.slice(0, r).map(x => { let n = 0; for (const k in (x.e || {})) if (k.split(":")[0] === "pliromeni") n += x.e[k]; return n ? `<tr><td>${x.day.split("-").reverse().join("/")}</td><td class="n">${n}</td></tr>` : ""; }).join("")}</table>`;
   }
   html += `</div>`;
-  html += `<div class="card"><h2>Επισκέψεις</h2><div class="big">${total}</div></div>`;
-  html += `<div class="card"><h2>Από πού ήρθαν</h2>${table(S, k => SRC[k] || k)}</div>`;
+  html += `<div class="card"><h2>Επισκέψεις</h2><div class="big">${total}</div>${nr(VR)}${(VR.n || VR.r) && (VR.n || 0) + (VR.r || 0) < total ? '<p class="muted" style="margin:4px 0 0">Το «νέοι / ξαναήρθαν» μετράει από 22/11 και μετά.</p>' : ''}</div>`;
+  const hasSR = Object.keys(SR).length;
+  const srcRows = Object.entries(S).sort((a, b) => b[1] - a[1]).map(([k, v]) => `<tr><td>${SRC[k] || k}${hasSR ? `<div class="muted">νέοι ${SR[k + ":n"] || 0} · ξαναήρθαν ${SR[k + ":r"] || 0}</div>` : ""}</td><td class="n">${v}</td></tr>`).join("");
+  html += `<div class="card"><h2>Από πού ήρθαν</h2>${srcRows ? "<table>" + srcRows + "</table>" : '<p class="muted">Τίποτα ακόμα.</p>'}</div>`;
   html += `<div class="card"><h2>Τι έκαναν</h2>${table(REST, evName)}</div>`;
   html += `<div class="card"><h2>Σελίδες</h2>${table(V, k => PAGE[k] || k)}</div>`;
   if (r > 2) html += `<div class="card"><h2>Ανά μέρα</h2><table>${d.days.slice(0, r).map(x => `<tr><td>${x.day.split("-").reverse().join("/")}</td><td class="n">${Object.values(x.s || {}).reduce((a, b) => a + b, 0)}</td></tr>`).join("")}</table></div>`;

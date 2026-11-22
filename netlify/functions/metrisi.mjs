@@ -23,6 +23,7 @@ export default async (req) => {
     const p = clean(b.p, 40) || "/";
     const s = SOURCES.has(b.s) ? b.s : "alli";
     const e = clean(b.e, 40);
+    const r = b.r === 1 || b.r === "1" ? "r" : (b.r === 0 || b.r === "0" ? "n" : "");
     // Για τις πληρωμές κρατάμε μόνο ένα σύντομο αποτύπωμα της πληρωμής, για να μη μετριέται δύο φορές
     const u = b.u ? createHash("sha256").update(String(b.u)).digest("hex").slice(0, 16) : "";
     const day = athensDay();
@@ -30,10 +31,15 @@ export default async (req) => {
     for (let i = 0; i < 3; i++) {
       const cur = await st.getWithMetadata(day, { type: "json" });
       const data = (cur && cur.data) || { v: {}, s: {}, e: {} };
-      if (t === "v") { data.v[p] = (data.v[p] || 0) + 1; data.s[s] = (data.s[s] || 0) + 1; }
+      if (t === "v") {
+        data.v[p] = (data.v[p] || 0) + 1; data.s[s] = (data.s[s] || 0) + 1;
+        // Νέοι (n) ή ξαναήρθαν (r), συνολικά και ανά πηγή
+        if (r) { data.vr = data.vr || {}; data.vr[r] = (data.vr[r] || 0) + 1; data.sr = data.sr || {}; const k2 = s + ":" + r; data.sr[k2] = (data.sr[k2] || 0) + 1; }
+      }
       else if (e) {
         if (u) { data.u = data.u || {}; if (data.u[u]) break; data.u[u] = 1; }
         data.e[e] = (data.e[e] || 0) + 1;
+        if (r && e.startsWith("pliromeni:")) { data.pr = data.pr || {}; data.pr[r] = (data.pr[r] || 0) + 1; }
       }
       const opt = cur && cur.etag ? { onlyIfMatch: cur.etag } : { onlyIfNew: true };
       const r = await st.setJSON(day, data, opt);

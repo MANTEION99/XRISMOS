@@ -1,4 +1,4 @@
-/* Μετρητής χωρίς cookies: στέλνει μόνο σελίδα, πηγή και γεγονός. Δεν κρατά τίποτα στη συσκευή. */
+/* Μετρητής χωρίς cookies: στέλνει μόνο σελίδα, πηγή και γεγονός. Δεν κρατά τίποτα στη συσκευή. Νέος ή ξαναήρθε βγαίνει από την απάντηση 18+ που υπάρχει ήδη. */
 (function () {
   if (navigator.webdriver) return;
   function send(o) {
@@ -24,8 +24,16 @@
     if (/youtube/.test(h)) return "youtube";
     return "alli";
   }
+  // Νέος ή ξαναήρθε: κοιτάμε μόνο αν η συσκευή έχει ήδη απαντήσει στο 18+ (manteio_18). Τίποτα καινούργιο δεν αποθηκεύεται.
+  // Κρατιέται για όλη την ίδια επίσκεψη (μέχρι να κλείσει η καρτέλα), ώστε όποιος μπήκε πρώτη φορά και πλήρωσε να μετρηθεί σωστά ως νέος.
+  var ret = 0;
+  try {
+    var ss = sessionStorage.getItem("manteio_r");
+    if (ss === "0" || ss === "1") ret = +ss;
+    else { ret = localStorage.getItem("manteio_18") === "1" ? 1 : 0; sessionStorage.setItem("manteio_r", String(ret)); }
+  } catch (e) {}
   var page = location.pathname.replace(/\.html$/, "").replace(/-tool-agora$/, "") || "/";
-  send({ t: "v", p: page, s: source() });
+  send({ t: "v", p: page, s: source(), r: ret });
   var tool = page.replace(/^\//, "") || "arxiki";
   var once = {};
   function ev(name) { if (once[name]) return; once[name] = 1; send({ t: "e", e: name }); }
@@ -45,7 +53,7 @@
           if (!r.ok || !sid) return;
           var key = "manteio_paid_" + sid;
           try { if (localStorage.getItem(key)) return; localStorage.setItem(key, "1"); } catch (e) {}
-          send({ t: "e", e: "pliromeni:" + tool, u: sid });
+          send({ t: "e", e: "pliromeni:" + tool, u: sid, r: ret });
           // Με ποιον τρόπο πλήρωσε: vv_ είναι Viva (IRIS), cs_ είναι Stripe (κάρτα, Apple Pay, Google Pay)
           send({ t: "e", e: "tropos-pliromis:" + (/^vv_/.test(sid) ? "iris" : "karta"), u: sid + "#m" });
         }).catch(function () {});
