@@ -83,9 +83,11 @@ export async function vivaConfirm(transactionId, orderCode) {
   const t = await token();
   const r = await fetch(`${H().api}/checkout/v2/transactions/${transactionId}`, { headers: { Authorization: `Bearer ${t}` } });
   const d = await r.json().catch(() => ({}));
-  const ok = d.statusId === "F" && String(d.orderCode) === String(orderCode) && Math.round(Number(d.amount) * 100) === rec.amount;
+  // Η Viva μπορεί να χρεώσει στρογγυλεμένο ποσό (π.χ. 5,00€ αντί για 4,99€): δεχόμαστε ίσο ή έως 10 λεπτά παραπάνω, ποτέ λιγότερο.
+  const paidCents = Math.round(Number(d.amount) * 100);
+  const ok = d.statusId === "F" && String(d.orderCode) === String(orderCode) && paidCents >= rec.amount && paidCents <= rec.amount + 10;
   if (ok) {
-    Object.assign(rec, { paid: true, transactionId, email: d.email || "", fullName: d.fullName || "", paidAt: new Date().toISOString() });
+    Object.assign(rec, { paid: true, transactionId, paidCents, email: d.email || "", fullName: d.fullName || "", paidAt: new Date().toISOString() });
     await st.setJSON(String(orderCode), rec);
   } else {
     console.error("[viva] not confirmed", orderCode, d.statusId, d.amount);
