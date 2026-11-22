@@ -22,7 +22,11 @@
         "<button type='button' data-p='stripe'><b>Με κάρτα</b><span>Χρεωστική ή πιστωτική κάρτα, Apple Pay ή Google Pay.</span></button>" +
         "<div style='text-align:center;font-size:12px;color:#a8a2bf;margin-top:6px'>Ασφαλής πληρωμή μέσω <b style='color:#fff;letter-spacing:.3px'>viva.com</b> (IRIS) και <b style='color:#fff'>Stripe</b> (κάρτα)</div></div>";
       document.body.appendChild(bg);
-      bg.querySelectorAll("button").forEach(function (b) { b.onclick = function () { bg.remove(); res(b.getAttribute("data-p")); }; });
+      bg.querySelectorAll("button").forEach(function (b) { b.onclick = function () {
+        var c = b.getAttribute("data-p");
+        // Μέτρηση: ποιον τρόπο διάλεξαν στο παράθυρο
+        try { if (window.manteioEvent) manteioEvent("epilogi-pliromis:" + (c === "viva" ? "iris" : "karta")); } catch (e) {}
+        bg.remove(); res(c); }; });
     });
   }
   // Μήνυμα αναμονής όσο ανοίγει η σελίδα πληρωμής IRIS της Viva

@@ -46,6 +46,8 @@
           var key = "manteio_paid_" + sid;
           try { if (localStorage.getItem(key)) return; localStorage.setItem(key, "1"); } catch (e) {}
           send({ t: "e", e: "pliromeni:" + tool, u: sid });
+          // Με ποιον τρόπο πλήρωσε: vv_ είναι Viva (IRIS), cs_ είναι Stripe (κάρτα, Apple Pay, Google Pay)
+          send({ t: "e", e: "tropos-pliromis:" + (/^vv_/.test(sid) ? "iris" : "karta"), u: sid + "#m" });
         }).catch(function () {});
         return p;
       }
