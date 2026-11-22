@@ -88,12 +88,33 @@
   // Αν γυρίσει πίσω από τη σελίδα πληρωμής με το κουμπί «πίσω», να μη μείνει το μήνυμα στην οθόνη
   window.addEventListener("pageshow", function () { document.querySelectorAll(".pcWait").forEach(function (x) { x.remove(); }); });
   try {
-    if (new URLSearchParams(location.search).get("pay") === "fail") {
-      var n = function () { css(); var d = document.createElement("div");
-        d.style.cssText = "position:fixed;left:12px;right:12px;top:12px;z-index:99999;max-width:520px;margin:0 auto;background:#3a1420;border:1px solid #e07a8c;border-radius:14px;padding:12px 14px;color:#fff;font:15px Inter,Arial,sans-serif";
-        d.textContent = "Η πληρωμή δεν ολοκληρώθηκε και δεν χρεώθηκες. Μπορείς να δοκιμάσεις ξανά.";
-        document.body.appendChild(d); setTimeout(function () { d.remove(); }, 8000); };
-      if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", n); else n();
+    var payQ = new URLSearchParams(location.search).get("pay");
+    if (payQ === "fail" || payQ === "back") {
+      // Η πληρωμή απέτυχε (IRIS) ή ακυρώθηκε (κάρτα): ζεστό μήνυμα και κουμπί για νέα προσπάθεια, ώστε να μη χαθεί ο πελάτης.
+      var n = function () {
+        css();
+        try { var u = new URL(location.href); u.searchParams.delete("pay"); history.replaceState(null, "", u.pathname + u.search + u.hash); } catch (e) {}
+        try { if (window.manteioEvent) window.manteioEvent("pliromi-den-oloklirothike:" + payQ); } catch (e) {}
+        var o = document.createElement("div");
+        o.style.cssText = "position:fixed;inset:0;z-index:99999;background:rgba(5,4,12,.72);display:flex;align-items:center;justify-content:center;padding:16px";
+        o.innerHTML = "<div style='max-width:440px;width:100%;background:#15122a;border:1px solid rgba(217,178,92,.55);border-radius:18px;padding:22px 20px;color:#F5F1E8;font:15.5px/1.55 Inter,Arial,sans-serif;text-align:center'>" +
+          "<div style='font-family:\"Cormorant Garamond\",Georgia,serif;font-size:25px;color:#D9B25C;margin-bottom:8px'>Η πληρωμή δεν ολοκληρώθηκε</div>" +
+          "<div style='margin-bottom:6px'>Δεν έγινε καμία χρέωση. Η απάντησή σου σε περιμένει εδώ.</div>" +
+          "<div style='color:#cfc8b8;font-size:14px;margin-bottom:16px'>Μπορείς να δοκιμάσεις ξανά τώρα. Αν η τράπεζα δεν ενέκρινε την πληρωμή, διάλεξε άλλον τρόπο: IRIS αντί για κάρτα, ή μια άλλη κάρτα.</div>" +
+          "<button type='button' id='pcRetry' style='display:block;width:100%;padding:14px;border:0;border-radius:24px;background:linear-gradient(135deg,#D9B25C,#8C6420);color:#241A08;font:600 16px Inter,Arial,sans-serif;cursor:pointer;margin-bottom:10px'>Δοκίμασε ξανά</button>" +
+          "<button type='button' id='pcLater' style='background:none;border:0;color:#cfc8b8;font:14px Inter,Arial,sans-serif;text-decoration:underline;cursor:pointer'>Όχι τώρα</button></div>";
+        document.body.appendChild(o);
+        o.querySelector("#pcLater").onclick = function () { o.remove(); };
+        o.querySelector("#pcRetry").onclick = function () {
+          o.remove();
+          try { if (window.manteioEvent) window.manteioEvent("pliromi-xanadokimi:" + payQ); } catch (e) {}
+          // Το κουμπί πληρωμής της σελίδας (ανοίγει ξανά το παράθυρο IRIS ή κάρτα).
+          var ids = ["unlockBtn", "bBuy", "buyBtn", "payBtn"], b = null;
+          for (var i = 0; i < ids.length && !b; i++) { var x = document.getElementById(ids[i]); if (x && x.offsetParent !== null) b = x; }
+          if (b) { b.scrollIntoView({ behavior: "smooth", block: "center" }); setTimeout(function () { b.click(); }, 450); }
+        };
+      };
+      if (document.readyState === "complete") setTimeout(n, 600); else window.addEventListener("load", function () { setTimeout(n, 600); });
     }
   } catch (e) {}
 })();

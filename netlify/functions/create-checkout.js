@@ -82,7 +82,8 @@ exports.handler = async function (event) {
     // Το Stripe θα αντικαταστήσει το {CHECKOUT_SESSION_ID} με το πραγματικό id όταν στείλει πίσω τον χρήστη
     const separator = returnUrl.includes("?") ? "&" : "?";
     const successUrl = `${returnUrl}${separator}session_id={CHECKOUT_SESSION_ID}`;
-    const cancelUrl = returnUrl;
+    // Αν ακυρώσει στο Stripe, γυρίζει με pay=back και του βγαίνει μήνυμα για νέα προσπάθεια.
+    const cancelUrl = returnUrl + (returnUrl.includes("?") ? "&" : "?") + "pay=back";
 
     // Για τον δωρεάν χρησμό που συνεχίζεται μετά την πληρωμή: η πληρωμή δένεται με τον συγκεκριμένο χρησμό.
     const metadata = { tool };
