@@ -45,9 +45,13 @@ async function allDocs(store) {
 
 export default async (req) => {
   const url = new URL(req.url);
-  const key = process.env.EXPORT_KEY || "";
-  if (!key || key.length < 12) return new Response("Δεν έχει οριστεί κωδικός EXPORT_KEY (τουλάχιστον 12 χαρακτήρες) στο Netlify.", { status: 503 });
-  if (url.searchParams.get("key") !== key) return new Response("Λάθος κωδικός.", { status: 403 });
+  const key = String(process.env.EXPORT_KEY || "").trim();
+  const mkey = String(process.env.METRISI_KEY || "").trim();
+  if ((!key || key.length < 12) && !mkey) return new Response("Δεν έχει οριστεί κωδικός EXPORT_KEY (τουλάχιστον 12 χαρακτήρες) στο Netlify.", { status: 503 });
+  // Δέχεται τον κωδικό της εξαγωγής ή τον κωδικό της Μέτρησης, χωρίς κενά στην αρχή ή στο τέλος.
+  const given = String(url.searchParams.get("key") || "").trim();
+  const okKey = (key.length >= 12 && given === key) || (mkey && given === mkey);
+  if (!okKey) return new Response("Λάθος κωδικός. (" + given.length + " χαρακτήρες έφτασαν)", { status: 403, headers: { "Cache-Control": "no-store" } });
   const onlyConsent = url.searchParams.get("consent") === "1";
   const withTests = url.searchParams.get("tests") === "1";
 
