@@ -235,7 +235,7 @@ ${ENDING(STARS_CHANGE)}`
   },
 
   symvatotita: {
-    title: "Ταιριάζετε; Η Πλήρης Συμβατότητά σας",
+    title: "Ταιριάζετε; Η Συναστρία σας",
     kind: "astro2", needDob2: true, needQuestion: false,
     pctLabel: "ΠΟΣΟΣΤΟ ΣΥΜΒΑΤΟΤΗΤΑΣ",
     skySpec: { p1: { Venus: "την Αφροδίτη", Moon: "τη Σελήνη" }, desc1: true, p2: { Sun: "τον Ήλιο", Venus: "την Αφροδίτη" } },

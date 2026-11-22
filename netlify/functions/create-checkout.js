@@ -9,7 +9,7 @@ const PRODUCTS = {
   oikonomika: { name: "Μια Φωτισμένη Οικονομική Αρχή", price: 499 },
   oikonomika_q2: { name: "Μια Φωτισμένη Οικονομική Αρχή — 2η ερώτηση", price: 299 },
   oikonomika_q3: { name: "Μια Φωτισμένη Οικονομική Αρχή — 3η ερώτηση", price: 199 },
-  symvatotita: { name: "Ταιριάζετε; Η Πλήρης Συμβατότητά σας", price: 499 },
+  symvatotita: { name: "Ταιριάζετε; Η Συναστρία σας", price: 499 },
   symvatotita_q2: { name: "Ταιριάζετε; — 2η ερώτηση", price: 299 },
   symvatotita_q3: { name: "Ταιριάζετε; — 3η ερώτηση", price: 199 },
   erotima: { name: "Ρώτα το Μαντείο", price: 499 },
