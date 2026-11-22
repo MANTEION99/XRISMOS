@@ -35,7 +35,7 @@ export default async (req) => {
   const piId = session.payment_intent && (session.payment_intent.id || session.payment_intent);
 
   const isQuestion = reading.kind === "question";
-  if (reading.tool === "xartis" && !isQuestion) {
+  if ((reading.tool === "xartis" || reading.tool === "paidi") && !isQuestion) {
     return natalGenerate({ reading, readings, readingId, sessionId, genId, session, piId });
   }
   const prompt = isQuestion
@@ -137,7 +137,7 @@ async function natalGenerate({ reading, readings, readingId, sessionId, genId, s
   const p = reading.inputs;
   const hasTime = /^\d{2}:\d{2}$/.test(String(p.tob1 || ""));
   const data = plus ? addSolar(reading.data || {}) : (reading.data || {});
-  const list = chapterList(plus);
+  const list = chapterList(plus, !!p.child);
   const chapters = Array.isArray(reading.chapters) && reading.chapters.length === list.length ? reading.chapters.slice() : new Array(list.length).fill(null);
   const buffers = {};
   let superseded = false, stopped = false, lastSave = 0, lastLen = -1, progressAt = Date.now();

@@ -26,19 +26,27 @@ export default async (req) => {
     name2: nameCase(b.name2), dob2: clip(b.dob2, 10), tob2: clip(b.tob2, 5), pob2: clip(b.pob2, 60),
     question: clip(b.question, 400)
   };
+  // Ο χάρτης του παιδιού: φύλο και σχέση με όποιον τον παραγγέλνει.
+  if (t.child) {
+    p.child = true;
+    p.sex = ["agori", "koritsi"].includes(b.sex) ? b.sex : "";
+    p.rel = ["paidi", "eggoni", "allo"].includes(b.rel) ? b.rel : "allo";
+  }
   const email = normalizeEmail(b.email);
   const marketingConsent = b.consent === true;
 
   // Έλεγχος στοιχείων ανά εργαλείο.
-  if (!p.name1) return json(400, { error: "Γράψε το όνομά σου." });
-  if (t.kind !== "taro" && !dateOk(p.dob1)) return json(400, { error: "Γράψε την ημερομηνία γέννησής σου." });
+  if (!p.name1) return json(400, { error: t.child ? "Γράψε το όνομα του παιδιού." : "Γράψε το όνομά σου." });
+  if (t.kind !== "taro" && !dateOk(p.dob1)) return json(400, { error: t.child ? "Γράψε την ημερομηνία γέννησης του παιδιού." : "Γράψε την ημερομηνία γέννησής σου." });
+  if (t.child && p.dob1 > new Date().toISOString().slice(0, 10)) return json(400, { error: "Η ημερομηνία γέννησης δεν μπορεί να είναι στο μέλλον." });
   if (t.kind === "astro2" && !p.name2) return json(400, { error: "Γράψε και το όνομα του άλλου προσώπου." });
   if (t.needDob2 && !dateOk(p.dob2)) return json(400, { error: "Χρειάζεται και η ημερομηνία γέννησης του άλλου προσώπου." });
   if (p.dob2 && !dateOk(p.dob2)) p.dob2 = "";
   if (t.needQuestion && p.question.length < 3) return json(400, { error: "Γράψε την ερώτησή σου." });
   if (!isValidEmail(email)) return json(400, { error: "Γράψε ένα σωστό email." });
   // Μόνο ενήλικες: όποιος ρωτά, και το άλλο πρόσωπο στα εργαλεία της αγάπης. Δεν κρατιέται τίποτα.
-  if (p.dob1 && !isAdult(p.dob1)) return json(403, { error: ADULTS_ONLY });
+  // Στον χάρτη του παιδιού η ημερομηνία είναι του παιδιού· ενήλικας είναι όποιος τον παραγγέλνει (παράθυρο 18+).
+  if (!t.child && p.dob1 && !isAdult(p.dob1)) return json(403, { error: ADULTS_ONLY });
   if (t.kind === "astro2" && p.dob2 && !isAdult(p.dob2)) return json(403, { error: "Οι χρησμοί αγάπης αφορούν μόνο ενήλικες." });
 
   const readings = oracleStore();

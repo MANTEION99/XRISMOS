@@ -38,7 +38,7 @@
   function upgradeDate(input) {
     const thisYear = new Date().getFullYear();
     // Μόνο ενήλικες: για όποιον ρωτά (dob1 ή dob), και για το άλλο πρόσωπο στα εργαλεία της αγάπης.
-    const adult = input.id === 'dob1' || input.id === 'dob' || (input.id === 'dob2' && document.body.dataset.adult2 === '1');
+    const adult = ((input.id === 'dob1' || input.id === 'dob') && document.body.dataset.child !== '1') || (input.id === 'dob2' && document.body.dataset.adult2 === '1');
     const maxYear = adult ? thisYear - 18 : thisYear;
     const d = makeSelect('Μέρα', Array.from({ length: 31 }, (_, i) => [pad(i + 1), String(i + 1)]), 'dt-day');
     const m = makeSelect('Μήνας', MONTHS.map((x, i) => [pad(i + 1), x]), 'dt-month');
