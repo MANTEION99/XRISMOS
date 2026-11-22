@@ -24,7 +24,8 @@ function signOf(dob) {
 
 const TOOL_NAMES = {
   epistrofi: "Επιστροφή", erotima: "Ρώτα το Μαντείο", agapi: "Αγάπη", alitheia: "Αλήθεια",
-  symvatotita: "Συμβατότητα", oikonomika: "Οικονομικά", numerology: "Αριθμολογία", taro: "Ταρώ"
+  symvatotita: "Συμβατότητα", oikonomika: "Οικονομικά", numerology: "Αριθμολογία", taro: "Ταρώ",
+  imerologio: "Ημερολόγιο 2027"
 };
 
 const csvCell = (v) => {

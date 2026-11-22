@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+<meta charset="UTF-8">
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Οι καλές σου μέρες του 2027 | Μαντείο</title>
+<meta name="description" content="Προσωπικό ημερολόγιο για όλο το 2027 από τον γενέθλιο χάρτη σου: μέρες για αγάπη, χρήματα και αποφάσεις, και μέρες που θέλουν προσοχή. Ο Ιανουάριος είναι δωρεάν.">
+<meta property="og:title" content="Οι καλές σου μέρες του 2027 | Μαντείο">
+<meta property="og:description" content="Ποιες μέρες του 2027 είναι οι δικές σου; Για αγάπη, χρήματα, αποφάσεις, από τον δικό σου χάρτη. Ο Ιανουάριος δωρεάν.">
+<meta property="og:image" content="https://manteio.live/images/iakovos.jpg">
+<meta property="og:url" content="https://manteio.live/2027">
+<meta property="og:type" content="website">
+<meta property="og:locale" content="el_GR">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{ --navy:#0B0A16; --paper:#F5F1E8; --muted:#9C96AE; --gold:#D9B25C; --gold-deep:#8C6420; --ruby:#B4576B; --line:rgba(217,178,92,0.35);
+    --love:#E68AA6; --money:#6FC28E; --dec:#86AEE6; --avoid:#C9707F; --pine:#2F5D46; }
+  *{ box-sizing:border-box; }
+  body{ margin:0; background:radial-gradient(ellipse at 50% 15%, #1b1832 0%, #0B0A16 65%); font-family:'Inter',sans-serif; color:var(--paper);
+    min-height:100vh; display:flex; flex-direction:column; align-items:center; padding:0 14px 48px; overflow-x:hidden; }
+  .stars{ position:fixed; inset:0; pointer-events:none; z-index:0; background-image:
+    radial-gradient(1px 1px at 10% 20%, rgba(255,255,255,0.5), transparent), radial-gradient(1px 1px at 80% 15%, rgba(255,255,255,0.4), transparent),
+    radial-gradient(1px 1px at 30% 70%, rgba(255,255,255,0.5), transparent), radial-gradient(1px 1px at 60% 85%, rgba(255,255,255,0.3), transparent),
+    radial-gradient(1px 1px at 90% 60%, rgba(255,255,255,0.4), transparent), radial-gradient(1px 1px at 45% 35%, rgba(255,255,255,0.4), transparent); }
+  /* Λίγα χρυσά αστεράκια που πέφτουν αργά, σαν γιορτινό χιόνι */
+  .snow{ position:fixed; inset:0; pointer-events:none; z-index:0; overflow:hidden; }
+  .snow i{ position:absolute; top:-12px; color:rgba(217,178,92,0.55); font-style:normal; font-size:10px; animation:fall linear infinite; }
+  @keyframes fall{ to{ transform:translateY(110vh) rotate(180deg); } }
+  @media (prefers-reduced-motion: reduce){ .snow{ display:none; } }
+
+  .topbar{ position:sticky; top:34px; z-index:5; display:flex; justify-content:space-between; align-items:center; max-width:520px; width:100%; margin:0 auto 10px; padding:9px 4px; background:linear-gradient(180deg,#0B0A16 70%,#0B0A1600); }
+  .topbar .lg{ font-family:'Cormorant Garamond',serif; font-size:20px; font-weight:700; color:var(--gold); letter-spacing:1px; text-decoration:none; }
+  .topbar .all{ font-size:14px; font-weight:700; color:#241A08; background:linear-gradient(135deg, var(--gold), var(--gold-deep)); padding:9px 14px; border-radius:20px; text-decoration:none; }
+
+  .card{ max-width:520px; width:100%; position:relative; z-index:1; border:1.5px solid var(--gold); border-radius:22px; padding:3px; box-shadow:0 0 50px rgba(217,178,92,0.12); }
+  .card-inner{ border:1px solid rgba(217,178,92,0.5); border-radius:19px; padding:26px 18px 24px; background:linear-gradient(180deg, #14122380, #0B0A1680); }
+  .sprig{ display:block; width:150px; height:auto; margin:-6px auto 6px; }
+  .eyebrow{ text-align:center; letter-spacing:2.5px; font-size:12px; color:var(--gold); text-transform:uppercase; margin-bottom:8px; }
+  h1{ font-family:'Cormorant Garamond',serif; font-weight:600; text-align:center; font-size:32px; line-height:1.15; margin:0 0 12px; color:var(--gold); }
+  p.sub{ font-size:15px; line-height:1.65; color:#cfc8d9; margin:0 0 16px; text-align:center; }
+  .bf{ display:none; text-align:center; border:1.5px dashed var(--gold); border-radius:14px; padding:12px; margin:0 0 18px; background:rgba(217,178,92,0.08); }
+  .bf b{ display:block; font-family:'Cormorant Garamond',serif; font-size:22px; color:var(--gold); }
+  .bf span{ font-size:14px; color:var(--paper); }
+  .bf s{ color:var(--muted); }
+  .gets{ list-style:none; padding:0; margin:0 0 20px; }
+  .gets li{ display:flex; gap:10px; align-items:flex-start; font-size:14.5px; line-height:1.5; padding:7px 0; border-bottom:1px solid rgba(217,178,92,0.12); }
+  .gets li:last-child{ border-bottom:none; }
+  .dot{ flex:0 0 12px; width:12px; height:12px; border-radius:50%; margin-top:5px; }
+  .d-love{ background:var(--love); } .d-money{ background:var(--money); } .d-dec{ background:var(--dec); } .d-avoid{ background:var(--avoid); }
+  .gift{ font-size:13.5px; line-height:1.6; color:var(--paper); border-left:2px solid var(--pine); padding:4px 0 4px 12px; margin:0 0 20px; }
+  .gift b{ color:#9fd4b4; }
+
+  .field{ margin-bottom:15px; }
+  .field label{ display:block; font-size:12.5px; color:var(--gold); letter-spacing:0.5px; margin-bottom:6px; }
+  .field input{ width:100%; background:rgba(255,255,255,0.03); border:1px solid var(--line); border-radius:9px; padding:12px 13px; color:var(--paper); font-size:16px; font-family:'Inter',sans-serif; color-scheme:dark; }
+  .field input:focus{ outline:none; border-color:var(--gold); }
+  .field.consent{ display:flex; gap:10px; align-items:flex-start; }
+  .field.consent input{ width:22px; height:22px; flex:0 0 22px; accent-color:var(--gold); }
+  .field.consent label{ color:var(--muted); font-size:13px; line-height:1.5; margin:0; letter-spacing:0; }
+  .hint{ font-size:12px; color:var(--muted); margin-top:5px; line-height:1.5; }
+  .error{ color:#e58a9a; font-size:14px; margin:4px 0 12px; display:none; }
+  button.submit, .pay{ display:block; width:100%; padding:15px; margin-top:6px; background:linear-gradient(135deg, var(--gold), var(--gold-deep)); color:#241A08; border:none; border-radius:10px;
+    font-family:'Cormorant Garamond',serif; font-weight:700; font-size:20px; letter-spacing:0.3px; cursor:pointer; text-align:center; text-decoration:none; }
+  button.submit:disabled, .pay.busy{ opacity:0.6; pointer-events:none; }
+  .adult{ font-size:12.5px; color:var(--muted); text-align:center; margin-top:10px; line-height:1.5; }
+  .spinner{ width:26px; height:26px; margin:16px auto; border:2px solid var(--line); border-top-color:var(--gold); border-radius:50%; animation:spin 1s linear infinite; display:none; }
+  @keyframes spin{ to{ transform:rotate(360deg); } }
+
+  #res{ display:none; }
+  .hello{ font-family:'Cormorant Garamond',serif; font-size:26px; text-align:center; margin:0 0 6px; color:var(--paper); }
+  .hello-sub{ text-align:center; font-size:14px; color:var(--muted); margin:0 0 18px; line-height:1.55; }
+  .legend{ display:flex; flex-wrap:wrap; gap:6px 14px; justify-content:center; font-size:12.5px; color:var(--muted); margin:0 0 16px; }
+  .legend span{ display:inline-flex; align-items:center; gap:6px; }
+  .legend .dot{ margin:0; width:10px; height:10px; flex-basis:10px; }
+
+  .month{ border:1px solid var(--line); border-radius:16px; padding:16px 12px 14px; margin:0 0 18px; background:rgba(255,255,255,0.015); }
+  .month h2{ font-family:'Cormorant Garamond',serif; font-size:28px; color:var(--gold); text-align:center; margin:0 0 4px; font-weight:600; }
+  .month .theme{ font-size:14px; line-height:1.55; color:#d8d1e2; text-align:center; margin:0 0 12px; }
+  .grid{ display:grid; grid-template-columns:repeat(7, 1fr); gap:4px; margin:0 0 12px; }
+  .grid .wd{ font-size:11px; color:var(--muted); text-align:center; padding:2px 0 4px; letter-spacing:0.5px; }
+  .grid .c{ min-height:46px; border-radius:8px; background:rgba(255,255,255,0.03); text-align:center; padding:5px 2px 4px; position:relative; }
+  .grid .c.empty{ background:none; }
+  .grid .c .n{ font-size:14px; font-weight:500; color:var(--paper); }
+  .grid .c .ds{ display:flex; justify-content:center; gap:3px; margin-top:4px; }
+  .grid .c .ds .dot{ width:7px; height:7px; flex-basis:7px; margin:0; }
+  .grid .c.best{ outline:1.5px solid var(--gold); background:rgba(217,178,92,0.14); }
+  .grid .c.best::after{ content:"★"; position:absolute; top:1px; right:3px; font-size:10px; color:var(--gold); }
+  .grid .c.bday{ background:rgba(230,138,166,0.12); }
+  .grid .c.retro .n{ text-decoration:underline dotted var(--muted); }
+  .days{ list-style:none; margin:0; padding:0; }
+  .days li{ padding:9px 2px; border-top:1px solid rgba(217,178,92,0.12); font-size:14px; line-height:1.55; }
+  .days .when{ font-weight:600; color:var(--paper); }
+  .days .tag{ display:inline-block; font-size:11.5px; font-weight:600; letter-spacing:0.4px; padding:2px 8px; border-radius:10px; margin:0 4px 2px 0; color:#15121f; }
+  .t-love{ background:var(--love); } .t-money{ background:var(--money); } .t-dec{ background:var(--dec); } .t-avoid{ background:var(--avoid); }
+  .days .why{ display:block; color:#cfc8d9; margin-top:3px; }
+  .note{ font-size:13.5px; line-height:1.6; color:var(--paper); border-left:2px solid var(--gold); padding:4px 0 4px 12px; margin:10px 0 0; }
+  .note.bd{ border-color:var(--love); }
+
+  .paywall{ border:1.5px solid var(--gold); border-radius:16px; padding:18px 16px; margin:6px 0 18px; text-align:center; background:linear-gradient(180deg, rgba(217,178,92,0.10), rgba(217,178,92,0.03)); }
+  .paywall h3{ font-family:'Cormorant Garamond',serif; font-size:25px; color:var(--gold); margin:0 0 8px; }
+  .paywall p{ font-size:14.5px; line-height:1.6; color:var(--paper); margin:0 0 12px; }
+  .paywall .price{ font-family:'Cormorant Garamond',serif; font-size:34px; color:var(--paper); margin:4px 0 2px; }
+  .paywall .price s{ font-size:22px; color:var(--muted); margin-right:8px; }
+  .paywall .small{ font-size:12.5px; color:var(--muted); margin-top:10px; }
+  .locked{ display:grid; grid-template-columns:repeat(4,1fr); gap:6px; margin:0 0 14px; }
+  .locked span{ font-size:12px; color:var(--muted); border:1px solid rgba(217,178,92,0.25); border-radius:8px; padding:7px 2px; }
+  .tools{ display:flex; gap:10px; margin:0 0 18px; flex-wrap:wrap; }
+  .tools button{ flex:1 1 150px; padding:12px; border-radius:24px; border:1px solid var(--gold); background:transparent; color:var(--gold); font-family:'Cormorant Garamond',serif; font-size:18px; font-weight:600; cursor:pointer; }
+  .keep{ font-size:13px; color:var(--muted); text-align:center; line-height:1.55; margin:0 0 16px; }
+  .back{ display:none; text-align:center; margin:0 0 16px; }
+  .back button{ background:none; border:1px solid var(--gold); color:var(--gold); border-radius:22px; padding:10px 18px; font-size:15px; cursor:pointer; }
+  footer{ text-align:center; font-size:11.5px; color:var(--muted); margin-top:22px; line-height:1.6; }
+  footer a{ color:var(--muted); }
+
+  /* Εκτύπωση και αποθήκευση σε PDF: λευκό χαρτί, ένας μήνας ανά σελίδα */
+  @media print{
+    @page{ size:A4; margin:12mm; }
+    body{ background:#fff !important; color:#1d1a26; padding:0; display:block; }
+    body > *:not(.card){ display:none !important; }
+    .stars, .snow, .topbar, #formBox, .tools, .keep, .paywall, .back, footer, .sprig, #socialProof{ display:none !important; }
+    .card{ border:none; box-shadow:none; padding:0; max-width:none; }
+    .card-inner{ border:none; background:none; padding:0; }
+    .hello{ color:#1d1a26; } .hello-sub, .legend{ color:#4a4458; }
+    .month{ break-after:page; page-break-after:always; border:1px solid #c9b27a; background:#fff; }
+    .month:last-child{ break-after:auto; page-break-after:auto; }
+    .month h2{ color:#7a5a18; } .month .theme{ color:#2b2636; }
+    .grid .c{ background:#f6f2e8; } .grid .c .n{ color:#1d1a26; }
+    .grid .c.best{ background:#f1e2b8; outline-color:#7a5a18; }
+    .month{ padding:10px 12px; margin:0; }
+    .month h2{ font-size:26px; } .month .theme{ font-size:12px; margin-bottom:8px; }
+    .grid{ gap:3px; margin-bottom:8px; } .grid .c{ min-height:34px; padding:3px 2px; } .grid .c .n{ font-size:12px; }
+    .days{ columns:2; column-gap:16px; }
+    .days li{ font-size:10.5px; line-height:1.4; padding:5px 0; break-inside:avoid; }
+    .days .tag{ font-size:9.5px; padding:1px 6px; }
+    .note{ font-size:10.5px; margin-top:6px; }
+    .days li{ border-color:#e5dcc6; } .days .when{ color:#1d1a26; } .days .why{ color:#3a3446; }
+    .note{ color:#1d1a26; }
+    * { -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+  }
+</style>
+<script src="/agegate.js"></script>
+<script src="/footer.js" defer></script>
+<script src="/trust.js" defer></script>
+<script src="/consent.js" defer></script>
+<script src="/metrisi.js"></script>
+<script src="/pay-choice.js" defer></script>
+<script src="/reviews.js" defer></script>
+<script>
+/* Από ποιο post ήρθε η επισκέπτρια (ίδιο με tools/source.js) */
+(function () {
+  const KEY = 'manteio_src';
+  try {
+    const q = new URLSearchParams(location.search);
+    const c = (q.get('utm_campaign') || '').trim();
+    if (c) {
+      const parts = [q.get('utm_source'), q.get('utm_medium'), c].filter(Boolean);
+      localStorage.setItem(KEY, JSON.stringify({ src: parts.join('/').slice(0, 80), ts: Date.now() }));
+    }
+  } catch (e) {}
+  window.manteioSource = function () {
+    try {
+      const v = JSON.parse(localStorage.getItem(KEY) || 'null');
+      if (v && v.src && Date.now() - v.ts < 14 * 86400000) return v.src;
+    } catch (e) {}
+    return '';
+  };
+})();
+</script>
+</head>
+<body>
+<div class="stars"></div>
+<div class="snow" id="snow"></div>
+<div class="topbar"><a class="lg" href="/">Το Μαντείο</a><a class="all" href="/#oracles">Όλες οι προβλέψεις</a></div>
+
+<div class="card"><div class="card-inner">
+
+  <!-- Κλαδί έλατου με χρυσά στολίδια: η χριστουγεννιάτικη πινελιά της σελίδας -->
+  <svg class="sprig" viewBox="0 0 300 70" aria-hidden="true">
+    <g stroke="#2F5D46" stroke-width="3" stroke-linecap="round" fill="none">
+      <path d="M20 30 Q150 8 280 30"/>
+      <path d="M50 24 l-10 -14 M50 24 l-14 -2 M90 18 l-8 -15 M90 18 l-15 -1 M130 14 l-6 -14 M130 14 l-14 0 M170 14 l6 -14 M170 14 l14 0 M210 18 l8 -15 M210 18 l15 -1 M250 24 l10 -14 M250 24 l14 -2"/>
+      <path d="M50 24 l-6 14 M90 18 l-4 15 M130 14 l-2 15 M170 14 l2 15 M210 18 l4 15 M250 24 l6 14" stroke="#3d7a5b"/>
+    </g>
+    <g fill="#D9B25C"><circle cx="70" cy="40" r="6"/><circle cx="150" cy="36" r="7"/><circle cx="230" cy="40" r="6"/></g>
+    <g fill="#B4576B"><circle cx="110" cy="38" r="5"/><circle cx="190" cy="38" r="5"/></g>
+    <path d="M150 0 l2.6 6 6.4 .6 -4.9 4.2 1.5 6.3 -5.6 -3.4 -5.6 3.4 1.5 -6.3 -4.9 -4.2 6.4 -.6z" fill="#F6DD8A"/>
+  </svg>
+
+  <div id="formBox">
+    <div class="eyebrow">Νέο · Ιδανικό δώρο για τα Χριστούγεννα</div>
+    <h1>Οι καλές σου μέρες του 2027</h1>
+    <p class="sub">Ένα προσωπικό ημερολόγιο για όλη τη χρονιά, βγαλμένο από τον δικό σου γενέθλιο χάρτη. Ξέρεις από πριν ποιες μέρες είναι για σένα και ποιες θέλουν προσοχή. Το τυπώνεις και το έχεις δίπλα σου όλο τον χρόνο.</p>
+
+    <div class="bf" id="bf"><b>Black Friday</b><span><s>19,99€</s> 14,99€ για όλη τη χρονιά, μόνο ως τη Δευτέρα 30 Νοεμβρίου</span></div>
+
+    <ul class="gets">
+      <li><span class="dot d-love"></span><span><b>Μέρες για αγάπη.</b> Για να μιλήσεις, να συναντηθείς, να συμφιλιωθείς.</span></li>
+      <li><span class="dot d-money"></span><span><b>Μέρες για χρήματα.</b> Για αγορές, αιτήσεις, πληρωμές και συμφωνίες.</span></li>
+      <li><span class="dot d-dec"></span><span><b>Μέρες για αποφάσεις.</b> Για το βήμα που αναβάλλεις και για κάθε νέο ξεκίνημα.</span></li>
+      <li><span class="dot d-avoid"></span><span><b>Μέρες προσοχής.</b> Πότε να μην υπογράψεις, να μην ξεκινήσεις καβγά, να ξεκουραστείς.</span></li>
+      <li><span style="flex:0 0 12px;color:var(--gold);font-size:14px">★</span><span><b>Η καλύτερη μέρα κάθε μήνα</b>, οι περίοδοι του ανάδρομου Ερμή και τα γενέθλιά σου.</span></li>
+    </ul>
+
+    <div class="gift"><b>Για δώρο:</b> γράψε τα στοιχεία γέννησης του ανθρώπου που θέλεις να το χαρίσεις. Το ημερολόγιο φτιάχνεται για εκείνον και του το στέλνεις ή του το τυπώνεις.</div>
+
+    <p class="sub" style="margin-bottom:18px"><b style="color:var(--gold)">Ο Ιανουάριος είναι δωρεάν.</b> Τον βλέπεις αμέσως, και αποφασίζεις μετά αν θέλεις όλη τη χρονιά.</p>
+
+    <form id="f" novalidate>
+      <div class="field"><label for="nm">Όνομα</label><input id="nm" type="text" placeholder="π.χ. Μαρία" autocomplete="given-name" maxlength="40"></div>
+      <div class="field"><label for="dob">Ημερομηνία γέννησης</label><input id="dob" type="date" min="1920-01-01" max="2008-12-31"></div>
+      <div class="field"><label for="tob">Ώρα γέννησης (αν την ξέρεις)</label><input id="tob" type="time">
+        <div class="hint">Με την ώρα, το ημερολόγιο υπολογίζει και τη Σελήνη και τον Ωροσκόπο σου, οπότε βγαίνει πιο ακριβές. Χωρίς ώρα δουλεύει κανονικά.</div></div>
+      <div class="field"><label for="pob">Τόπος γέννησης</label><input id="pob" type="text" placeholder="π.χ. Λάρισα" autocomplete="off" maxlength="60"></div>
+      <div class="field"><label for="email">Email</label><input id="email" type="email" placeholder="π.χ. maria@gmail.com" autocomplete="email"></div>
+      <div class="field consent"><input type="checkbox" id="consent"><label for="consent">Θέλω να λαμβάνω τους χρησμούς και τα νέα του Μαντείου στο email μου. Μπορώ να διαγραφώ όποτε θέλω.</label></div>
+      <div class="error" id="err"></div>
+      <button class="submit" id="go" type="submit">Δες τον Ιανουάριό σου δωρεάν</button>
+      <div class="spinner" id="spin"></div>
+      <div class="adult">Το Μαντείο απευθύνεται μόνο σε ενήλικες (18+).</div>
+    </form>
+    <script src="/dt.js"></script>
+    <div class="back" id="backBox"><button type="button" id="backBtn">Άνοιξε το ημερολόγιό σου του 2027</button></div>
+  </div>
+
+  <div id="res">
+    <div class="hello" id="hello"></div>
+    <p class="hello-sub" id="helloSub"></p>
+    <div class="legend">
+      <span><i class="dot d-love"></i>Αγάπη</span><span><i class="dot d-money"></i>Χρήματα</span>
+      <span><i class="dot d-dec"></i>Αποφάσεις</span><span><i class="dot d-avoid"></i>Προσοχή</span>
+      <span><b style="color:var(--gold)">★</b>Η καλύτερη μέρα</span>
+    </div>
+    <div class="tools" id="tools" style="display:none">
+      <button type="button" id="printBtn">Κατέβασέ το σε PDF</button>
+      <button type="button" id="shareBtn">Στείλ' το</button>
+    </div>
+    <p class="keep" id="keep" style="display:none">Το ημερολόγιό σου μένει σε αυτή τη σελίδα. Κράτησέ την στα αγαπημένα σου ή αποθήκευσέ το σε PDF, για να το έχεις πάντα.</p>
+    <div id="months"></div>
+    <div class="paywall" id="paywall" style="display:none">
+      <h3>Δες όλο το 2027</h3>
+      <p>Ο Ιανουάριος είναι μόνο η αρχή. Οι υπόλοιποι 11 μήνες είναι ήδη υπολογισμένοι από τον χάρτη σου και σε περιμένουν, με όλες τις καλές μέρες και τις μέρες προσοχής.</p>
+      <div class="locked"><span>Φεβ</span><span>Μάρ</span><span>Απρ</span><span>Μάι</span><span>Ιούν</span><span>Ιούλ</span><span>Αύγ</span><span>Σεπ</span><span>Οκτ</span><span>Νοέ</span><span>Δεκ</span><span>+ PDF</span></div>
+      <div class="price" id="price"></div>
+      <a class="pay" id="payBtn" href="#">Θέλω όλη τη χρονιά</a>
+      <div class="small">Ασφαλής πληρωμή με κάρτα, Apple Pay ή Google Pay. Το ημερολόγιο ανοίγει αμέσως μετά την πληρωμή.</div>
+    </div>
+    <div id="socialProof"></div>
+  </div>
+
+  <footer>Το Μαντείο είναι τεχνητή νοημοσύνη. Οι μέρες υπολογίζονται με αστρονομικά δεδομένα, από τις πραγματικές θέσεις των πλανητών το 2027 πάνω στον γενέθλιο χάρτη. <a href="/">manteio.live</a></footer>
+</div></div>
+
+<script>
+const $ = (id) => document.getElementById(id);
+const MONTHS = ["Ιανουάριος","Φεβρουάριος","Μάρτιος","Απρίλιος","Μάιος","Ιούνιος","Ιούλιος","Αύγουστος","Σεπτέμβριος","Οκτώβριος","Νοέμβριος","Δεκέμβριος"];
+const MONTHS_GEN = ["Ιανουαρίου","Φεβρουαρίου","Μαρτίου","Απριλίου","Μαΐου","Ιουνίου","Ιουλίου","Αυγούστου","Σεπτεμβρίου","Οκτωβρίου","Νοεμβρίου","Δεκεμβρίου"];
+const WD = ["Κυριακή","Δευτέρα","Τρίτη","Τετάρτη","Πέμπτη","Παρασκευή","Σάββατο"];
+const WD_SHORT = ["Δε","Τρ","Τε","Πε","Πα","Σα","Κυ"];
+const CAT = { love:"Αγάπη", money:"Χρήματα", dec:"Αποφάσεις", avoid:"Προσοχή" };
+const MERC = "Ο Ερμής είναι ανάδρομος. Μην υπογράφεις σημαντικά χαρτιά και έλεγξε δύο φορές ό,τι κλείνεις.";
+const SAVE_KEY = "manteio_2027";
+const FORM_KEY = "manteio_2027_form";
+const esc = (s) => String(s).replace(/[&<>"]/g, c => ({ "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;" }[c]));
+const eur = (c) => (c / 100).toFixed(2).replace(".", ",") + "€";
+let readingId = null, year = 2027;
+
+// Γιορτινά αστεράκια
+(function () {
+  const s = $("snow"); if (!s) return;
+  for (let i = 0; i < 14; i++) {
+    const e = document.createElement("i"); e.textContent = "✦";
+    e.style.left = Math.random() * 100 + "%";
+    e.style.animationDuration = (14 + Math.random() * 16) + "s";
+    e.style.animationDelay = (-Math.random() * 25) + "s";
+    e.style.fontSize = (7 + Math.random() * 7) + "px";
+    s.appendChild(e);
+  }
+})();
+
+// Η προσφορά της Black Friday φαίνεται μόνο τις μέρες που ισχύει (ώρα Ελλάδας).
+function isBF() {
+  const d = new Intl.DateTimeFormat("en-CA", { timeZone: "Europe/Athens", year: "numeric", month: "2-digit", day: "2-digit" }).format(new Date());
+  return d >= "2026-11-27" && d <= "2026-11-30";
+}
+if (isBF()) $("bf").style.display = "block";
+
+function dayLine(m, d) {
+  const wd = WD[new Date(Date.UTC(year, m - 1, d)).getUTCDay()];
+  return `${wd} ${d} ${MONTHS_GEN[m - 1]}`;
+}
+
+function renderMonth(mo) {
+  const marks = {}; mo.marks.forEach(x => marks[x.d] = x);
+  const retroDays = new Set();
+  mo.retro.forEach(([a, b]) => { for (let d = a; d <= b; d++) retroDays.add(d); });
+  const first = (new Date(Date.UTC(year, mo.m - 1, 1)).getUTCDay() + 6) % 7; // Δευτέρα πρώτη
+  let cells = WD_SHORT.map(w => `<div class="wd">${w}</div>`).join("");
+  for (let i = 0; i < first; i++) cells += `<div class="c empty"></div>`;
+  for (let d = 1; d <= mo.len; d++) {
+    const x = marks[d];
+    const cls = ["c"];
+    if (mo.best === d) cls.push("best");
+    if (mo.birthday === d) cls.push("bday");
+    if (retroDays.has(d)) cls.push("retro");
+    const dots = x ? x.cats.map(c => `<i class="dot d-${c}"></i>`).join("") : "";
+    cells += `<div class="${cls.join(" ")}"><div class="n">${d}</div><div class="ds">${dots}${mo.birthday === d ? '<span style="font-size:10px">🎂</span>' : ""}</div></div>`;
+  }
+  const list = mo.marks.map(x => {
+    const tags = x.cats.map(c => `<span class="tag t-${c}">${CAT[c]}</span>`).join("");
+    const whys = [...new Set(x.cats.map(c => x.why[c]).filter(Boolean))].map(w => `<span class="why">${esc(w)}</span>`).join("");
+    return `<li><span class="when">${dayLine(mo.m, x.d)}${mo.best === x.d ? ' <b style="color:var(--gold)">★ η καλύτερη μέρα του μήνα</b>' : ""}</span><br>${tags}${whys}</li>`;
+  }).join("");
+  const retroNote = mo.retro.length ? `<div class="note"><b>Ανάδρομος Ερμής:</b> ${mo.retro.map(([a, b]) => a === b ? `${a} ${MONTHS_GEN[mo.m - 1]}` : `${a} έως ${b} ${MONTHS_GEN[mo.m - 1]}`).join(", ")}. ${MERC}</div>` : "";
+  const bdNote = mo.birthday ? `<div class="note bd"><b>${dayLine(mo.m, mo.birthday)}:</b> ο Ήλιος γυρίζει εκεί που ήταν τη μέρα που γεννήθηκες. Τα αστρολογικά σου γενέθλια ανοίγουν τη νέα σου χρονιά.</div>` : "";
+  return `<section class="month"><h2>${MONTHS[mo.m - 1]} ${year}</h2><p class="theme">${esc(mo.summary)}</p>
+    <div class="grid">${cells}</div><ul class="days">${list}</ul>${retroNote}${bdNote}</section>`;
+}
+
+function show(data, full) {
+  year = data.year || 2027;
+  $("formBox").style.display = "none";
+  $("res").style.display = "block";
+  $("hello").textContent = `${data.name}, οι μέρες σου του ${year}`;
+  $("helloSub").textContent = full
+    ? "Όλη η χρονιά, μήνα μήνα, από τον δικό σου χάρτη. Κάθε σημαδεμένη μέρα έχει από κάτω τον λόγο."
+    : "Αυτός είναι ο Ιανουάριός σου. Κάθε σημαδεμένη μέρα έχει από κάτω τον λόγο, όπως τον δείχνει ο χάρτης σου.";
+  $("months").innerHTML = data.months.map(renderMonth).join("");
+  $("paywall").style.display = full ? "none" : "block";
+  $("tools").style.display = full ? "flex" : "none";
+  $("keep").style.display = full ? "block" : "none";
+  if (!full && data.price) {
+    $("price").innerHTML = data.price.bf ? `<s>${eur(data.price.regular)}</s>${eur(data.price.cents)}` : eur(data.price.cents);
+    $("payBtn").textContent = `Θέλω όλη τη χρονιά, ${eur(data.price.cents)}`;
+  }
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}
+
+function err(msg) { const e = $("err"); e.textContent = msg; e.style.display = "block"; }
+
+// Τα στοιχεία της φόρμας μένουν στη συσκευή, για να μη χρειαστεί να ξαναγραφτούν.
+try {
+  const f = JSON.parse(localStorage.getItem(FORM_KEY) || "null");
+  if (f) { ["nm","dob","tob","pob","email"].forEach(k => { if (f[k] && $(k)) $(k).value = f[k]; }); if (window.syncDateFields) setTimeout(window.syncDateFields, 0); }
+} catch (e) {}
+
+$("f").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  $("err").style.display = "none";
+  const f = { name: $("nm").value.trim(), dob: $("dob").value, tob: $("tob").value, pob: $("pob").value.trim(), email: $("email").value.trim() };
+  if (!f.name) return err("Γράψε το όνομα.");
+  if (!f.dob) return err("Γράψε την ημερομηνία γέννησης.");
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(f.email)) return err("Γράψε ένα σωστό email.");
+  try { localStorage.setItem(FORM_KEY, JSON.stringify({ nm: f.name, dob: f.dob, tob: f.tob, pob: f.pob, email: f.email })); } catch (e2) {}
+  $("go").disabled = true; $("spin").style.display = "block";
+  try {
+    const r = await fetch("/api/imerologio-teaser", {
+      method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ ...f, consent: $("consent").checked, src: window.manteioSource ? window.manteioSource() : "" })
+    });
+    const d = await r.json();
+    if (!r.ok) throw new Error(d.error || "Κάτι πήγε στραβά. Δοκίμασε ξανά.");
+    readingId = d.reading_id;
+    show(d, false);
+  } catch (ex) {
+    err(ex.message || "Κάτι πήγε στραβά. Δοκίμασε ξανά.");
+  } finally {
+    $("go").disabled = false; $("spin").style.display = "none";
+  }
+});
+
+async function checkout() {
+  const b = $("payBtn");
+  const original = b.textContent;
+  b.classList.add("busy"); b.textContent = "Μεταφορά στην ασφαλή πληρωμή...";
+  try {
+    const returnUrl = location.origin + location.pathname + "?rid=" + encodeURIComponent(readingId);
+    const r = await fetch("/.netlify/functions/create-checkout", {
+      method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ tool: "imerologio", reading_id: readingId, returnUrl, src: window.manteioSource ? window.manteioSource() : "" })
+    });
+    const d = await r.json();
+    if (!d.url) throw new Error("no url");
+    location.href = d.url;
+  } catch (e) {
+    b.classList.remove("busy"); b.textContent = original;
+    alert("Κάτι πήγε στραβά με την πληρωμή, δοκίμασε ξανά.");
+  }
+}
+$("payBtn").addEventListener("click", (e) => {
+  e.preventDefault();
+  // Το pay-choice.js ρωτά μόνο του κάρτα ή IRIS, όταν η IRIS είναι ενεργή.
+  if (readingId) checkout();
+});
+
+async function loadFull(rid, sid, quiet) {
+  $("formBox").style.display = "block";
+  $("spin").style.display = "block";
+  try {
+    const r = await fetch("/api/imerologio-full", {
+      method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ reading_id: rid, session_id: sid })
+    });
+    const d = await r.json();
+    if (!r.ok) throw new Error(d.error || "Δεν βρέθηκε η πληρωμή.");
+    try { localStorage.setItem(SAVE_KEY, JSON.stringify({ rid, sid })); } catch (e) {}
+    readingId = rid;
+    show(d, true);
+    if (location.search.indexOf("session_id") === -1) history.replaceState(null, "", location.pathname + "?rid=" + encodeURIComponent(rid) + "&session_id=" + encodeURIComponent(sid));
+  } catch (ex) {
+    if (!quiet) err(ex.message + " Αν πλήρωσες και δεν ανοίγει, γράψε μας στο pliromes2021@gmail.com.");
+  } finally {
+    $("spin").style.display = "none";
+  }
+}
+
+$("printBtn").addEventListener("click", () => window.print());
+$("shareBtn").addEventListener("click", async () => {
+  const url = location.href;
+  try {
+    if (navigator.share) await navigator.share({ title: "Οι καλές μέρες του 2027", text: "Το ημερολόγιο του 2027 από Το Μαντείο", url });
+    else { await navigator.clipboard.writeText(url); alert("Το link αντιγράφηκε. Στείλ' το όπου θέλεις."); }
+  } catch (e) {}
+});
+
+// Επιστροφή από την πληρωμή, ή ξανά άνοιγμα αργότερα.
+(function () {
+  const q = new URLSearchParams(location.search);
+  const rid = q.get("rid"), sid = q.get("session_id");
+  if (rid && sid) { loadFull(rid, sid, false); return; }
+  if (rid) { readingId = rid; }
+  try {
+    const s = JSON.parse(localStorage.getItem(SAVE_KEY) || "null");
+    if (s && s.rid && s.sid) {
+      $("backBox").style.display = "block";
+      $("backBtn").addEventListener("click", () => loadFull(s.rid, s.sid, false));
+    }
+  } catch (e) {}
+})();
+</script>
+</body>
+</html>
