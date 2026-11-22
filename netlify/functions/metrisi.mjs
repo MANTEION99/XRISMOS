@@ -42,8 +42,8 @@ export default async (req) => {
         if (r && e.startsWith("pliromeni:")) { data.pr = data.pr || {}; data.pr[r] = (data.pr[r] || 0) + 1; }
       }
       const opt = cur && cur.etag ? { onlyIfMatch: cur.etag } : { onlyIfNew: true };
-      const r = await st.setJSON(day, data, opt);
-      if (!r || r.modified !== false) break;
+      const res = await st.setJSON(day, data, opt);
+      if (!res || res.modified !== false) break;
     }
     return json(200, { ok: true });
   }
