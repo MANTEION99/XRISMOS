@@ -56,6 +56,10 @@
           send({ t: "e", e: "pliromeni:" + tool, u: sid, r: ret });
           // Με ποιον τρόπο πλήρωσε: vv_ είναι Viva (IRIS), cs_ είναι Stripe (κάρτα, Apple Pay, Google Pay)
           send({ t: "e", e: "tropos-pliromis:" + (/^vv_/.test(sid) ? "iris" : "karta"), u: sid + "#m" });
+          // Ποια ερώτηση πλήρωσε: 1η (4,99€), 2η ή 3η (επιπλέον ερωτήσεις)
+          var st = (new URLSearchParams(location.search).get("stage") || "q1").replace(/[^q123]/g, "");
+          if (!/^q[123]$/.test(st)) st = "q1";
+          send({ t: "e", e: "erotisi:" + st, u: sid + "#q" });
         }).catch(function () {});
         return p;
       }

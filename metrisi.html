@@ -60,18 +60,20 @@ async function load() {
   days.forEach(x => { add(V, x.v || {}); add(S, x.s || {}); add(E, x.e || {}); add(VR, x.vr || {}); add(SR, x.sr || {}); add(PR, x.pr || {}); });
   const nr = (o) => (o.n || o.r) ? `<p class="muted" style="margin:6px 0 0">Νέοι <b style="color:#F5F1E8">${o.n || 0}</b> · Ξαναήρθαν <b style="color:#F5F1E8">${o.r || 0}</b></p>` : "";
   const total = Object.values(S).reduce((a, b) => a + b, 0);
-  const PT = {}, PM = {}, REST = {};
+  const PT = {}, PM = {}, PQ = {}, REST = {};
   for (const k in E) {
     const [a, b] = k.split(":");
     if (a === "pliromeni") PT[b || "?"] = (PT[b || "?"] || 0) + E[k];
     else if (a === "tropos-pliromis") PM[b || "?"] = (PM[b || "?"] || 0) + E[k];
+    else if (a === "erotisi") PQ[b || "?"] = (PQ[b || "?"] || 0) + E[k];
     else REST[k] = E[k];
   }
   const paid = Object.values(PT).reduce((a, b) => a + b, 0);
   const MET = { iris: "IRIS", karta: "Κάρτα, Apple Pay ή Google Pay" };
-  let html = `<div class="card" style="border-color:#D9B25C;background:rgba(217,178,92,.10)"><h2>Πλήρωσαν</h2><div class="big">${paid}</div>`;
+  let html = `<div class="card" style="border-color:#D9B25C;background:rgba(217,178,92,.10)"><h2>Πληρωμές</h2><div class="big">${paid}</div>`;
   if (paid) {
     html += `<p class="muted" style="margin:10px 0 4px">Για ποια πρόβλεψη</p>${table(PT, k => PAGE["/" + k] || k)}`;
+    if (Object.keys(PQ).length) html += `<p class="muted" style="margin:10px 0 4px">Ποια ερώτηση πλήρωσαν</p><table>${["q1", "q2", "q3"].map(q => `<tr><td>${{ q1: "1η ερώτηση (4,99€)", q2: "2η ερώτηση", q3: "3η ερώτηση" }[q]}</td><td class="n">${PQ[q] || 0}</td></tr>`).join("")}</table>`;
     html += `<p class="muted" style="margin:10px 0 4px">Με τι πλήρωσαν</p>${table(PM, k => MET[k] || k)}`;
     html += nr(PR).replace("Νέοι", "Με την πρώτη επίσκεψη").replace("Ξαναήρθαν", "Όταν ξαναήρθαν");
     if (r > 2) html += `<p class="muted" style="margin:10px 0 4px">Ανά μέρα</p><table>${d.days.slice(0, r).map(x => { let n = 0; for (const k in (x.e || {})) if (k.split(":")[0] === "pliromeni") n += x.e[k]; return n ? `<tr><td>${x.day.split("-").reverse().join("/")}</td><td class="n">${n}</td></tr>` : ""; }).join("")}</table>`;
