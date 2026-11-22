@@ -1,6 +1,30 @@
 /* Επιλογή τρόπου πληρωμής: κάρτα (Stripe) ή IRIS (Viva). Εμφανίζεται μόνο όταν η IRIS είναι ενεργή. */
 (function () {
   var ready = false;
+  var rawFetch = window.fetch; // το κανονικό fetch, χωρίς το παράθυρο πληρωμής που προσθέτουμε πιο κάτω
+  // Προ-σύνδεση με τις σελίδες πληρωμής (κερδίζει χρόνο όταν πατηθεί η πληρωμή). Δεν στέλνει κανένα στοιχείο.
+  try {
+    ["https://checkout.stripe.com", "https://www.vivapayments.com"].forEach(function (h) {
+      var l = document.createElement("link"); l.rel = "preconnect"; l.href = h; l.crossOrigin = "anonymous"; document.head.appendChild(l);
+    });
+  } catch (e) {}
+  // Ζέσταμα του server πληρωμών μόλις φανεί κουμπί πληρωμής (μία φορά ανά σελίδα). Δεν δημιουργεί παραγγελία.
+  try {
+    var warmed = false, tries = 0;
+    var iv = setInterval(function () {
+      tries++;
+      if (warmed || tries > 150) { clearInterval(iv); return; }
+      var ids = ["unlockBtn", "bBuy", "buyBtn", "payBtn"];
+      for (var i = 0; i < ids.length; i++) {
+        var b = document.getElementById(ids[i]);
+        if (b && b.offsetParent !== null) {
+          warmed = true; clearInterval(iv);
+          if (rawFetch) rawFetch.call(window, "/.netlify/functions/create-checkout?warm=1", { cache: "no-store" }).catch(function () {});
+          return;
+        }
+      }
+    }, 2000);
+  } catch (e) {}
   try { fetch("/api/viva-ready", { cache: "no-store" }).then(function (r) { return r.json(); }).then(function (d) { ready = !!(d && d.ready); }).catch(function () {}); } catch (e) {}
 
   function css() {
@@ -36,13 +60,15 @@
     w.innerHTML = "<div style='max-width:420px;background:#14122a;border:1px solid #D9B25C;border-radius:16px;padding:22px 18px;text-align:center;color:#F5F1E8;font:15px/1.55 Inter,Arial,sans-serif'>" +
       "<div style='width:34px;height:34px;margin:0 auto 12px;border:3px solid rgba(217,178,92,.3);border-top-color:#D9B25C;border-radius:50%;animation:pcspin 1s linear infinite'></div>" +
       (card
-        ? "<b style='color:#D9B25C;font-size:17px'>Ανοίγει η ασφαλής πληρωμή</b><br>Περίμενε λίγα δευτερόλεπτα." +
+        ? "<b style='color:#D9B25C;font-size:17px'>Ανοίγει η ασφαλής πληρωμή</b><br><span class='pcWaitT'>Συνήθως παίρνει 3 με 5 δευτερόλεπτα. Μην κλείσεις τη σελίδα.</span>" +
           "<div style='margin-top:10px;color:#cfc8b8'>Πληρώνεις με κάρτα, Apple Pay ή Google Pay. Μόλις ολοκληρωθεί η πληρωμή, επιστρέφεις αυτόματα εδώ και η απάντησή σου αρχίζει να γράφεται.</div></div>"
-        : "<b style='color:#D9B25C;font-size:17px'>Ανοίγει η ασφαλής πληρωμή IRIS</b><br>Περίμενε λίγα δευτερόλεπτα." +
+        : "<b style='color:#D9B25C;font-size:17px'>Ανοίγει η ασφαλής πληρωμή IRIS</b><br><span class='pcWaitT'>Συνήθως παίρνει 3 με 5 δευτερόλεπτα. Μην κλείσεις τη σελίδα.</span>" +
           "<div style='margin-top:10px;color:#cfc8b8'>Πληρώνεις από το e-banking ή την εφαρμογή της τράπεζάς σου. Μόλις ολοκληρωθεί η πληρωμή, επιστρέφεις αυτόματα εδώ και η απάντησή σου αρχίζει να γράφεται. Μην κλείσεις τη σελίδα πληρωμής πριν ολοκληρωθεί.</div></div>") +
       "<style>@keyframes pcspin{to{transform:rotate(360deg)}}</style>";
     w.className = "pcWait";
     document.body.appendChild(w);
+    // Αν αργήσει, να φαίνεται ότι δεν κόλλησε.
+    setTimeout(function () { var t = w.querySelector(".pcWaitT"); if (t && document.body.contains(w)) t.textContent = "Σχεδόν έτοιμο, ανοίγει η σελίδα πληρωμής..."; }, 6000);
     return w;
   }
   function toast(t) {

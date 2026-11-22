@@ -66,6 +66,12 @@ function toFormBody(params, prefix = "") {
 }
 
 exports.handler = async function (event) {
+  // Ζέσταμα από τη σελίδα (μόλις φανεί το κουμπί πληρωμής): ξυπνάει ο server και φέρνει από πριν το κλειδί της Viva.
+  // Δεν δημιουργεί καμία παραγγελία ή πληρωμή.
+  if (event.httpMethod === "GET" && event.queryStringParameters && event.queryStringParameters.warm) {
+    try { const { vivaWarm } = await import("../lib/viva.mjs"); await vivaWarm(); } catch (e) {}
+    return { statusCode: 204, headers: { "Cache-Control": "no-store" }, body: "" };
+  }
   if (event.httpMethod !== "POST") {
     return { statusCode: 405, body: "Method Not Allowed" };
   }

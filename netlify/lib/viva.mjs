@@ -28,14 +28,20 @@ export async function vivaOrderCheck() {
   } catch (e) { return String(e.message || e); }
 }
 
-export async function vivaTokenCheck() { try { await token(); return "ok"; } catch (e) { return String(e.message || e); } }
+export async function vivaTokenCheck() { try { TOK = null; await token(); return "ok"; } catch (e) { return String(e.message || e); } }
 
+// Το κλειδί της Viva κρατιέται στη μνήμη του server όσο ισχύει (μείον 2 λεπτά), μαζί με το Client ID που δούλεψε,
+// για να μη ζητιέται από την αρχή σε κάθε πληρωμή. Δεν φεύγει ποτέ προς τον browser.
+let TOK = null; // { t, exp, cid }
+export function tokenReset() { TOK = null; }
 async function token() {
+  if (TOK && TOK.exp > Date.now()) return TOK.t;
   // Δοκιμάζουμε το Client ID όπως μπήκε στο Netlify και, αν δεν περάσει, με/χωρίς την κατάληξη .apps.vivapayments.com
   const raw = String(process.env.VIVA_CLIENT_ID || "").trim();
   const sec = String(process.env.VIVA_CLIENT_SECRET || "").trim();
   const suf = ".apps.vivapayments.com";
-  const ids = [...new Set([raw, raw.endsWith(suf) ? raw.slice(0, -suf.length) : raw + suf])].filter(Boolean);
+  let ids = [...new Set([raw, raw.endsWith(suf) ? raw.slice(0, -suf.length) : raw + suf])].filter(Boolean);
+  if (TOK && TOK.cid && ids.includes(TOK.cid)) ids = [TOK.cid, ...ids.filter(x => x !== TOK.cid)];
   let last = "";
   for (const cid of ids) {
     const r = await fetch(`${H().accounts}/connect/token`, {
@@ -44,25 +50,40 @@ async function token() {
       body: "grant_type=client_credentials"
     });
     const d = await r.json().catch(() => ({}));
-    if (d.access_token) return d.access_token;
+    if (d.access_token) {
+      const life = Math.max(60, Number(d.expires_in) || 3600) - 120;
+      TOK = { t: d.access_token, exp: Date.now() + Math.max(30, life) * 1000, cid };
+      return d.access_token;
+    }
     last = `Viva token: ${r.status} ${d.error || ""} ${d.error_description || ""}`.trim();
   }
+  TOK = null;
   throw new Error(last || "Viva token: no client id");
 }
+// Κλήση στη Viva με το κλειδί· αν το απορρίψει (401), παίρνει καινούργιο και ξαναδοκιμάζει μία φορά.
+async function vivaFetch(url, opts = {}) {
+  let r = await fetch(url, { ...opts, headers: { ...(opts.headers || {}), Authorization: `Bearer ${await token()}` } });
+  if (r.status === 401) {
+    TOK = TOK ? { t: "", exp: 0, cid: TOK.cid } : null; // ξεχνάμε το κλειδί, κρατάμε ποιο Client ID δουλεύει
+    r = await fetch(url, { ...opts, headers: { ...(opts.headers || {}), Authorization: `Bearer ${await token()}` } });
+  }
+  return r;
+}
+// Ζέσταμα: φέρνει το κλειδί από πριν, ώστε η πληρωμή να ανοίγει πιο γρήγορα.
+export async function vivaWarm() { if (vivaReady()) { try { await token(); } catch (e) {} } }
 
 // Δημιουργεί παραγγελία και επιστρέφει τη διεύθυνση της σελίδας πληρωμής της Viva.
 export async function vivaCreateOrder({ tool, name, priceCents, readingId, returnUrl, src }) {
-  const t = await token();
-  const r = await fetch(`${H().api}/checkout/v2/orders`, {
+  const r = await vivaFetch(`${H().api}/checkout/v2/orders`, {
     method: "POST",
-    headers: { Authorization: `Bearer ${t}`, "Content-Type": "application/json" },
+    headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
       amount: priceCents,
       customerTrns: name,
       merchantTrns: `${tool}${readingId ? " " + readingId : ""}`.slice(0, 100),
       sourceCode: String(process.env.VIVA_SOURCE_CODE || "").trim(),
       paymentTimeout: 1800,
-      disableExactAmount: true,
+      disableExactAmount: false,
       allowRecurring: false
     })
   });
@@ -80,8 +101,7 @@ export async function vivaConfirm(transactionId, orderCode) {
   if (!rec) return { rec: null, ok: false };
   if (rec.paid) return { rec, ok: true };
   if (!/^[0-9a-f-]{36}$/i.test(String(transactionId || ""))) return { rec, ok: false };
-  const t = await token();
-  const r = await fetch(`${H().api}/checkout/v2/transactions/${transactionId}`, { headers: { Authorization: `Bearer ${t}` } });
+  const r = await vivaFetch(`${H().api}/checkout/v2/transactions/${transactionId}`);
   const d = await r.json().catch(() => ({}));
   // Η Viva μπορεί να χρεώσει στρογγυλεμένο ποσό (π.χ. 5,00€ αντί για 4,99€): δεχόμαστε ίσο ή έως 10 λεπτά παραπάνω, ποτέ λιγότερο.
   const paidCents = Math.round(Number(d.amount) * 100);
