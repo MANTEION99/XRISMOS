@@ -1,6 +1,6 @@
 // Δικός μας μετρητής επισκέψεων, χωρίς cookies και χωρίς προσωπικά δεδομένα.
 // POST /api/metrisi  { t: "v"|"e", p: σελίδα, s: πηγή, e: γεγονός }  -> αυξάνει τους μετρητές της μέρας
-// GET  /api/metrisi?k=ΚΛΕΙΔΙ&days=30                                 -> σύνολα ανά μέρα (μόνο με το κλειδί)
+// GET  /api/metrisi?k=ΚΛΕΙΔΙ&days=30                                 -> σύνολα ανά μέρα (μόνο με το κλειδί: METRISI_KEY στο Netlify)
 import { getStore } from "@netlify/blobs";
 import { createHash } from "node:crypto";
 
@@ -50,7 +50,10 @@ export default async (req) => {
   if (req.method === "GET") {
     const u = new URL(req.url);
     const k = u.searchParams.get("k") || "";
-    if (createHash("sha256").update(k).digest("hex") !== KEY_HASH) return json(403, { error: "Λάθος κωδικός" });
+    // Κωδικός από το Netlify (μεταβλητή METRISI_KEY). Ο παλιός κωδικός δουλεύει ακόμα.
+    const envKey = (process.env.METRISI_KEY || "").trim();
+    const okEnv = envKey && k.trim() === envKey;
+    if (!okEnv && createHash("sha256").update(k).digest("hex") !== KEY_HASH) return json(403, { error: "Λάθος κωδικός" });
     const days = Math.min(90, Math.max(1, parseInt(u.searchParams.get("days") || "30", 10)));
     const st = store(); const out = [];
     for (let i = 0; i < days; i++) {
