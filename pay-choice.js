@@ -30,14 +30,18 @@
     });
   }
   // Μήνυμα αναμονής όσο ανοίγει η σελίδα πληρωμής IRIS της Viva
-  function wait() {
+  function wait(card) {
     var w = document.createElement("div");
     w.style.cssText = "position:fixed;inset:0;z-index:99997;background:rgba(5,4,12,.85);display:flex;align-items:center;justify-content:center;padding:20px";
     w.innerHTML = "<div style='max-width:420px;background:#14122a;border:1px solid #D9B25C;border-radius:16px;padding:22px 18px;text-align:center;color:#F5F1E8;font:15px/1.55 Inter,Arial,sans-serif'>" +
       "<div style='width:34px;height:34px;margin:0 auto 12px;border:3px solid rgba(217,178,92,.3);border-top-color:#D9B25C;border-radius:50%;animation:pcspin 1s linear infinite'></div>" +
-      "<b style='color:#D9B25C;font-size:17px'>Ανοίγει η ασφαλής πληρωμή IRIS</b><br>Περίμενε λίγα δευτερόλεπτα." +
-      "<div style='margin-top:10px;color:#cfc8b8'>Πληρώνεις από το e-banking ή την εφαρμογή της τράπεζάς σου. Μόλις ολοκληρωθεί η πληρωμή, επιστρέφεις αυτόματα εδώ και η απάντησή σου αρχίζει να γράφεται. Μην κλείσεις τη σελίδα πληρωμής πριν ολοκληρωθεί.</div></div>" +
+      (card
+        ? "<b style='color:#D9B25C;font-size:17px'>Ανοίγει η ασφαλής πληρωμή</b><br>Περίμενε λίγα δευτερόλεπτα." +
+          "<div style='margin-top:10px;color:#cfc8b8'>Πληρώνεις με κάρτα, Apple Pay ή Google Pay. Μόλις ολοκληρωθεί η πληρωμή, επιστρέφεις αυτόματα εδώ και η απάντησή σου αρχίζει να γράφεται.</div></div>"
+        : "<b style='color:#D9B25C;font-size:17px'>Ανοίγει η ασφαλής πληρωμή IRIS</b><br>Περίμενε λίγα δευτερόλεπτα." +
+          "<div style='margin-top:10px;color:#cfc8b8'>Πληρώνεις από το e-banking ή την εφαρμογή της τράπεζάς σου. Μόλις ολοκληρωθεί η πληρωμή, επιστρέφεις αυτόματα εδώ και η απάντησή σου αρχίζει να γράφεται. Μην κλείσεις τη σελίδα πληρωμής πριν ολοκληρωθεί.</div></div>") +
       "<style>@keyframes pcspin{to{transform:rotate(360deg)}}</style>";
+    w.className = "pcWait";
     document.body.appendChild(w);
     return w;
   }
@@ -55,7 +59,7 @@
         if (!b.provider) {
           var self = this;
           return choose().then(function (p) {
-            if (p !== "viva") return of.call(self, u, opts);
+            if (p !== "viva") return withWait(of.call(self, u, opts), true);
             b.provider = "viva"; opts = Object.assign({}, opts, { body: JSON.stringify(b) });
             var w = wait();
             return of.call(self, u, opts).then(function (r) {
@@ -69,9 +73,20 @@
           });
         }
       }
+      // Κάρτα χωρίς παράθυρο επιλογής (π.χ. όταν η IRIS δεν είναι ενεργή): δείχνουμε κι εδώ το μήνυμα αναμονής
+      if (/create-checkout/.test(url)) return withWait(of.apply(this, arguments), true);
     } catch (e) {}
     return of.apply(this, arguments);
   };
+  function withWait(pr, card) {
+    var w = wait(card);
+    return pr.then(function (r) {
+      r.clone().json().then(function (d) { if (!d || !d.url) w.remove(); }).catch(function () { w.remove(); });
+      return r;
+    }, function (e) { w.remove(); throw e; });
+  }
+  // Αν γυρίσει πίσω από τη σελίδα πληρωμής με το κουμπί «πίσω», να μη μείνει το μήνυμα στην οθόνη
+  window.addEventListener("pageshow", function () { document.querySelectorAll(".pcWait").forEach(function (x) { x.remove(); }); });
   try {
     if (new URLSearchParams(location.search).get("pay") === "fail") {
       var n = function () { css(); var d = document.createElement("div");
