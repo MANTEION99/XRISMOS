@@ -35,6 +35,12 @@ export default async (req) => {
         data.v[p] = (data.v[p] || 0) + 1; data.s[s] = (data.s[s] || 0) + 1;
         // Νέοι (n) ή ξαναήρθαν (r), συνολικά και ανά πηγή
         if (r) { data.vr = data.vr || {}; data.vr[r] = (data.vr[r] || 0) + 1; data.sr = data.sr || {}; const k2 = s + ":" + r; data.sr[k2] = (data.sr[k2] || 0) + 1; }
+        // Άνθρωποι: μόνο η πρώτη σελίδα κάθε επίσκεψης, με την πηγή της και αν είναι νέος ή ξαναήρθε
+        if (b.h === 1 || b.h === "1") {
+          data.h = (data.h || 0) + 1;
+          data.hs = data.hs || {}; data.hs[s] = (data.hs[s] || 0) + 1;
+          if (r) { data.hr = data.hr || {}; data.hr[r] = (data.hr[r] || 0) + 1; }
+        }
       }
       else if (e) {
         if (u) { data.u = data.u || {}; if (data.u[u]) break; data.u[u] = 1; }

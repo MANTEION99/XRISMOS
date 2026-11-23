@@ -33,7 +33,11 @@
     else { ret = localStorage.getItem("manteio_18") === "1" ? 1 : 0; sessionStorage.setItem("manteio_r", String(ret)); }
   } catch (e) {}
   var page = location.pathname.replace(/\.html$/, "").replace(/-tool-agora$/, "") || "/";
-  send({ t: "v", p: page, s: source(), r: ret });
+  // Άνθρωποι: η πρώτη σελίδα κάθε επίσκεψης (μέχρι να κλείσει η καρτέλα) μετράει ένα άτομο, με την πηγή από την οποία ήρθε.
+  // Η σημαία ζει μόνο όσο είναι ανοιχτή η καρτέλα (sessionStorage) και δεν περιέχει κανένα στοιχείο.
+  var first = 0;
+  try { if (!sessionStorage.getItem("manteio_p")) { sessionStorage.setItem("manteio_p", "1"); first = 1; } } catch (e) {}
+  send({ t: "v", p: page, s: source(), r: ret, h: first });
   var tool = page.replace(/^\//, "") || "arxiki";
   var once = {};
   function ev(name) { if (once[name]) return; once[name] = 1; send({ t: "e", e: name }); }
