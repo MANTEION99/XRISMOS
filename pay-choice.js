@@ -31,7 +31,7 @@
     if (document.getElementById("pcCss")) return;
     var s = document.createElement("style"); s.id = "pcCss";
     s.textContent = "#pcBg{position:fixed;inset:0;background:rgba(5,4,12,.78);z-index:99998;display:flex;align-items:flex-end;justify-content:center}" +
-      "#pcBox{position:relative;background:#14122a;border:1px solid #D9B25C;border-radius:18px 18px 0 0;padding:50px 16px calc(34px + env(safe-area-inset-bottom));width:100%;max-width:520px;max-height:88vh;overflow-y:auto;color:#F5F1E8;font:15px/1.5 Inter,Arial,sans-serif}" +
+      "#pcBox{position:relative;background:#14122a;border:1px solid #D9B25C;border-radius:18px 18px 0 0;padding:20px 16px calc(34px + env(safe-area-inset-bottom));width:100%;max-width:520px;max-height:88vh;overflow-y:auto;color:#F5F1E8;font:15px/1.5 Inter,Arial,sans-serif}" +
       "#pcBox #pcX{position:absolute;top:8px;right:10px;width:40px;height:40px;padding:0;margin:0;border:0;background:none;color:#cfc8b8;font-size:28px;line-height:40px;text-align:center}" +
       "#pcBox h3{font-family:'Cormorant Garamond',Georgia,serif;font-size:24px;color:#D9B25C;margin:0 0 14px;text-align:center;font-weight:600}" +
       "#pcBox button{display:block;width:100%;text-align:center;background:rgba(217,178,92,.06);border:1px solid rgba(217,178,92,.55);border-radius:14px;color:#F5F1E8;padding:14px 16px;margin-bottom:10px;cursor:pointer;font:inherit}" +
@@ -81,12 +81,15 @@
     return new Promise(function (res) {
       css();
             var bg = document.createElement("div"); bg.id = "pcBg";
-      bg.innerHTML = "<div id='pcBox' role='dialog' aria-label='Τρόπος πληρωμής'><button type='button' data-p='back' id='pcX' aria-label='Κλείσιμο'>×</button>" +
+      bg.innerHTML = "<div id='pcBox' role='dialog' aria-label='Τρόπος πληρωμής'>" +
         "<button type='button' data-p='viva'><b>IRIS</b></button>" +
         "<button type='button' data-p='stripe'><b>Κάρτα, Apple Pay, Google Pay</b></button>" +
         "<div style='text-align:center;font-size:12px;color:#a8a2bf;margin-top:4px'>Ασφαλής πληρωμή</div></div>";
       document.body.appendChild(bg);
-      bg.addEventListener("click", function (e) { if (e.target === bg) { var x = bg.querySelector("#pcX"); if (x) x.click(); } });
+      bg.addEventListener("click", function (e) {
+        if (e.target !== bg) return;
+        try { if (window.manteioEvent) manteioEvent("pliromi-piso:" + String(tool || "").replace(/_q[23]$/, "")); } catch (x) {}
+        bg.remove(); res("back"); });
       bg.querySelectorAll("button").forEach(function (b) { b.onclick = function () {
         var c = b.getAttribute("data-p");
         // Μέτρηση: ποιον τρόπο διάλεξαν στο παράθυρο, ή αν γύρισαν πίσω
