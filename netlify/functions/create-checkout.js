@@ -30,15 +30,15 @@ const PRODUCTS = {
   synomilia: { name: "Η προσωπική συνομιλία με Το Μαντείο, 5 ερωτήσεις", price: 2999 },
   xartis: { name: "Ο Γενέθλιος Χάρτης σου, πλήρης ανάλυση", price: 3900 },
   xartis_plus: { name: "Ο Γενέθλιος Χάρτης σου, πλήρης ανάλυση και πρόβλεψη 12 μηνών", price: 5900 },
-  // Η τιμή του ημερολογίου ορίζεται τη στιγμή της πληρωμής: 19,99€, ή 14,99€ στη Black Friday (27 έως 30/11/2026).
-  imerologio: { name: "Οι καλές σου μέρες του 2027, προσωπικό ημερολόγιο", price: 1999 },
+  // Η τιμή του ημερολογίου ορίζεται τη στιγμή της πληρωμής: 29,99€, ή 14,99€ στη Black Friday (27 έως 30/11/2026).
+  imerologio: { name: "Οι καλές σου μέρες του 2027, προσωπικό ημερολόγιο", price: 2999 },
   paidi: { name: "Ο χάρτης του παιδιού ή του εγγονιού", price: 2499 }
 };
 
 // Ίδιος κανόνας με το netlify/lib/imerologio.mjs (priceNow).
 function imerologioPrice(now = new Date()) {
   const day = new Intl.DateTimeFormat("en-CA", { timeZone: "Europe/Athens", year: "numeric", month: "2-digit", day: "2-digit" }).format(now);
-  return day >= "2026-11-27" && day <= "2026-11-30" ? 1499 : 1999;
+  return day >= "2026-11-27" && day <= "2026-11-30" ? 1499 : 2999;
 }
 
 // Το Stripe REST API περιμένουν form-urlencoded body με bracket notation για nested δεδομένα

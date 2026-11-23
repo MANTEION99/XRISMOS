@@ -34,22 +34,66 @@
       "#pcBox{background:#14122a;border:1px solid #D9B25C;border-radius:18px 18px 0 0;padding:20px 16px 26px;width:100%;max-width:520px;color:#F5F1E8;font:15px/1.5 Inter,Arial,sans-serif}" +
       "#pcBox h3{font-family:'Cormorant Garamond',Georgia,serif;font-size:24px;color:#D9B25C;margin:0 0 14px;text-align:center;font-weight:600}" +
       "#pcBox button{display:block;width:100%;text-align:left;background:rgba(217,178,92,.06);border:1px solid rgba(217,178,92,.55);border-radius:14px;color:#F5F1E8;padding:14px 16px;margin-bottom:10px;cursor:pointer;font:inherit}" +
-      "#pcBox b{display:block;font-size:17px;color:#F5F1E8}#pcBox span{font-size:13.5px;color:#B9B3C9}";
+      "#pcBox b{display:block;font-size:17px;color:#F5F1E8}#pcBox span{font-size:13.5px;color:#B9B3C9}" +
+      "#pcWhat{text-align:center;margin:0 0 6px}#pcWhat .pcName{font-family:'Cormorant Garamond',Georgia,serif;font-size:21px;line-height:1.25;color:#F5F1E8;font-weight:600}" +
+      "#pcWhat .pcPrice{font-size:26px;font-weight:700;color:#D9B25C;margin-top:4px}" +
+      "#pcSure{text-align:center;font-size:13.5px;color:#cfc8b8;margin:0 0 14px}" +
+      "#pcBox #pcBack{text-align:center;background:none;border:0;color:#cfc8b8;text-decoration:underline;font-size:15px;padding:12px 0 0;margin:6px 0 0}";
     document.head.appendChild(s);
   }
-  function choose() {
+  // Τι αγοράζει και πόσο κοστίζει, για να το βλέπει μέσα στο παράθυρο πληρωμής.
+  var NAMES = { epistrofi: "Θα επιστρέψει;", agapi: "Με σκέφτεται ακόμα;", alitheia: "Μου κρύβει κάτι;", oikonomika: "Το οικονομικό σου μέλλον",
+    symvatotita: "Ταιριάζετε; Η Συναστρία σας", erotima: "Η δική σου ερώτηση", numerology: "Ο Χρησμός της Αριθμολογίας", taro: "Το Τρίφυλλο Ταρώ",
+    xartis: "Ο Γενέθλιος Χάρτης σου", xartis_plus: "Ο Γενέθλιος Χάρτης σου και πρόβλεψη 12 μηνών", imerologio: "Οι καλές σου μέρες του 2027",
+    paidi: "Ο χάρτης του παιδιού ή του εγγονιού" };
+  var QUESTION_TOOLS = /^(epistrofi|agapi|alitheia|oikonomika|symvatotita|erotima|numerology|taro)(_q[23])?$/;
+  function eur(c) { return (c % 100 ? (c / 100).toFixed(2).replace(".", ",") : String(c / 100)) + "€"; }
+  function info(tool) {
+    tool = String(tool || ""); var m = tool.match(QUESTION_TOOLS), name = "", price = 0;
+    if (m) {
+      name = "Η πλήρης απάντηση: " + NAMES[m[1]] + (m[2] ? " · " + m[2].slice(2) + "η ερώτηση" : "");
+      price = m[2] === "_q2" ? 299 : m[2] === "_q3" ? 199 : 499;
+    } else if (NAMES[tool]) {
+      name = NAMES[tool];
+      if (tool === "imerologio") {
+        var d = new Intl.DateTimeFormat("en-CA", { timeZone: "Europe/Athens", year: "numeric", month: "2-digit", day: "2-digit" }).format(new Date());
+        price = d >= "2026-11-27" && d <= "2026-11-30" ? 1499 : 2999;
+      } else price = { xartis: 3900, xartis_plus: 5900, paidi: 2499 }[tool] || 0;
+    }
+    return { name: name, price: price ? eur(price) : "" };
+  }
+  function esc(t) { return String(t).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); }
+  // Ποιο κουμπί πατήθηκε τελευταίο, με το κείμενό του πριν αλλάξει σε «Μεταφορά...», ώστε το «Πίσω» να το επαναφέρει.
+  var lastBtn = null, lastHTML = "";
+  document.addEventListener("click", function (e) {
+    var b = e.target && e.target.closest ? e.target.closest("button,a,[role=button]") : null;
+    if (b && !b.closest("#pcBg")) { lastBtn = b; lastHTML = b.innerHTML; }
+  }, true);
+  function restoreBtn() {
+    try {
+      if (!lastBtn) return;
+      lastBtn.innerHTML = lastHTML; lastBtn.style.pointerEvents = "auto"; lastBtn.disabled = false;
+      lastBtn.classList.remove("busy"); lastBtn.removeAttribute("aria-busy");
+    } catch (e) {}
+  }
+  function choose(tool) {
     return new Promise(function (res) {
       css();
+      var it = info(tool);
       var bg = document.createElement("div"); bg.id = "pcBg";
-      bg.innerHTML = "<div id='pcBox' role='dialog' aria-label='Τρόπος πληρωμής'><h3>Πώς θέλεις να πληρώσεις;</h3>" +
-        "<button type='button' data-p='viva'><b>Με IRIS, από την τράπεζά σου</b><span>Πληρώνεις από το e-banking της τράπεζάς σου, χωρίς κάρτα.</span></button>" +
+      bg.innerHTML = "<div id='pcBox' role='dialog' aria-label='Τρόπος πληρωμής'>" +
+        (it.name ? "<div id='pcWhat'><div class='pcName'>" + esc(it.name) + "</div>" + (it.price ? "<div class='pcPrice'>" + it.price + "</div>" : "") + "</div>" : "") +
+        "<div id='pcSure'>" + (QUESTION_TOOLS.test(String(tool || "")) ? "Ανοίγει αμέσως μόλις πληρώσεις, εδώ στη σελίδα." : "Μόλις πληρώσεις, αρχίζει να γράφεται εδώ στη σελίδα.") + "</div>" +
+        "<h3>Πώς θέλεις να πληρώσεις;</h3>" +
+        "<button type='button' data-p='viva'><b>Με IRIS, από την τράπεζά σου</b><span>Μέσα από την εφαρμογή της τράπεζάς σου στο κινητό, σε ένα λεπτό, χωρίς κάρτα.</span></button>" +
         "<button type='button' data-p='stripe'><b>Με κάρτα</b><span>Χρεωστική ή πιστωτική κάρτα, Apple Pay ή Google Pay.</span></button>" +
-        "<div style='text-align:center;font-size:12px;color:#a8a2bf;margin-top:6px'>Ασφαλής πληρωμή μέσω <b style='color:#fff;letter-spacing:.3px'>viva.com</b> (IRIS) και <b style='color:#fff'>Stripe</b> (κάρτα)</div></div>";
+        "<div style='text-align:center;font-size:12px;color:#a8a2bf;margin-top:6px'>Ασφαλής πληρωμή μέσω <b style='color:#fff;letter-spacing:.3px'>viva.com</b> (IRIS) και <b style='color:#fff'>Stripe</b> (κάρτα)</div>" +
+        "<button type='button' data-p='back' id='pcBack'>Πίσω</button></div>";
       document.body.appendChild(bg);
       bg.querySelectorAll("button").forEach(function (b) { b.onclick = function () {
         var c = b.getAttribute("data-p");
-        // Μέτρηση: ποιον τρόπο διάλεξαν στο παράθυρο
-        try { if (window.manteioEvent) manteioEvent("epilogi-pliromis:" + (c === "viva" ? "iris" : "karta")); } catch (e) {}
+        // Μέτρηση: ποιον τρόπο διάλεξαν στο παράθυρο, ή αν γύρισαν πίσω
+        try { if (window.manteioEvent) manteioEvent(c === "back" ? "pliromi-piso:" + String(tool || "").replace(/_q[23]$/, "") : "epilogi-pliromis:" + (c === "viva" ? "iris" : "karta")); } catch (e) {}
         bg.remove(); res(c); }; });
     });
   }
@@ -84,7 +128,9 @@
         var b = JSON.parse(opts.body);
         if (!b.provider) {
           var self = this;
-          return choose().then(function (p) {
+          return choose(b.tool).then(function (p) {
+            // «Πίσω»: η πληρωμή δεν ξεκινά, το κουμπί της σελίδας επανέρχεται και η σελίδα μένει όπως ήταν
+            if (p === "back") { restoreBtn(); return new Promise(function () {}); }
             if (p !== "viva") return withWait(of.call(self, u, opts), true);
             b.provider = "viva"; opts = Object.assign({}, opts, { body: JSON.stringify(b) });
             var w = wait();
