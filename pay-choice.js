@@ -34,7 +34,7 @@
       "#pcBox{position:relative;background:#14122a;border:1px solid #D9B25C;border-radius:18px 18px 0 0;padding:50px 16px calc(34px + env(safe-area-inset-bottom));width:100%;max-width:520px;max-height:88vh;overflow-y:auto;color:#F5F1E8;font:15px/1.5 Inter,Arial,sans-serif}" +
       "#pcBox #pcX{position:absolute;top:8px;right:10px;width:40px;height:40px;padding:0;margin:0;border:0;background:none;color:#cfc8b8;font-size:28px;line-height:40px;text-align:center}" +
       "#pcBox h3{font-family:'Cormorant Garamond',Georgia,serif;font-size:24px;color:#D9B25C;margin:0 0 14px;text-align:center;font-weight:600}" +
-      "#pcBox button{display:block;width:100%;text-align:left;background:rgba(217,178,92,.06);border:1px solid rgba(217,178,92,.55);border-radius:14px;color:#F5F1E8;padding:14px 16px;margin-bottom:10px;cursor:pointer;font:inherit}" +
+      "#pcBox button{display:block;width:100%;text-align:center;background:rgba(217,178,92,.06);border:1px solid rgba(217,178,92,.55);border-radius:14px;color:#F5F1E8;padding:14px 16px;margin-bottom:10px;cursor:pointer;font:inherit}" +
       "#pcBox b{display:block;font-size:17px;color:#F5F1E8}#pcBox span{font-size:13.5px;color:#B9B3C9}" +
       "#pcWhat{text-align:center;margin:0 0 6px}#pcWhat .pcName{font-family:'Cormorant Garamond',Georgia,serif;font-size:21px;line-height:1.25;color:#F5F1E8;font-weight:600}" +
       "#pcWhat .pcPrice{font-size:26px;font-weight:700;color:#D9B25C;margin-top:4px}" +
@@ -82,10 +82,9 @@
       css();
             var bg = document.createElement("div"); bg.id = "pcBg";
       bg.innerHTML = "<div id='pcBox' role='dialog' aria-label='Τρόπος πληρωμής'><button type='button' data-p='back' id='pcX' aria-label='Κλείσιμο'>×</button>" +
-        "<button type='button' data-p='viva'><b>Με IRIS, από την τράπεζά σου</b><span>Μέσα από την εφαρμογή της τράπεζάς σου στο κινητό, σε ένα λεπτό, χωρίς κάρτα.</span></button>" +
-        "<button type='button' data-p='stripe'><b>Με κάρτα</b><span>Χρεωστική ή πιστωτική κάρτα, Apple Pay ή Google Pay.</span></button>" +
-        "<div style='text-align:center;font-size:12px;color:#a8a2bf;margin-top:6px'>Ασφαλής πληρωμή μέσω <b style='color:#fff;letter-spacing:.3px'>viva.com</b> (IRIS) και <b style='color:#fff'>Stripe</b> (κάρτα)</div>" +
-        "<button type='button' data-p='back' id='pcBack'>Πίσω</button></div>";
+        "<button type='button' data-p='viva'><b>IRIS</b></button>" +
+        "<button type='button' data-p='stripe'><b>Κάρτα, Apple Pay, Google Pay</b></button>" +
+        "<div style='text-align:center;font-size:12px;color:#a8a2bf;margin-top:4px'>Ασφαλής πληρωμή</div></div>";
       document.body.appendChild(bg);
       bg.addEventListener("click", function (e) { if (e.target === bg) { var x = bg.querySelector("#pcX"); if (x) x.click(); } });
       bg.querySelectorAll("button").forEach(function (b) { b.onclick = function () {
