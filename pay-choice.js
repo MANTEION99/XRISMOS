@@ -39,7 +39,9 @@
       "#pcBox #pcIris{display:flex;align-items:center;justify-content:center;gap:10px;padding:18px 16px;border:1.5px solid #D9B25C;background:rgba(217,178,92,.10)}" +
       "#pcBox #pcIris b{display:inline;font-size:26px;letter-spacing:1px;color:#fff}" +
       ".pcRing{display:inline-block;width:26px;height:26px;border-radius:50%;background:radial-gradient(circle,#14122a 0 33%,transparent 35%),conic-gradient(#2670b5 0 25%,#169c96 0 50%,#f68d22 0 75%,#ee3b38 0)}" +
-      "#pcBox #pcCard{font-size:15px;color:#E9E3D3;padding:13px 14px}" +
+      "#pcBox #pcCard{padding:11px 14px}#pcBox #pcCard .pcCt{display:block;font-size:13.5px;color:#cfc8b8;margin-bottom:7px}" +
+      ".pcLogos{display:flex;justify-content:center;gap:8px}.pcB{display:inline-flex;align-items:center;gap:3px;border-radius:6px;padding:4px 9px;font:600 14px/1 -apple-system,Inter,Arial,sans-serif}" +
+      ".pcAp{background:#000;border:1px solid #555}.pcAp b{display:inline!important;color:#fff!important;font-size:14px!important}.pcGp{background:#fff}.pcGp b{display:inline!important;color:#5f6368!important;font-size:14px!important}" +
       "#pcWhat{text-align:center;margin:0 0 6px}#pcWhat .pcName{font-family:'Cormorant Garamond',Georgia,serif;font-size:21px;line-height:1.25;color:#F5F1E8;font-weight:600}" +
       "#pcWhat .pcPrice{font-size:26px;font-weight:700;color:#D9B25C;margin-top:4px}" +
       "#pcSure{text-align:center;font-size:13.5px;color:#cfc8b8;margin:0 0 14px}" +
@@ -87,7 +89,8 @@
             var bg = document.createElement("div"); bg.id = "pcBg";
       bg.innerHTML = "<div id='pcBox' role='dialog' aria-label='Τρόπος πληρωμής'>" +
         "<button type='button' data-p='viva' id='pcIris'><span class='pcRing'></span><b>IRIS</b></button>" +
-        "<button type='button' data-p='stripe' id='pcCard'>Συνέχεια με κάρτα, Apple Pay, Google Pay</button>" +
+        "<button type='button' data-p='stripe' id='pcCard'><span class='pcCt'>Συνέχεια με κάρτα</span>" +
+        "<span class='pcLogos'><span class='pcB pcAp'><svg width=\"15\" height=\"15\" viewBox=\"0 0 24 24\" fill=\"#fff\" style=\"vertical-align:-2px\"><path d=\"M12.152 6.896c-.948 0-2.415-1.078-3.96-1.04-2.04.027-3.91 1.183-4.961 3.014-2.117 3.675-.546 9.103 1.519 12.09 1.013 1.454 2.208 3.09 3.792 3.039 1.52-.065 2.09-.987 3.935-.987 1.831 0 2.35.987 3.96.948 1.637-.026 2.676-1.48 3.676-2.948 1.156-1.688 1.636-3.325 1.662-3.415-.039-.013-3.182-1.221-3.22-4.857-.026-3.04 2.48-4.494 2.597-4.559-1.429-2.09-3.623-2.324-4.39-2.376-2-.156-3.675 1.09-4.61 1.09zM15.53 3.83c.843-1.012 1.4-2.427 1.245-3.83-1.207.052-2.662.805-3.532 1.818-.78.896-1.454 2.338-1.273 3.714 1.338.104 2.715-.688 3.559-1.701\"/></svg><b>Pay</b></span><span class='pcB pcGp'><svg width=\"15\" height=\"15\" viewBox=\"0 0 48 48\" style=\"vertical-align:-2px\"><path fill=\"#EA4335\" d=\"M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z\"/><path fill=\"#4285F4\" d=\"M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z\"/><path fill=\"#FBBC05\" d=\"M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z\"/><path fill=\"#34A853\" d=\"M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z\"/></svg><b>Pay</b></span></span></button>" +
         "<div style='text-align:center;font-size:12px;color:#a8a2bf;margin-top:4px'>Ασφαλής πληρωμή</div></div>";
       document.body.appendChild(bg);
       bg.addEventListener("click", function (e) {
