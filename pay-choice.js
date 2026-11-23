@@ -36,6 +36,10 @@
       "#pcBox h3{font-family:'Cormorant Garamond',Georgia,serif;font-size:24px;color:#D9B25C;margin:0 0 14px;text-align:center;font-weight:600}" +
       "#pcBox button{display:block;width:100%;text-align:center;background:rgba(217,178,92,.06);border:1px solid rgba(217,178,92,.55);border-radius:14px;color:#F5F1E8;padding:14px 16px;margin-bottom:10px;cursor:pointer;font:inherit}" +
       "#pcBox b{display:block;font-size:17px;color:#F5F1E8}#pcBox span{font-size:13.5px;color:#B9B3C9}" +
+      "#pcBox #pcIris{display:flex;align-items:center;justify-content:center;gap:10px;padding:18px 16px;border:1.5px solid #D9B25C;background:rgba(217,178,92,.10)}" +
+      "#pcBox #pcIris b{display:inline;font-size:26px;letter-spacing:1px;color:#fff}" +
+      ".pcRing{display:inline-block;width:26px;height:26px;border-radius:50%;background:radial-gradient(circle,#14122a 0 33%,transparent 35%),conic-gradient(#2670b5 0 25%,#169c96 0 50%,#f68d22 0 75%,#ee3b38 0)}" +
+      "#pcBox #pcCard{font-size:15px;color:#E9E3D3;padding:13px 14px}" +
       "#pcWhat{text-align:center;margin:0 0 6px}#pcWhat .pcName{font-family:'Cormorant Garamond',Georgia,serif;font-size:21px;line-height:1.25;color:#F5F1E8;font-weight:600}" +
       "#pcWhat .pcPrice{font-size:26px;font-weight:700;color:#D9B25C;margin-top:4px}" +
       "#pcSure{text-align:center;font-size:13.5px;color:#cfc8b8;margin:0 0 14px}" +
@@ -82,8 +86,8 @@
       css();
             var bg = document.createElement("div"); bg.id = "pcBg";
       bg.innerHTML = "<div id='pcBox' role='dialog' aria-label='Τρόπος πληρωμής'>" +
-        "<button type='button' data-p='viva'><b>IRIS</b></button>" +
-        "<button type='button' data-p='stripe'><b>Κάρτα, Apple Pay, Google Pay</b></button>" +
+        "<button type='button' data-p='viva' id='pcIris'><span class='pcRing'></span><b>IRIS</b></button>" +
+        "<button type='button' data-p='stripe' id='pcCard'>Συνέχεια με κάρτα, Apple Pay, Google Pay</button>" +
         "<div style='text-align:center;font-size:12px;color:#a8a2bf;margin-top:4px'>Ασφαλής πληρωμή</div></div>";
       document.body.appendChild(bg);
       bg.addEventListener("click", function (e) {
