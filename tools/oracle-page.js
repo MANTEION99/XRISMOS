@@ -397,7 +397,7 @@ function validate(f) {
 }
 
 async function startCheckout(buttonEl, readingId, tool, stage) {
-  const original = buttonEl.textContent;
+  const original = buttonEl.innerHTML;
   buttonEl.textContent = 'Μεταφορά στην ασφαλή πληρωμή...';
   buttonEl.style.pointerEvents = 'none';
   try {
@@ -411,7 +411,7 @@ async function startCheckout(buttonEl, readingId, tool, stage) {
     if (!data.url) throw new Error('no url');
     window.location.href = data.url;
   } catch (e) {
-    buttonEl.textContent = original;
+    buttonEl.innerHTML = original;
     buttonEl.style.pointerEvents = 'auto';
     infoLine.textContent = 'Κάτι πήγε στραβά με την πληρωμή, δοκίμασε ξανά.';
     infoLine.style.display = 'block';

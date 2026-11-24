@@ -240,7 +240,10 @@
   .seal-sub{ font-size:13px; color:var(--muted); max-width:300px; line-height:1.5; }
   .full-wrap{ display:none; margin-top:22px; padding-top:22px; border-top:1px solid var(--line); }
   .full-wrap.show{ display:block; animation:fadein 0.6s ease; }
-  #unlockBtn{ padding:12px 26px; font-size:15px; letter-spacing:1px; white-space:nowrap; }
+  #unlockBtn{ display:inline-flex; flex-direction:column; align-items:center; gap:3px; max-width:100%; box-sizing:border-box; padding:12px 24px; font-size:17px; letter-spacing:1px; white-space:normal; line-height:1.25; }
+  #unlockBtn .ub-price{ font-family:'Inter',sans-serif; font-size:17px; font-weight:700; letter-spacing:.5px; color:#F4EEDF; }
+  #unlockBtn:hover .ub-price{ color:inherit; }
+  .card{ min-width:0; }
   .info{ text-align:center; font-size:13.5px; color:var(--paper); line-height:1.6; margin:4px 0 6px; }
 
   .dt-row{ display:flex; gap:6px; }
@@ -448,8 +451,8 @@
         <div class="seal-title">Ο χρησμός σου συνεχίζεται</div>
         <div class="seal-sub">Η καθαρή απάντηση στην ερώτησή σου, πότε αλλάζει και τι να κάνεις τότε.</div>
         <div class="seal-note" style="font-size:13.5px;line-height:1.55;color:#d8cfb8;margin:10px auto 14px;max-width:420px;">Η δωρεάν απάντηση είναι μια γεύση, για να δεις πώς δουλεύει Το Μαντείο. <b>Η πληρωμένη απάντηση είναι η πραγματική:</b> απαντά ακριβώς σε αυτό που ρώτησες, πάνω στον δικό σου χάρτη, με ημερομηνίες και τι να κάνεις.</div>
-        <div class="enter-btn" id="unlockBtn">Δες τη συνέχεια · 4,99€</div>
         <p class="value-note" style="font-size:14px;line-height:1.55;color:#F4EEDF;max-width:340px;margin:12px auto 18px;text-align:center;">Σε αστρολόγο, μια απάντηση σε μία ερώτηση κοστίζει συνήθως από 40 έως 80€. Το Μαντείο σού την προσφέρει με <b style="color:#D9B25C;">4,99€</b>.<span style="display:block;margin-top:8px;font-size:13px;color:#d8cfb8;">Ο χάρτης σου υπολογίζεται με τα ίδια αστρονομικά δεδομένα που χρησιμοποιούν οι επαγγελματίες αστρολόγοι, με ακρίβεια λεπτού.</span></p>
+        <div class="enter-btn" id="unlockBtn"><span class="ub-main">Δες την απάντηση</span><span class="ub-price">4,99€</span></div>
         <div class="secure-note"><svg viewBox="0 0 24 24" fill="none"><rect x="5" y="11" width="14" height="10" rx="2" stroke="currentColor" stroke-width="1.6"/><path d="M8 11V7a4 4 0 0 1 8 0v4" stroke="currentColor" stroke-width="1.6"/></svg> Ασφαλής πληρωμή μέσω Stripe</div>
       </div>
     </div>
@@ -903,7 +906,7 @@ function validate(f) {
 }
 
 async function startCheckout(buttonEl, readingId, tool, stage) {
-  const original = buttonEl.textContent;
+  const original = buttonEl.innerHTML;
   buttonEl.textContent = 'Μεταφορά στην ασφαλή πληρωμή...';
   buttonEl.style.pointerEvents = 'none';
   try {
@@ -917,7 +920,7 @@ async function startCheckout(buttonEl, readingId, tool, stage) {
     if (!data.url) throw new Error('no url');
     window.location.href = data.url;
   } catch (e) {
-    buttonEl.textContent = original;
+    buttonEl.innerHTML = original;
     buttonEl.style.pointerEvents = 'auto';
     infoLine.textContent = 'Κάτι πήγε στραβά με την πληρωμή, δοκίμασε ξανά.';
     infoLine.style.display = 'block';
