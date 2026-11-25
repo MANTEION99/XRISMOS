@@ -380,7 +380,7 @@ function show(data, full) {
   } else {
     $("days").innerHTML = data.days.map(x => x.open ? openCard(x) : blurCard(x)).join("");
     const left = data.days.filter(x => x.locked).length;
-    $("sealSub").textContent = `Οι άλλες ${left} μέρες είναι ήδη υπολογισμένες από τα στοιχεία σου. Βλέπεις ποια είναι η πιο δυνατή σου μέρα και, για κάθε μέρα, τι λέει ο ουρανός, τον αριθμό της και το χαρτί της.`;
+    $("sealSub").textContent = `Οι άλλες ${left} μέρες είναι ήδη υπολογισμένες από τα στοιχεία σου. Βλέπεις ποια είναι η πιο δυνατή σου μέρα και, για κάθε μέρα, τι λέει το σύμπαν, τον αριθμό της και το χαρτί της.`;
     $("seal").style.display = "block";
     if (data.price) priceUI(data.price.cents);
   }
