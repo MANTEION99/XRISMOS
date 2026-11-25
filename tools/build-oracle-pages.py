@@ -119,7 +119,11 @@ NATAL_UNLOCK = (
 
 DEFAULT_UNLOCK = (
     '        <p class="value-note" style="font-size:12.5px;line-height:1.55;color:var(--muted);max-width:320px;margin:10px auto 18px;text-align:center;">Μια τέτοια πρόβλεψη κοστίζει περίπου 100€. Εδώ γράφεται μόνο για σένα, με 4,99€. Χρεώνεσαι μόνο όταν ολοκληρωθεί ο χρησμός σου.</p>\n'
-    '        <div class="enter-btn" id="unlockBtn"><span class="ub-main">Δες την απάντηση</span><span class="ub-price">ΜΟΝΟ&nbsp;4,99€</span></div>\n')
+    '        <div class="enter-btn" id="unlockBtn"><span class="ub-main">Δες την απάντηση</span><span class="ub-price">ΜΟΝΟ&nbsp;4,99€</span></div>\n'
+    '        <p class="lucky-note" style="font-size:13.5px;line-height:1.5;color:#D9B25C;max-width:320px;margin:10px auto 4px;text-align:center;">Μαζί παίρνεις και την πιο τυχερή σου μέρα για την εβδομάδα που έρχεται</p>\n')
+
+# Στο Ταρό δεν ζητάμε ημερομηνία γέννησης, άρα δεν υπάρχει τυχερή μέρα να υποσχεθούμε.
+TARO_UNLOCK = DEFAULT_UNLOCK.replace('        <p class="lucky-note" style="font-size:13.5px;line-height:1.5;color:#D9B25C;max-width:320px;margin:10px auto 4px;text-align:center;">Μαζί παίρνεις και την πιο τυχερή σου μέρα για την εβδομάδα που έρχεται</p>\n', '')
 
 TOOLS = {
   "xartis": dict(
@@ -217,7 +221,7 @@ TOOLS = {
     waitSteps=["Η πληρωμή σου επιβεβαιώθηκε", "Οι αριθμοί σου φανερώνονται", "Το μοτίβο της ζωής σου συντίθεται", "Ο χρησμός σου γράφεται ειδικά για σένα"],
     qPh="π.χ. Γιατί επαναλαμβάνω τα ίδια λάθη στις σχέσεις μου;", qHint="Ρώτα ό,τι σε καίει για τον εαυτό σου, τις σχέσεις ή τη χρονιά σου.", sameData="με τους ίδιους αριθμούς"),
   "taro": dict(
-    slug="taro", file="taro-tool-agora.html", kind="taro", needDob2=False, needQuestion=True,
+    slug="taro", file="taro-tool-agora.html", kind="taro", needDob2=False, needQuestion=True, unlock=TARO_UNLOCK,
     title="Το Τρίφυλλο Ταρώ", h1="Το Τρίφυλλο<br>Ταρώ", img="images/taro.jpg",
     sub="Τρία χαρτιά πάνω στο δικό σου ερώτημα: τι σε έφερε ως εδώ, τι ζεις τώρα και τι έρχεται.",
     ask="Και μετά την ανάγνωσή σου, μπορείς να ρωτήσεις κι άλλα πάνω στα ίδια χαρτιά.",
@@ -355,6 +359,12 @@ def build(tool, c):
       <div id="adviceWrap" style="display:none; margin-top:20px; padding-top:18px; border-top:1px solid var(--line);">
         <div style="font-size:11.5px; letter-spacing:2px; color:var(--gold); text-transform:uppercase; margin-bottom:8px;">Πρακτική συμβουλή</div>
         <div id="adviceText" style="font-family:'Inter',sans-serif; font-size:14.5px; line-height:1.65; color:var(--paper); white-space:pre-wrap;"></div>
+      </div>
+      <div id="luckyWrap" style="display:none; margin-top:22px; padding:18px 16px; border:1px solid rgba(217,178,92,.55); border-radius:14px; text-align:center; background:rgba(217,178,92,.06);">
+        <div style="font-size:11.5px; letter-spacing:2px; color:var(--gold); text-transform:uppercase; margin-bottom:8px;">Η πιο τυχερή σου μέρα για την εβδομάδα που έρχεται</div>
+        <div id="luckyDay" style="font-family:'Cormorant Garamond',serif; font-size:26px; line-height:1.2; color:var(--gold); margin-bottom:8px;"></div>
+        <div id="luckyWhy" style="font-family:'Inter',sans-serif; font-size:14.5px; line-height:1.6; color:var(--paper);"></div>
+        <div style="font-family:'Inter',sans-serif; font-size:13px; line-height:1.5; color:var(--muted); margin-top:12px;">Όλες τις καλές σου μέρες του 2027 τις βρίσκεις στο <a href="/imerologio" style="color:var(--gold);">Ημερολόγιο 2027</a>.</div>
       </div>
     </div>
     <div id="extraActions" style="margin-top:22px; text-align:center;"></div>

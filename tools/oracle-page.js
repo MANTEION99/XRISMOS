@@ -167,6 +167,15 @@ function renderNatal(text, finished) {
   });
 }
 
+// Το δώρο του πληρωμένου χρησμού: η πιο τυχερή μέρα της εβδομάδας που έρχεται, από τον χάρτη του ανθρώπου.
+function showLucky(l) {
+  const w = $('luckyWrap');
+  if (!w || !l || !l.label) return;
+  $('luckyDay').textContent = l.label;
+  $('luckyWhy').textContent = l.why || '';
+  w.style.display = 'block';
+}
+
 function renderContinuation(cont, finished) {
   if (CFG.kind === 'natal') return renderNatal(cont.replace(ERR_MARK, ''), finished);
   let text = cont.replace(ERR_MARK, '');
@@ -603,6 +612,7 @@ function loadFullReading() {
     if (data.status === 'done' && firstPoll && !typerStarted) {
       stopRitual();
       fullTyper.instant(data.text);
+      showLucky(data.lucky);
       renderExtraActions(data);
       return;
     }
@@ -612,6 +622,7 @@ function loadFullReading() {
     if (data.status === 'done') {
       await fullTyper.whenDone();
       stopRitual();
+      showLucky(data.lucky);
       renderExtraActions(data);
       return;
     }

@@ -448,6 +448,7 @@
         <div class="seal-note" style="font-size:13.5px;line-height:1.55;color:#d8cfb8;margin:10px auto 14px;max-width:420px;">Η δωρεάν απάντηση είναι μια γεύση, για να δεις πώς δουλεύει Το Μαντείο. <b>Η πληρωμένη απάντηση είναι η πραγματική:</b> απαντά ακριβώς σε αυτό που ρώτησες, πάνω στον δικό σου χάρτη, με ημερομηνίες και τι να κάνεις.</div>
         <p class="value-note" style="font-size:14px;line-height:1.55;color:#F4EEDF;max-width:340px;margin:12px auto 18px;text-align:center;">Σε αστρολόγο, μια απάντηση σε μία ερώτηση κοστίζει συνήθως από 40 έως 80€. Το Μαντείο σού την προσφέρει με <b style="color:#D9B25C;">4,99€</b>.<span style="display:block;margin-top:8px;font-size:13px;color:#d8cfb8;">Ο χάρτης σου υπολογίζεται με τα ίδια αστρονομικά δεδομένα που χρησιμοποιούν οι επαγγελματίες αστρολόγοι, με ακρίβεια λεπτού.</span></p>
         <div class="enter-btn" id="unlockBtn"><span class="ub-main">Δες την απάντηση</span><span class="ub-price">ΜΟΝΟ&nbsp;4,99€</span></div>
+        <p class="lucky-note" style="font-size:13.5px;line-height:1.5;color:#D9B25C;max-width:320px;margin:10px auto 4px;text-align:center;">Μαζί παίρνεις και την πιο τυχερή σου μέρα για την εβδομάδα που έρχεται</p>
         <div class="secure-note"><svg viewBox="0 0 24 24" fill="none"><rect x="5" y="11" width="14" height="10" rx="2" stroke="currentColor" stroke-width="1.6"/><path d="M8 11V7a4 4 0 0 1 8 0v4" stroke="currentColor" stroke-width="1.6"/></svg> Ασφαλής πληρωμή μέσω Stripe</div>
       </div>
     </div>
@@ -468,6 +469,12 @@
       <div id="adviceWrap" style="display:none; margin-top:20px; padding-top:18px; border-top:1px solid var(--line);">
         <div style="font-size:11.5px; letter-spacing:2px; color:var(--gold); text-transform:uppercase; margin-bottom:8px;">Πρακτική συμβουλή</div>
         <div id="adviceText" style="font-family:'Inter',sans-serif; font-size:14.5px; line-height:1.65; color:var(--paper); white-space:pre-wrap;"></div>
+      </div>
+      <div id="luckyWrap" style="display:none; margin-top:22px; padding:18px 16px; border:1px solid rgba(217,178,92,.55); border-radius:14px; text-align:center; background:rgba(217,178,92,.06);">
+        <div style="font-size:11.5px; letter-spacing:2px; color:var(--gold); text-transform:uppercase; margin-bottom:8px;">Η πιο τυχερή σου μέρα για την εβδομάδα που έρχεται</div>
+        <div id="luckyDay" style="font-family:'Cormorant Garamond',serif; font-size:26px; line-height:1.2; color:var(--gold); margin-bottom:8px;"></div>
+        <div id="luckyWhy" style="font-family:'Inter',sans-serif; font-size:14.5px; line-height:1.6; color:var(--paper);"></div>
+        <div style="font-family:'Inter',sans-serif; font-size:13px; line-height:1.5; color:var(--muted); margin-top:12px;">Όλες τις καλές σου μέρες του 2027 τις βρίσκεις στο <a href="/imerologio" style="color:var(--gold);">Ημερολόγιο 2027</a>.</div>
       </div>
     </div>
     <div id="extraActions" style="margin-top:22px; text-align:center;"></div>
@@ -673,6 +680,15 @@ function renderNatal(text, finished) {
     if (c.body !== body) { c.body = body; setText(c.b, body); }
     c.b.classList.toggle('typing', !finished && i === parts.length - 1);
   });
+}
+
+// Το δώρο του πληρωμένου χρησμού: η πιο τυχερή μέρα της εβδομάδας που έρχεται, από τον χάρτη του ανθρώπου.
+function showLucky(l) {
+  const w = $('luckyWrap');
+  if (!w || !l || !l.label) return;
+  $('luckyDay').textContent = l.label;
+  $('luckyWhy').textContent = l.why || '';
+  w.style.display = 'block';
 }
 
 function renderContinuation(cont, finished) {
@@ -1111,6 +1127,7 @@ function loadFullReading() {
     if (data.status === 'done' && firstPoll && !typerStarted) {
       stopRitual();
       fullTyper.instant(data.text);
+      showLucky(data.lucky);
       renderExtraActions(data);
       return;
     }
@@ -1120,6 +1137,7 @@ function loadFullReading() {
     if (data.status === 'done') {
       await fullTyper.whenDone();
       stopRitual();
+      showLucky(data.lucky);
       renderExtraActions(data);
       return;
     }

@@ -7,6 +7,7 @@
 // Απάντηση: { status: "generating" | "done" | "error", teaser, text }
 
 import { readingsStore, json, verifyStripeSession, releasePayment } from "../lib/epistrofi-common.mjs";
+import { luckyFor } from "../lib/lucky.mjs";
 
 // Αν η συγγραφή δεν έχει δώσει σημάδι ζωής για 45 δευτερόλεπτα, θεωρείται χαμένη και ξεκινά ξανά.
 const STALE_MS = 45 * 1000;
@@ -38,7 +39,7 @@ export default async (req) => {
   }
 
   const teaser = reading.teaser || "";
-  if (reading.full) return json(200, { status: "done", teaser, text: reading.full });
+  if (reading.full) return json(200, { status: "done", teaser, text: reading.full, lucky: await luckyFor(reading, readings, readingId) });
 
   // Τρέχει κανονικά αν δίνει σημάδι ζωής ΚΑΙ προχωρά: αν η ροή κόλλησε (ζωντανή αλλά χωρίς
   // νέο κείμενο για 2,5 λεπτά), θεωρείται κολλημένη και ξεκινά νέα προσπάθεια από εκεί που έμεινε.

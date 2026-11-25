@@ -260,3 +260,31 @@ export function computeYear(N, year = YEAR) {
 }
 
 export const MERC_RETRO_TEXT = R.mercRetro;
+
+/* ---------- Η πιο τυχερή μέρα της εβδομάδας που έρχεται (δώρο με κάθε πληρωμένο χρησμό) ---------- */
+
+const DAYS_GR = ["Κυριακή", "Δευτέρα", "Τρίτη", "Τετάρτη", "Πέμπτη", "Παρασκευή", "Σάββατο"];
+const MONTHS_GEN = ["Ιανουαρίου", "Φεβρουαρίου", "Μαρτίου", "Απριλίου", "Μαΐου", "Ιουνίου", "Ιουλίου", "Αυγούστου", "Σεπτεμβρίου", "Οκτωβρίου", "Νοεμβρίου", "Δεκεμβρίου"];
+const LUCKY_CALM = "Η πιο ήρεμη και καθαρή μέρα της εβδομάδας για σένα. Κράτα την για ό,τι σημαντικό θέλεις να κάνεις ή να πεις.";
+
+// Ψάχνει τις 7 μέρες μετά από τη μέρα της πληρωμής (σε ώρα Ελλάδας) και κρατά την πιο δυνατή καλή μέρα.
+export function luckyWeek(N, from = new Date()) {
+  const ath = new Date(from.toLocaleString("en-US", { timeZone: "Europe/Athens" }));
+  let best = null;
+  for (let i = 1; i <= 7; i++) {
+    const dt = new Date(Date.UTC(ath.getFullYear(), ath.getMonth(), ath.getDate() + i));
+    const y = dt.getUTCFullYear(), m = dt.getUTCMonth() + 1, d = dt.getUTCDate();
+    const x = scoreDay(y, m, d, N);
+    if ((x.avoid || 0) >= 3) continue;
+    const cats = ["love", "money", "dec"].map(c => [c, Math.max(0, x[c] || 0)]).sort((a, b) => b[1] - a[1]);
+    const score = cats.reduce((a, c) => a + c[1], 0) - (x.avoid || 0);
+    if (!best || score > best.score) best = { score, y, m, d, wd: dt.getUTCDay(), cat: cats[0][1] > 0 ? cats[0][0] : null, why: cats[0][1] > 0 ? (x.why[cats[0][0]] || "") : "" };
+  }
+  if (!best) return null;
+  return {
+    date: `${best.y}-${String(best.m).padStart(2, "0")}-${String(best.d).padStart(2, "0")}`,
+    label: `${DAYS_GR[best.wd]} ${best.d} ${MONTHS_GEN[best.m - 1]}`,
+    cat: best.cat,
+    why: best.why || LUCKY_CALM
+  };
+}

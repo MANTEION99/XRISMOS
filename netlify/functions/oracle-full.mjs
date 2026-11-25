@@ -8,6 +8,7 @@
 import { json, verifyStripeSession, releasePayment } from "../lib/epistrofi-common.mjs";
 import { publicData, paidToolsFor } from "../lib/oracle-tools.mjs";
 import { oracleStore } from "../lib/oracle-store.mjs";
+import { luckyFor } from "../lib/lucky.mjs";
 
 const STALE_MS = 45 * 1000;
 const MAX_ATTEMPTS = 6;
@@ -54,7 +55,7 @@ export default async (req) => {
     await readings.setJSON(readingId, reading);
   }
 
-  if (reading.full) return json(200, { ...base, status: "done", text: reading.full });
+  if (reading.full) return json(200, { ...base, status: "done", text: reading.full, lucky: await luckyFor(reading, readings, readingId) });
   // Ερώτηση εκτός ορίων: δεν απαντήθηκε και δεν χρεώθηκε. Η σελίδα ζητά νέα ερώτηση.
   if (reading.redirect) return json(200, { ...base, status: "redirect", text: "", message: reading.redirect });
 

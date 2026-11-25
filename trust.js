@@ -16,7 +16,7 @@
   function note(btn) {
     if (!btn) return;
     // Η σύγκριση τιμής μένει αμέσως κάτω από το κουμπί, και η σημείωση ασφάλειας μπαίνει μετά από αυτήν.
-    if (btn.nextElementSibling && /value-note/.test(btn.nextElementSibling.className)) btn = btn.nextElementSibling;
+    if (btn.nextElementSibling && /value-note|lucky-note/.test(btn.nextElementSibling.className)) btn = btn.nextElementSibling;
     if (btn.nextElementSibling && btn.nextElementSibling.className === "tnote") return;
     var n = document.createElement("div"); n.className = "tnote";
     n.style.cssText = "font:13px/1.55 Inter,Arial,sans-serif;color:#cfc8b8;text-align:center;margin:12px auto 0;max-width:420px";
