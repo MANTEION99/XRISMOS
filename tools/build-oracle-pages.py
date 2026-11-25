@@ -122,6 +122,17 @@ DEFAULT_UNLOCK = (
     '        <div class="enter-btn" id="unlockBtn"><span class="ub-main">Δες την απάντηση</span><span class="ub-price">ΜΟΝΟ&nbsp;4,99€</span></div>\n'
     '        <p class="lucky-note" style="font-family:\'Inter\',sans-serif;font-size:16px;font-weight:400;line-height:1.5;color:#D9B25C;max-width:330px;margin:8px auto 4px;text-align:center;"><span style="display:block;font-size:28px;font-weight:300;line-height:1;margin-bottom:6px;">+</span>Μαζί παίρνεις και την πιο τυχερή σου μέρα για την εβδομάδα που έρχεται</p>\n')
 
+# Το δώρο κάθε υπηρεσίας, γραμμένο κάτω από το κουμπί (ίδιο με το netlify/lib/lucky.mjs).
+LUCKY_GEN = "Μαζί παίρνεις και την πιο τυχερή σου μέρα για την εβδομάδα που έρχεται"
+LUCKY_LINES = {
+  "epistrofi": "Μαζί παίρνεις και τη μέρα της εβδομάδας που ανοίγει ο δρόμος ανάμεσά σας",
+  "agapi": "Μαζί παίρνεις και τη μέρα της εβδομάδας που σε σκέφτεται πιο έντονα",
+  "alitheia": "Μαζί παίρνεις και τη μέρα της εβδομάδας που η αλήθεια βγαίνει πιο εύκολα στο φως",
+  "symvatotita": "Μαζί παίρνεις και την πιο ζεστή μέρα της εβδομάδας για τους δυο σας",
+  "oikonomika": "Μαζί παίρνεις και τη μέρα της εβδομάδας με την πιο θετική ενέργεια για τα οικονομικά σου",
+  "numerology": "Μαζί παίρνεις και τη μέρα της εβδομάδας που κουβαλά τον δικό σου αριθμό",
+}
+
 # Στο Ταρό δεν ζητάμε ημερομηνία γέννησης, άρα δεν υπάρχει τυχερή μέρα να υποσχεθούμε.
 TARO_UNLOCK = DEFAULT_UNLOCK.replace('        <p class="lucky-note" style="font-family:\'Inter\',sans-serif;font-size:16px;font-weight:400;line-height:1.5;color:#D9B25C;max-width:330px;margin:8px auto 4px;text-align:center;"><span style="display:block;font-size:28px;font-weight:300;line-height:1;margin-bottom:6px;">+</span>Μαζί παίρνεις και την πιο τυχερή σου μέρα για την εβδομάδα που έρχεται</p>\n', '')
 
@@ -343,7 +354,7 @@ def build(tool, c):
         <div class="wax">Μ</div>
         <div class="seal-title">Ο χρησμός σου συνεχίζεται</div>
         <div class="seal-sub">{c["sealSub"]}</div>
-{c.get("unlock", DEFAULT_UNLOCK)}        <div class="secure-note">{LOCK} Ασφαλής πληρωμή μέσω Stripe</div>
+{c.get("unlock", DEFAULT_UNLOCK).replace(LUCKY_GEN, LUCKY_LINES.get(tool, LUCKY_GEN))}        <div class="secure-note">{LOCK} Ασφαλής πληρωμή μέσω Stripe</div>
       </div>
     </div>
     <div id="socialProof"></div>
@@ -361,9 +372,11 @@ def build(tool, c):
         <div id="adviceText" style="font-family:'Inter',sans-serif; font-size:14.5px; line-height:1.65; color:var(--paper); white-space:pre-wrap;"></div>
       </div>
       <div id="luckyWrap" style="display:none; margin-top:22px; padding:18px 16px; border:1px solid rgba(217,178,92,.55); border-radius:14px; text-align:center; background:rgba(217,178,92,.06);">
-        <div style="font-size:11.5px; letter-spacing:2px; color:var(--gold); text-transform:uppercase; margin-bottom:8px;">Η πιο τυχερή σου μέρα για την εβδομάδα που έρχεται</div>
+        <div id="luckyTitle" style="font-size:11.5px; letter-spacing:2px; color:var(--gold); text-transform:uppercase; margin-bottom:8px;">Η πιο τυχερή σου μέρα για την εβδομάδα που έρχεται</div>
+        <div id="luckyIntro" style="display:none; font-family:'Inter',sans-serif; font-size:14px; line-height:1.55; color:var(--paper); margin-bottom:8px;"></div>
         <div id="luckyDay" style="font-family:'Cormorant Garamond',serif; font-size:26px; line-height:1.2; color:var(--gold); margin-bottom:8px;"></div>
         <div id="luckyWhy" style="font-family:'Inter',sans-serif; font-size:14.5px; line-height:1.6; color:var(--paper);"></div>
+        <div id="luckyNext" style="display:none; font-family:'Inter',sans-serif; font-size:14px; line-height:1.6; color:var(--paper); margin-top:12px; padding-top:12px; border-top:1px solid rgba(217,178,92,.3);"></div>
         <div style="font-family:'Inter',sans-serif; font-size:13px; line-height:1.5; color:var(--muted); margin-top:12px;">Όλες τις καλές σου μέρες του 2027 τις βρίσκεις στο <a href="/imerologio" style="color:var(--gold);">Ημερολόγιο 2027</a>.</div>
       </div>
     </div>

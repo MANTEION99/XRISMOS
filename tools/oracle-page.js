@@ -171,8 +171,11 @@ function renderNatal(text, finished) {
 function showLucky(l) {
   const w = $('luckyWrap');
   if (!w || !l || !l.label) return;
+  if (l.title && $('luckyTitle')) $('luckyTitle').textContent = l.title;
+  const li = $('luckyIntro'); if (li) { li.textContent = l.intro || ''; li.style.display = l.intro ? 'block' : 'none'; }
   $('luckyDay').textContent = l.label;
   $('luckyWhy').textContent = l.why || '';
+  const ln = $('luckyNext'); if (ln) { ln.textContent = l.next || ''; ln.style.display = l.next ? 'block' : 'none'; }
   w.style.display = 'block';
 }
 
