@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+<meta charset="UTF-8">
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Οι τυχερές μέρες της εβδομάδας | Μαντείο</title>
+<meta name="description" content="Ποιες μέρες της εβδομάδας είναι οι τυχερές σου; Αστρολογία, αριθμολογία και ταρό μαζί, από τα δικά σου στοιχεία γέννησης. Μια μέρα λέγεται τυχερή μόνο όταν συμφωνούν και οι τρεις.">
+<meta property="og:title" content="Οι τυχερές μέρες της εβδομάδας | Μαντείο">
+<meta property="og:description" content="Αστρολογία, αριθμολογία και ταρό μαζί, για κάθε μέρα της εβδομάδας σου. Μια μέρα λέγεται τυχερή μόνο όταν συμφωνούν και οι τρεις.">
+<meta property="og:image" content="https://manteio.live/images/iakovos.jpg">
+<meta property="og:url" content="https://manteio.live/tyxeres-meres">
+<meta property="og:type" content="website">
+<meta property="og:locale" content="el_GR">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,500&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{ --navy:#0B0A16; --paper:#F5F1E8; --muted:#9C96AE; --gold:#D9B25C; --gold-bright:#F6DD8A; --gold-deep:#8C6420; --line:rgba(217,178,92,0.35); --good:#9fd4b4; }
+  *{ box-sizing:border-box; }
+  body{ margin:0; background:radial-gradient(ellipse at 50% 15%, #1b1832 0%, #0B0A16 65%); font-family:'Inter',sans-serif; color:var(--paper);
+    min-height:100vh; display:flex; flex-direction:column; align-items:center; padding:0 12px 48px; overflow-x:hidden; }
+  .stars{ position:fixed; inset:0; pointer-events:none; z-index:0; background-image:
+    radial-gradient(1px 1px at 10% 20%, rgba(255,255,255,0.5), transparent), radial-gradient(1px 1px at 80% 15%, rgba(255,255,255,0.4), transparent),
+    radial-gradient(1px 1px at 30% 70%, rgba(255,255,255,0.5), transparent), radial-gradient(1px 1px at 60% 85%, rgba(255,255,255,0.3), transparent),
+    radial-gradient(1px 1px at 90% 60%, rgba(255,255,255,0.4), transparent), radial-gradient(1px 1px at 45% 35%, rgba(255,255,255,0.4), transparent); }
+
+  .topbar{ position:sticky; top:34px; z-index:5; display:flex; justify-content:space-between; align-items:center; gap:8px; max-width:520px; width:100%; margin:0 auto 10px; padding:9px 4px; background:linear-gradient(180deg,#0B0A16 70%,#0B0A1600); }
+  .topbar .lg{ font-family:'Cormorant Garamond',serif; font-size:20px; font-weight:700; color:var(--gold); letter-spacing:1px; text-decoration:none; white-space:nowrap; }
+  .topbar .all{ font-size:13.5px; font-weight:700; color:#241A08; background:linear-gradient(135deg, var(--gold), var(--gold-deep)); padding:9px 13px; border-radius:20px; text-decoration:none; text-align:center; }
+
+  .card{ max-width:520px; width:100%; min-width:0; position:relative; z-index:1; border:1.5px solid var(--gold); border-radius:22px; padding:3px; box-shadow:0 0 50px rgba(217,178,92,0.12); }
+  .card-inner{ border:1px solid rgba(217,178,92,0.5); border-radius:19px; padding:24px 16px 22px; background:linear-gradient(180deg, #14122380, #0B0A1680); }
+  .eyebrow{ text-align:center; letter-spacing:2.5px; font-size:12px; color:var(--gold); text-transform:uppercase; margin-bottom:10px; }
+  h1{ font-family:'Cormorant Garamond',serif; font-weight:600; text-align:center; font-size:31px; line-height:1.2; margin:0 0 14px; color:var(--gold); overflow-wrap:break-word; }
+
+  /* Το σήμα «ΝΕΟ» που λάμπει. Σταματά να πάλλεται όταν η συσκευή έχει ζητήσει λιγότερη κίνηση. */
+  .neo{ display:inline-block; vertical-align:middle; position:relative; top:-3px; margin-left:6px; font:700 13px/1 'Inter',sans-serif; letter-spacing:2px; color:#FFFFFF;
+    background:linear-gradient(135deg, #FF5A5F, #E0202F 45%, #A3121F); text-shadow:0 1px 1px rgba(0,0,0,0.35); padding:6px 11px 6px 13px; border-radius:999px; white-space:nowrap;
+    animation:neoGlow 1.8s ease-in-out infinite; }
+  @keyframes neoGlow{
+    0%, 100%{ box-shadow:0 0 6px rgba(255,60,70,0.6), 0 0 0 0 rgba(255,60,70,0); }
+    50%{ box-shadow:0 0 18px rgba(255,70,80,1), 0 0 34px 6px rgba(224,32,47,0.6); }
+  }
+  @media (prefers-reduced-motion: reduce){ .neo{ animation:none; box-shadow:0 0 14px rgba(255,70,80,0.85); } }
+
+  p.sub{ font-size:15.5px; line-height:1.65; color:#d8d1e2; margin:0 0 16px; text-align:center; }
+  .offer{ text-align:center; border:1.5px dashed var(--gold); border-radius:14px; padding:12px 12px; margin:0 0 18px; background:rgba(217,178,92,0.08); }
+  .offer b{ display:block; font-family:'Cormorant Garamond',serif; font-size:23px; line-height:1.25; color:var(--gold-bright); }
+  .offer span{ display:block; font-size:14.5px; color:var(--paper); margin-top:4px; }
+  .weekline{ text-align:center; font-size:14.5px; line-height:1.55; color:var(--paper); margin:0 0 18px; }
+  .weekline b{ color:var(--gold-bright); }
+
+  .methods{ list-style:none; padding:0; margin:0 0 14px; }
+  .methods li{ display:flex; gap:12px; align-items:flex-start; font-size:14.5px; line-height:1.55; padding:9px 0; border-bottom:1px solid rgba(217,178,92,0.14); }
+  .methods li:last-child{ border-bottom:none; }
+  .methods .ic{ flex:0 0 34px; height:34px; border-radius:50%; border:1px solid var(--gold); display:flex; align-items:center; justify-content:center; color:var(--gold-bright); font-family:'Cormorant Garamond',serif; font-size:19px; font-weight:700; }
+  .methods b{ color:var(--gold-bright); }
+  .rule{ font-size:14px; line-height:1.6; color:var(--paper); border-left:2px solid var(--gold); padding:4px 0 4px 12px; margin:0 0 20px; }
+
+  .field{ margin-bottom:15px; min-width:0; }
+  .field label{ display:block; font-size:12.5px; color:var(--gold); letter-spacing:0.5px; margin-bottom:6px; }
+  .field input{ width:100%; max-width:100%; background:rgba(255,255,255,0.03); border:1px solid var(--line); border-radius:9px; padding:12px 13px; color:var(--paper); font-size:16px; font-family:'Inter',sans-serif; color-scheme:dark; }
+  .field input:focus{ outline:none; border-color:var(--gold); }
+  .field.consent{ display:flex; gap:10px; align-items:flex-start; }
+  .field.consent input{ width:22px; height:22px; flex:0 0 22px; accent-color:var(--gold); }
+  .field.consent label{ color:var(--muted); font-size:13px; line-height:1.5; margin:0; letter-spacing:0; }
+  .hint{ font-size:12px; color:var(--muted); margin-top:5px; line-height:1.5; }
+  .error{ color:#e58a9a; font-size:14px; margin:4px 0 12px; display:none; }
+  button.submit{ display:block; width:100%; padding:15px; margin-top:6px; background:linear-gradient(135deg, var(--gold), var(--gold-deep)); color:#241A08; border:none; border-radius:10px;
+    font-family:'Cormorant Garamond',serif; font-weight:700; font-size:20px; line-height:1.25; cursor:pointer; }
+  button.submit:disabled{ opacity:0.6; pointer-events:none; }
+  .adult{ font-size:12.5px; color:var(--muted); text-align:center; margin-top:10px; line-height:1.5; }
+  .spinner{ width:26px; height:26px; margin:16px auto; border:2px solid var(--line); border-top-color:var(--gold); border-radius:50%; animation:spin 1s linear infinite; display:none; }
+  @keyframes spin{ to{ transform:rotate(360deg); } }
+  .back{ display:none; text-align:center; margin:16px 0 0; }
+  .back button{ background:none; border:1px solid var(--gold); color:var(--gold); border-radius:22px; padding:10px 18px; font-size:15px; cursor:pointer; }
+
+  #res{ display:none; }
+  .hello{ font-family:'Cormorant Garamond',serif; font-size:27px; line-height:1.25; text-align:center; margin:0 0 6px; color:var(--paper); }
+  .hello-week{ text-align:center; font-size:14px; color:var(--gold); margin:0 0 14px; line-height:1.5; }
+  .headline{ text-align:center; font-family:'Cormorant Garamond',serif; font-size:22px; line-height:1.35; color:var(--gold-bright); margin:0 0 16px; }
+  .legend{ display:flex; flex-wrap:wrap; gap:6px 14px; justify-content:center; font-size:12.5px; color:var(--muted); margin:0 0 16px; }
+  .legend span{ display:inline-flex; align-items:center; gap:6px; }
+  .pill{ display:inline-block; font-size:11.5px; font-weight:700; letter-spacing:0.5px; padding:3px 9px; border-radius:10px; white-space:nowrap; }
+  .p-tyxeri{ background:linear-gradient(135deg, var(--gold-bright), var(--gold)); color:#241A08; }
+  .p-kali{ background:rgba(159,212,180,0.18); color:var(--good); border:1px solid rgba(159,212,180,0.5); }
+  .p-apli{ background:rgba(255,255,255,0.06); color:var(--muted); border:1px solid rgba(255,255,255,0.12); }
+
+  .strip{ display:grid; grid-template-columns:repeat(7, minmax(0,1fr)); gap:4px; margin:0 0 16px; }
+  .strip .s{ border-radius:9px; border:1px solid rgba(217,178,92,0.25); background:rgba(255,255,255,0.03); text-align:center; padding:6px 1px 5px; min-width:0; }
+  .strip .s .w{ font-size:10.5px; color:var(--muted); letter-spacing:0.3px; }
+  .strip .s .n{ font-family:'Cormorant Garamond',serif; font-size:19px; font-weight:600; color:var(--paper); line-height:1.15; }
+  .strip .s .m{ font-size:11px; line-height:1; margin-top:2px; color:var(--muted); }
+  .strip .s.tyxeri{ border-color:var(--gold-bright); background:rgba(217,178,92,0.22); box-shadow:0 0 12px rgba(246,221,138,0.35); }
+  .strip .s.tyxeri .m{ color:var(--gold-bright); }
+  .strip .s.kali{ border-color:rgba(159,212,180,0.6); background:rgba(159,212,180,0.08); }
+  .strip .s.kali .m{ color:var(--good); }
+  .strip .s.locked .m{ color:var(--gold); }
+  .strip .s.past{ opacity:0.55; }
+
+  .day{ border:1px solid var(--line); border-radius:16px; padding:14px 12px 12px; margin:0 0 14px; background:rgba(255,255,255,0.015); }
+  .day.tyxeri{ border:1.5px solid var(--gold-bright); background:linear-gradient(180deg, rgba(217,178,92,0.14), rgba(217,178,92,0.03)); box-shadow:0 0 26px rgba(217,178,92,0.18); }
+  .day.kali{ border-color:rgba(159,212,180,0.55); }
+  .day .dh{ display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:6px 10px; margin:0 0 10px; }
+  .day .dh b{ font-family:'Cormorant Garamond',serif; font-size:22px; font-weight:600; color:var(--paper); line-height:1.2; }
+  .day .best{ font-size:13px; color:var(--gold-bright); margin:-4px 0 10px; font-weight:600; }
+  .day .past-note{ font-size:12px; color:var(--muted); margin:-4px 0 10px; }
+  .mrow{ display:flex; gap:10px; align-items:flex-start; padding:9px 0; border-top:1px solid rgba(217,178,92,0.12); }
+  .mrow .mk{ flex:0 0 24px; height:24px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:13px; font-weight:700; margin-top:1px; }
+  .mrow .mk.yes{ background:var(--gold); color:#241A08; }
+  .mrow .mk.no{ border:1px solid rgba(255,255,255,0.22); color:var(--muted); }
+  .mrow .tx{ min-width:0; flex:1 1 auto; font-size:14px; line-height:1.55; color:#d8d1e2; }
+  .mrow .tx .lb{ display:block; font-size:11.5px; letter-spacing:1.5px; color:var(--gold); text-transform:uppercase; margin-bottom:2px; }
+  .mrow .tx .num{ font-family:'Cormorant Garamond',serif; font-size:20px; font-weight:700; color:var(--gold-bright); margin-right:4px; }
+  .mrow .card-img{ flex:0 0 46px; width:46px; height:79px; border:1px solid var(--gold); border-radius:6px; overflow:hidden; background:#120f22; }
+  .mrow .card-img img{ width:100%; height:100%; object-fit:cover; display:block; }
+  .mrow .card-img img.rev{ transform:rotate(180deg); }
+  @media (max-width:340px){ .day{ padding:12px 9px 10px; } .mrow{ gap:8px; } .mrow .card-img{ flex-basis:34px; width:34px; height:58px; } }
+  .sample-tag{ text-align:center; font-size:12.5px; color:var(--muted); margin:0 0 8px; }
+
+  /* Η πληρωμή: ίδιο κουμπί και ίδιο πλαίσιο με τα άλλα εργαλεία. Το πλαίσιο μεγαλώνει όσο χρειάζεται. */
+  .seal{ position:relative; border:1.5px solid var(--gold); border-radius:16px; padding:22px 14px 20px; margin:6px 0 18px; text-align:center; background:linear-gradient(180deg, rgba(217,178,92,0.10), rgba(217,178,92,0.03)); overflow:hidden; }
+  .seal .wax{ width:50px; height:50px; margin:0 auto 10px; border-radius:50%; display:flex; align-items:center; justify-content:center; background:radial-gradient(circle at 35% 30%, #c86a6a, #7a2531 70%); color:#f3d9a0; font-family:'Cormorant Garamond',serif; font-size:26px; box-shadow:0 4px 14px rgba(0,0,0,0.45); }
+  .seal h3{ font-family:'Cormorant Garamond',serif; font-size:24px; line-height:1.25; color:var(--gold); margin:0 0 8px; font-weight:600; }
+  .seal .ss{ font-size:14px; line-height:1.6; color:var(--paper); margin:0 auto 6px; max-width:400px; }
+  .seal .offer-mini{ font-size:13.5px; font-weight:600; color:var(--gold-bright); margin:8px auto 0; max-width:360px; line-height:1.5; }
+  .value-note{ font-size:12.5px; line-height:1.55; color:var(--muted); max-width:320px; margin:10px auto 18px; text-align:center; }
+  .value-note.after{ margin:12px auto 0; }
+  .enter-btn{ display:inline-block; padding:12px 38px; background:transparent; border:1px solid var(--gold); border-radius:24px; color:var(--gold);
+    font-family:'Cormorant Garamond',serif; font-size:16px; letter-spacing:2px; text-transform:uppercase; cursor:pointer; transition:all 0.25s; }
+  .enter-btn:hover{ background:var(--gold); color:#241A08; }
+  #unlockBtn{ display:inline-flex; flex-direction:column; align-items:center; gap:3px; max-width:100%; box-sizing:border-box; padding:12px 24px; font-size:17px; letter-spacing:1px; white-space:normal; line-height:1.25; }
+  #unlockBtn .ub-price{ font-family:'Inter',sans-serif; font-size:17px; font-weight:700; letter-spacing:.5px; color:#F4EEDF; }
+  #unlockBtn:hover .ub-price{ color:inherit; }
+  .pay-error{ color:#e58a9a; font-size:13px; margin-top:12px; display:none; }
+
+  .how{ font-size:13px; line-height:1.6; color:var(--muted); border-top:1px solid rgba(217,178,92,0.2); padding-top:14px; margin:18px 0 0; }
+  .how b{ color:var(--paper); font-weight:600; }
+  .disclaimer{ font-size:11.5px; line-height:1.6; color:var(--muted); text-align:center; margin:16px 0 0; }
+  footer{ text-align:center; font-size:11.5px; color:var(--muted); margin-top:22px; line-height:1.6; }
+  footer a{ color:var(--muted); }
+</style>
+<script src="/agegate.js"></script>
+<script src="/footer.js" defer></script>
+<script src="/trust.js" defer></script>
+<script src="/consent.js" defer></script>
+<script src="/metrisi.js"></script>
+<script src="/pay-choice.js" defer></script>
+<script src="/reviews.js" defer></script>
+<script>
+/* Από ποιο post ήρθε ο επισκέπτης (ίδιο με tools/source.js) */
+(function () {
+  const KEY = 'manteio_src';
+  try {
+    const q = new URLSearchParams(location.search);
+    const c = (q.get('utm_campaign') || '').trim();
+    if (c) {
+      const parts = [q.get('utm_source'), q.get('utm_medium'), c].filter(Boolean);
+      localStorage.setItem(KEY, JSON.stringify({ src: parts.join('/').slice(0, 80), ts: Date.now() }));
+    }
+  } catch (e) {}
+  window.manteioSource = function () {
+    try {
+      const v = JSON.parse(localStorage.getItem(KEY) || 'null');
+      if (v && v.src && Date.now() - v.ts < 14 * 86400000) return v.src;
+    } catch (e) {}
+    return '';
+  };
+})();
+</script>
+</head>
+<body>
+<div class="stars"></div>
+<div class="topbar"><a class="lg" href="/">Το Μαντείο</a><a class="all" href="/#oracles">Όλες οι προβλέψεις</a></div>
+
+<div class="card"><div class="card-inner">
+
+  <div id="formBox">
+    <div class="eyebrow">Αστρολογία · Αριθμολογία · Ταρό</div>
+    <h1>Οι τυχερές μέρες της εβδομάδας <span class="neo">ΝΕΟ</span></h1>
+    <p class="sub">Ποιες μέρες αυτής της εβδομάδας είναι οι δικές σου; Τρεις μέθοδοι κοιτάζουν κάθε μέρα χωριστά, από τα δικά σου στοιχεία γέννησης.</p>
+
+    <div class="offer" id="offer"><b>2,99€ μόνο ως την Τετάρτη 2 Δεκεμβρίου</b><span>Μετά 4,99€</span></div>
+    <p class="weekline" id="weekline"></p>
+
+    <ul class="methods">
+      <li><span class="ic">☉</span><span><b>Αστρολογία.</b> Οι θέσεις των πλανητών για κάθε μέρα, πάνω στον χάρτη της ημερομηνίας, της ώρας και του τόπου που γεννήθηκες.</span></li>
+      <li><span class="ic">9</span><span><b>Αριθμολογία.</b> Ο προσωπικός αριθμός κάθε μέρας, από την ημερομηνία γέννησής σου.</span></li>
+      <li><span class="ic">✦</span><span><b>Ταρό.</b> Ένα χαρτί για κάθε μέρα, από τα 22 χαρτιά της Μεγάλης Αρκάνας.</span></li>
+    </ul>
+    <p class="rule"><b style="color:var(--gold-bright)">Μια μέρα λέγεται τυχερή μόνο όταν συμφωνούν και οι τρεις.</b> Όταν συμφωνούν οι δύο, είναι καλή μέρα.</p>
+
+    <p class="sub" style="margin-bottom:18px"><b style="color:var(--gold)">Δωρεάν βλέπεις</b> πόσες τυχερές μέρες έχει η εβδομάδα σου και μία μέρα ολόκληρη, για να δεις πώς δουλεύει.</p>
+
+    <form id="f" novalidate>
+      <div class="field"><label for="nm">Όνομα</label><input id="nm" type="text" placeholder="π.χ. Μαρία" autocomplete="given-name" maxlength="40"></div>
+      <div class="field"><label for="dob">Ημερομηνία γέννησης</label><input id="dob" type="date" min="1920-01-01" max="2008-12-31"></div>
+      <div class="field"><label for="tob">Ώρα γέννησης (αν την ξέρεις)</label><input id="tob" type="time">
+        <div class="hint">Με την ώρα μπαίνουν στον υπολογισμό και η Σελήνη και ο Ωροσκόπος σου. Χωρίς ώρα ο υπολογισμός γίνεται κανονικά.</div></div>
+      <div class="field"><label for="pob">Τόπος γέννησης</label><input id="pob" type="text" placeholder="π.χ. Λάρισα" autocomplete="off" maxlength="60">
+        <div class="hint">Αν γεννήθηκες σε χωριό, γράψε την κοντινότερη πόλη.</div></div>
+      <div class="field"><label for="email">Email</label><input id="email" type="email" placeholder="π.χ. maria@gmail.com" autocomplete="email"></div>
+      <div class="field consent"><input type="checkbox" id="consent"><label for="consent">Θέλω να λαμβάνω τους χρησμούς και τα νέα του Μαντείου στο email μου. Μπορώ να διαγραφώ όποτε θέλω.</label></div>
+      <div class="error" id="err"></div>
+      <button class="submit" id="go" type="submit">Δες δωρεάν την εβδομάδα σου</button>
+      <div class="spinner" id="spin"></div>
+      <div class="adult">Το Μαντείο απευθύνεται μόνο σε ενήλικες (18+).</div>
+    </form>
+    <script src="/dt.js"></script>
+    <div class="back" id="backBox"><button type="button" id="backBtn">Άνοιξε τις τυχερές σου μέρες</button></div>
+  </div>
+
+  <div id="res">
+    <div class="hello" id="hello"></div>
+    <p class="hello-week" id="helloWeek"></p>
+    <p class="headline" id="headline"></p>
+    <div class="strip" id="strip"></div>
+    <div class="legend">
+      <span><i class="pill p-tyxeri">Τυχερή</i>συμφωνούν και οι τρεις</span>
+      <span><i class="pill p-kali">Καλή</i>συμφωνούν οι δύο</span>
+    </div>
+    <div id="days"></div>
+
+    <div class="seal" id="seal" style="display:none">
+      <div class="wax">Μ</div>
+      <h3>Ποιες είναι οι τυχερές σου μέρες</h3>
+      <p class="ss" id="sealSub"></p>
+      <p class="value-note" id="valueNote"></p>
+      <div class="enter-btn" id="unlockBtn"><span class="ub-main">Δες τις τυχερές σου μέρες</span><span class="ub-price" id="ubPrice">ΜΟΝΟ&nbsp;2,99€</span></div>
+      <p class="value-note after">Ο χάρτης σου υπολογίζεται με τα ίδια αστρονομικά δεδομένα που χρησιμοποιούν οι επαγγελματίες αστρολόγοι, με ακρίβεια λεπτού.</p>
+      <p class="offer-mini" id="offerMini"></p>
+      <p class="pay-error" id="payErr"></p>
+    </div>
+
+    <div class="how">
+      <b>Πώς υπολογίζεται.</b> Οι θέσεις του Ήλιου, της Σελήνης και των πλανητών υπολογίζονται για κάθε μέρα από αστρονομικά δεδομένα και συγκρίνονται με τον χάρτη της στιγμής που γεννήθηκες. Ο προσωπικός αριθμός της μέρας βγαίνει από την ημερομηνία γέννησής σου και την ημερομηνία της μέρας, με τους κανόνες της αριθμολογίας. Το χαρτί κάθε μέρας βγαίνει από τα στοιχεία σου και την ημερομηνία, οπότε όποτε ξανανοίξεις τη σελίδα θα δεις το ίδιο. Κάθε μέρα εξετάζεται χωριστά από τις τρεις μεθόδους, και τυχερή λέγεται μόνο όταν συμφωνούν και οι τρεις.
+    </div>
+    <p class="disclaimer">Το περιεχόμενο του Μαντείου έχει ψυχαγωγικό χαρακτήρα και απευθύνεται σε ενήλικες. Μην παίρνεις σημαντικές αποφάσεις βασισμένες μόνο σε αυτό.</p>
+    <div id="socialProof"></div>
+  </div>
+
+  <footer>Το Μαντείο είναι τεχνητή νοημοσύνη. <a href="/">manteio.live</a></footer>
+</div></div>
+
+<script>
+const $ = (id) => document.getElementById(id);
+const MONTHS_GEN = ["Ιανουαρίου","Φεβρουαρίου","Μαρτίου","Απριλίου","Μαΐου","Ιουνίου","Ιουλίου","Αυγούστου","Σεπτεμβρίου","Οκτωβρίου","Νοεμβρίου","Δεκεμβρίου"];
+const WD_SHORT = { "Δευτέρα":"Δευ", "Τρίτη":"Τρί", "Τετάρτη":"Τετ", "Πέμπτη":"Πέμ", "Παρασκευή":"Παρ", "Σάββατο":"Σάβ", "Κυριακή":"Κυρ" };
+const TIER = { tyxeri:"Τυχερή μέρα", kali:"Καλή μέρα", apli:"Απλή μέρα" };
+const SAVE_KEY = "manteio_tyxeres";
+const FORM_KEY = "manteio_2027_form";   // ίδια στοιχεία με το Ημερολόγιο, για να μη χρειαστεί να ξαναγραφτούν
+const EARLY_UNTIL = "2026-12-02";       // ίδιο με το netlify/lib/tyxeres.mjs
+const esc = (s) => String(s).replace(/[&<>"]/g, c => ({ "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;" }[c]));
+const eur = (c) => (c / 100).toFixed(2).replace(".", ",") + "€";
+let readingId = null;
+
+const athensDay = () => new Intl.DateTimeFormat("en-CA", { timeZone: "Europe/Athens", year: "numeric", month: "2-digit", day: "2-digit" }).format(new Date());
+const early = () => athensDay() <= EARLY_UNTIL;
+
+// Η τιμή αλλάζει μόνη της μετά την Τετάρτη 2 Δεκεμβρίου (ώρα Ελλάδας).
+function priceUI(cents) {
+  const isEarly = cents ? cents < 499 : early();
+  const c = cents || (isEarly ? 299 : 499);
+  $("offer").style.display = isEarly ? "block" : "none";
+  $("ubPrice").innerHTML = "ΜΟΝΟ&nbsp;" + eur(c);
+  $("valueNote").textContent = `Σε αστρολόγο, μια προσωπική πρόβλεψη κοστίζει συνήθως από 40 έως 80€. Το Μαντείο σού δίνει όλη την εβδομάδα σου με ${eur(c)}.`;
+  $("offerMini").textContent = isEarly ? "2,99€ μόνο ως την Τετάρτη 2 Δεκεμβρίου. Μετά 4,99€." : "";
+}
+priceUI(0);
+
+// Ποια εβδομάδα: από Δευτέρα ως Πέμπτη η τρέχουσα, από Παρασκευή ως Κυριακή αυτή που ξεκινά τη Δευτέρα.
+(function () {
+  const [y, m, d] = athensDay().split("-").map(Number);
+  const t = new Date(Date.UTC(y, m - 1, d));
+  const since = (t.getUTCDay() + 6) % 7;
+  const next = since >= 4;
+  const a = new Date(t.getTime() - since * 86400000 + (next ? 7 * 86400000 : 0));
+  const b = new Date(a.getTime() + 6 * 86400000);
+  const lab = a.getUTCMonth() === b.getUTCMonth()
+    ? `Δευτέρα ${a.getUTCDate()} έως Κυριακή ${b.getUTCDate()} ${MONTHS_GEN[b.getUTCMonth()]}`
+    : `Δευτέρα ${a.getUTCDate()} ${MONTHS_GEN[a.getUTCMonth()]} έως Κυριακή ${b.getUTCDate()} ${MONTHS_GEN[b.getUTCMonth()]}`;
+  $("weekline").innerHTML = next
+    ? `Από Παρασκευή ως Κυριακή παίρνεις την <b>εβδομάδα που έρχεται</b>:<br><b>${lab}</b>.`
+    : `Παίρνεις την <b>εβδομάδα που διανύουμε</b>:<br><b>${lab}</b>.`;
+})();
+
+const plural = (n, one, many) => n === 1 ? one : `${n} ${many}`;
+function headlineText(c) {
+  if (c.tyxeri > 0) {
+    const t = plural(c.tyxeri, "μία τυχερή μέρα", "τυχερές μέρες");
+    return c.kali > 0 ? `Η εβδομάδα σου έχει ${t} και ${plural(c.kali, "μία καλή", "καλές")}.` : `Η εβδομάδα σου έχει ${t}.`;
+  }
+  if (c.kali > 0) return `Αυτή την εβδομάδα οι τρεις μέθοδοι δεν συμφωνούν σε καμία μέρα, αλλά έχεις ${plural(c.kali, "μία καλή μέρα", "καλές μέρες")}.`;
+  return "Η εβδομάδα σου είναι ήσυχη. Ξεχωρίζει όμως μία μέρα, πιο καθαρή από τις άλλες.";
+}
+const isPast = (date) => date < athensDay();
+
+function strip(days) {
+  return days.map(x => {
+    const d = +x.date.slice(8, 10);
+    const cls = ["s", x.locked ? "locked" : x.tier, isPast(x.date) ? "past" : ""].join(" ");
+    const mark = x.locked ? "🔒" : x.tier === "tyxeri" ? "★" : x.tier === "kali" ? "●" : "·";
+    return `<div class="${cls}"><div class="w">${WD_SHORT[x.wd] || ""}</div><div class="n">${d}</div><div class="m">${mark}</div></div>`;
+  }).join("");
+}
+
+function dayCard(x) {
+  const astroLabel = x.astro.ok ? "Αστρολογία, θετική" : "Αστρολογία";
+  const numLabel = x.num.ok ? "Αριθμολογία, θετική" : "Αριθμολογία";
+  const cardLabel = x.card.ok ? "Ταρό, θετικό" : "Ταρό";
+  const past = isPast(x.date) ? `<div class="past-note">Η μέρα αυτή έχει περάσει.</div>` : "";
+  return `<section class="day ${x.tier}">
+    <div class="dh"><b>${esc(x.label)}</b><span class="pill p-${x.tier}">${TIER[x.tier]}</span></div>
+    ${x.best ? `<div class="best">★ Η πιο δυνατή μέρα της εβδομάδας σου</div>` : ""}${past}
+    <div class="mrow"><span class="mk ${x.astro.ok ? "yes" : "no"}">${x.astro.ok ? "✓" : "☉"}</span><span class="tx"><span class="lb">${astroLabel}</span>${esc(x.astro.why)}</span></div>
+    <div class="mrow"><span class="mk ${x.num.ok ? "yes" : "no"}">${x.num.ok ? "✓" : "9"}</span><span class="tx"><span class="lb">${numLabel}</span><span class="num">${x.num.n}</span>${esc(x.num.text)}</span></div>
+    <div class="mrow"><span class="mk ${x.card.ok ? "yes" : "no"}">${x.card.ok ? "✓" : "✦"}</span><span class="tx"><span class="lb">${cardLabel}</span><b style="color:var(--paper)">${esc(x.card.name)}</b>${x.card.reversed ? " (ανάποδο)" : ""}. ${esc(cap(x.card.meaning))}.</span>
+      <span class="card-img"><img src="/tarot-cards/${esc(x.card.file)}" alt="${esc(x.card.name)}" class="${x.card.reversed ? "rev" : ""}" loading="lazy"></span></div>
+  </section>`;
+}
+const cap = (s) => String(s || "").charAt(0).toLocaleUpperCase("el") + String(s || "").slice(1);
+
+function show(data, full) {
+  $("formBox").style.display = "none";
+  $("res").style.display = "block";
+  $("hello").textContent = full ? `${data.name}, οι τυχερές σου μέρες` : `${data.name}, η εβδομάδα σου`;
+  $("helloWeek").textContent = data.week.label;
+  $("headline").textContent = headlineText(data.counts);
+  $("strip").innerHTML = strip(data.days);
+  if (full) {
+    // Πρώτα οι τυχερές, μετά οι καλές, μετά οι υπόλοιπες, η καθεμία με τη σειρά της εβδομάδας.
+    const order = { tyxeri: 0, kali: 1, apli: 2 };
+    const list = [...data.days].sort((a, b) => (b.best ? 1 : 0) - (a.best ? 1 : 0) || order[a.tier] - order[b.tier] || a.date.localeCompare(b.date));
+    $("days").innerHTML = list.map(dayCard).join("");
+    $("seal").style.display = "none";
+  } else {
+    const s = data.days.find(x => x.sample);
+    $("days").innerHTML = s ? `<p class="sample-tag">Δείγμα: μία από τις μέρες σου, ολόκληρη</p>${dayCard(s)}` : "";
+    const left = data.days.filter(x => x.locked).length;
+    $("sealSub").textContent = `Οι υπόλοιπες ${left} μέρες είναι ήδη υπολογισμένες από τα στοιχεία σου. Για καθεμία βλέπεις αν είναι τυχερή ή καλή, τι λέει ο ουρανός, τον αριθμό της και το χαρτί της.`;
+    $("seal").style.display = "block";
+    if (data.price) priceUI(data.price.cents);
+  }
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}
+
+function err(msg) { const e = $("err"); e.textContent = msg; e.style.display = "block"; }
+
+try {
+  const f = JSON.parse(localStorage.getItem(FORM_KEY) || "null");
+  if (f) { ["nm","dob","tob","pob","email"].forEach(k => { if (f[k] && $(k)) $(k).value = f[k]; }); if (window.syncDateFields) setTimeout(window.syncDateFields, 0); }
+} catch (e) {}
+
+$("f").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  $("err").style.display = "none";
+  const f = { name: $("nm").value.trim(), dob: $("dob").value, tob: $("tob").value, pob: $("pob").value.trim(), email: $("email").value.trim() };
+  if (!f.name) return err("Γράψε το όνομα.");
+  if (!f.dob) return err("Γράψε την ημερομηνία γέννησης.");
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(f.email)) return err("Γράψε ένα σωστό email.");
+  try { localStorage.setItem(FORM_KEY, JSON.stringify({ nm: f.name, dob: f.dob, tob: f.tob, pob: f.pob, email: f.email })); } catch (e2) {}
+  $("go").disabled = true; $("spin").style.display = "block";
+  try {
+    const r = await fetch("/api/tyxeres-teaser", {
+      method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ ...f, consent: $("consent").checked, src: window.manteioSource ? window.manteioSource() : "" })
+    });
+    const d = await r.json();
+    if (!r.ok) throw new Error(d.error || "Κάτι πήγε στραβά. Δοκίμασε ξανά.");
+    readingId = d.reading_id;
+    show(d, false);
+  } catch (ex) {
+    err(ex.message || "Κάτι πήγε στραβά. Δοκίμασε ξανά.");
+  } finally {
+    $("go").disabled = false; $("spin").style.display = "none";
+  }
+});
+
+// Ίδια με τα άλλα εργαλεία: το κουμπί κρατιέται και επανέρχεται με innerHTML.
+async function startCheckout(buttonEl) {
+  const original = buttonEl.innerHTML;
+  buttonEl.textContent = "Μεταφορά στην ασφαλή πληρωμή...";
+  buttonEl.style.pointerEvents = "none";
+  try {
+    const returnUrl = location.origin + location.pathname + "?rid=" + encodeURIComponent(readingId);
+    const r = await fetch("/.netlify/functions/create-checkout", {
+      method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ tool: "tyxeres", reading_id: readingId, returnUrl, src: window.manteioSource ? window.manteioSource() : "" })
+    });
+    const d = await r.json();
+    if (!d.url) throw new Error("no url");
+    location.href = d.url;
+  } catch (e) {
+    buttonEl.innerHTML = original;
+    buttonEl.style.pointerEvents = "auto";
+    $("payErr").textContent = "Κάτι πήγε στραβά με την πληρωμή, δοκίμασε ξανά.";
+    $("payErr").style.display = "block";
+  }
+}
+$("unlockBtn").addEventListener("click", () => { if (readingId) startCheckout($("unlockBtn")); });
+
+async function loadFull(rid, sid) {
+  $("formBox").style.display = "block";
+  $("spin").style.display = "block";
+  try {
+    const r = await fetch("/api/tyxeres-full", {
+      method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ reading_id: rid, session_id: sid })
+    });
+    const d = await r.json();
+    if (!r.ok) throw new Error(d.error || "Δεν βρέθηκε η πληρωμή.");
+    try { localStorage.setItem(SAVE_KEY, JSON.stringify({ rid, sid, end: d.week.end })); } catch (e) {}
+    readingId = rid;
+    show(d, true);
+    if (location.search.indexOf("session_id") === -1) history.replaceState(null, "", location.pathname + "?rid=" + encodeURIComponent(rid) + "&session_id=" + encodeURIComponent(sid));
+  } catch (ex) {
+    err(ex.message + " Αν πλήρωσες και δεν ανοίγει, γράψε μας στο pliromes2021@gmail.com.");
+  } finally {
+    $("spin").style.display = "none";
+  }
+}
+
+// Επιστροφή από την πληρωμή, ή ξανά άνοιγμα όσο διαρκεί η εβδομάδα που αγόρασε.
+(function () {
+  const q = new URLSearchParams(location.search);
+  const rid = q.get("rid"), sid = q.get("session_id");
+  if (rid && sid) { loadFull(rid, sid); return; }
+  if (rid) readingId = rid;
+  try {
+    const s = JSON.parse(localStorage.getItem(SAVE_KEY) || "null");
+    if (s && s.rid && s.sid && (!s.end || s.end >= athensDay())) {
+      $("backBox").style.display = "block";
+      $("backBtn").addEventListener("click", () => loadFull(s.rid, s.sid));
+    }
+  } catch (e) {}
+})();
+</script>
+</body>
+</html>

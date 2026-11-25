@@ -181,6 +181,15 @@
   .feat .row > div:only-child{ text-align:center; width:100%; }
   .feat .free{ margin:14px 0 10px; font-weight:700; color:var(--gold-bright); font-size:1rem; }
   .feat a{ display:block; text-decoration:none; font-weight:700; font-size:1.05rem; color:#1a1408; background:linear-gradient(135deg, var(--gold-bright), var(--gold)); padding:14px; border-radius:12px; }
+  /* Νέα υπηρεσία: το σήμα «ΝΕΟ» κάθεται πάνω στο πλαίσιο και λάμπει. Σταματά όταν η συσκευή ζητά λιγότερη κίνηση. */
+  .feat.feat-new{ position:relative; margin-top:1.4rem; }
+  .feat.feat-new .neo{ position:absolute; top:-15px; left:50%; transform:translateX(-50%); font:700 13px/1 Inter,Arial,sans-serif; letter-spacing:2px; color:#FFFFFF;
+    background:linear-gradient(135deg, #FF5A5F, #E0202F 45%, #A3121F); text-shadow:0 1px 1px rgba(0,0,0,0.35); padding:7px 14px 7px 16px; border-radius:999px; white-space:nowrap; animation:neoGlow 1.8s ease-in-out infinite; }
+  @keyframes neoGlow{
+    0%, 100%{ box-shadow:0 0 6px rgba(255,60,70,0.6), 0 0 0 0 rgba(255,60,70,0); }
+    50%{ box-shadow:0 0 18px rgba(255,70,80,1), 0 0 34px 6px rgba(224,32,47,0.6); }
+  }
+  @media (prefers-reduced-motion: reduce){ .feat.feat-new .neo{ animation:none; box-shadow:0 0 14px rgba(255,70,80,0.85); } }
   .hero-portrait{
     width:clamp(150px, 38vw, 210px);
     aspect-ratio:4/5;
@@ -702,6 +711,15 @@
       </div>
       <div class="free">Η πρώτη απάντηση είναι δωρεάν</div>
       <a href="/epistrofi?src=arxiki-proti" onclick="window.manteioEvent&&manteioEvent('arxiki-proti:epistrofi')">Ρώτα Το Μαντείο</a>
+    </div>
+
+    <div class="feat feat-new">
+      <span class="neo">ΝΕΟ</span>
+      <div class="row">
+        <div><h2>Οι τυχερές μέρες της εβδομάδας</h2><p>Αστρολογία, αριθμολογία και ταρό για κάθε μέρα. Τυχερή λέγεται μόνο όταν συμφωνούν και οι τρεις.</p></div>
+      </div>
+      <div class="free">Δωρεάν βλέπεις πόσες τυχερές μέρες έχεις</div>
+      <a href="/tyxeres-meres?src=arxiki" onclick="window.manteioEvent&&manteioEvent('arxiki-kouti:tyxeres-meres')">Δες τις μέρες σου</a>
     </div>
 
     <div class="feat">

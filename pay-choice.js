@@ -52,7 +52,7 @@
   var NAMES = { epistrofi: "Θα επιστρέψει;", agapi: "Με σκέφτεται ακόμα;", alitheia: "Μου κρύβει κάτι;", oikonomika: "Το οικονομικό σου μέλλον",
     symvatotita: "Ταιριάζετε; Η Συναστρία σας", erotima: "Η δική σου ερώτηση", numerology: "Ο Χρησμός της Αριθμολογίας", taro: "Το Τρίφυλλο Ταρώ",
     xartis: "Ο Γενέθλιος Χάρτης σου", xartis_plus: "Ο Γενέθλιος Χάρτης σου και πρόβλεψη 12 μηνών", imerologio: "Οι καλές σου μέρες του 2027",
-    paidi: "Ο χάρτης του παιδιού ή του εγγονιού" };
+    paidi: "Ο χάρτης του παιδιού ή του εγγονιού", tyxeres: "Οι τυχερές μέρες της εβδομάδας" };
   var QUESTION_TOOLS = /^(epistrofi|agapi|alitheia|oikonomika|symvatotita|erotima|numerology|taro)(_q[23])?$/;
   function eur(c) { return (c % 100 ? (c / 100).toFixed(2).replace(".", ",") : String(c / 100)) + "€"; }
   function info(tool) {
@@ -65,6 +65,9 @@
       if (tool === "imerologio") {
         var d = new Intl.DateTimeFormat("en-CA", { timeZone: "Europe/Athens", year: "numeric", month: "2-digit", day: "2-digit" }).format(new Date());
         price = d >= "2026-11-27" && d <= "2026-11-30" ? 1499 : 2999;
+      } else if (tool === "tyxeres") {
+        var d2 = new Intl.DateTimeFormat("en-CA", { timeZone: "Europe/Athens", year: "numeric", month: "2-digit", day: "2-digit" }).format(new Date());
+        price = d2 <= "2026-12-02" ? 299 : 499;
       } else price = { xartis: 3900, xartis_plus: 5900, paidi: 2499 }[tool] || 0;
     }
     return { name: name, price: price ? eur(price) : "" };

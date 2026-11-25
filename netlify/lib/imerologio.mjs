@@ -114,7 +114,7 @@ function addScore(day, cat, pts, reason) {
   if (reason && (!day.why[cat] || pts > day.whyPts[cat])) { day.why[cat] = reason; day.whyPts[cat] = pts; }
 }
 
-function scoreDay(y, m, d, N) {
+export function scoreDay(y, m, d, N) {
   // Η μέρα ορίζεται σε ώρα Ελλάδας: από τα μεσάνυχτα ως τα επόμενα μεσάνυχτα.
   const off = zoneOffset("Europe/Athens", y, m, d, 12, 0);
   const t0 = new Date(Date.UTC(y, m - 1, d, 0, 0) - off * 3600000);

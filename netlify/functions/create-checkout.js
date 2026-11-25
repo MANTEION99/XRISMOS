@@ -32,13 +32,21 @@ const PRODUCTS = {
   xartis_plus: { name: "Ο Γενέθλιος Χάρτης σου, πλήρης ανάλυση και πρόβλεψη 12 μηνών", price: 5900 },
   // Η τιμή του ημερολογίου ορίζεται τη στιγμή της πληρωμής: 29,99€, ή 14,99€ στη Black Friday (27 έως 30/11/2026).
   imerologio: { name: "Οι καλές σου μέρες του 2027, προσωπικό ημερολόγιο", price: 2999 },
-  paidi: { name: "Ο χάρτης του παιδιού ή του εγγονιού", price: 2499 }
+  paidi: { name: "Ο χάρτης του παιδιού ή του εγγονιού", price: 2499 },
+  // Η τιμή ορίζεται τη στιγμή της πληρωμής: 2,99€ ως και τις 2/12/2026, μετά 4,99€.
+  tyxeres: { name: "Οι τυχερές μέρες της εβδομάδας", price: 499 }
 };
 
 // Ίδιος κανόνας με το netlify/lib/imerologio.mjs (priceNow).
 function imerologioPrice(now = new Date()) {
   const day = new Intl.DateTimeFormat("en-CA", { timeZone: "Europe/Athens", year: "numeric", month: "2-digit", day: "2-digit" }).format(now);
   return day >= "2026-11-27" && day <= "2026-11-30" ? 1499 : 2999;
+}
+
+// Ίδιος κανόνας με το netlify/lib/tyxeres.mjs (priceNow).
+function tyxeresPrice(now = new Date()) {
+  const day = new Intl.DateTimeFormat("en-CA", { timeZone: "Europe/Athens", year: "numeric", month: "2-digit", day: "2-digit" }).format(now);
+  return day <= "2026-12-02" ? 299 : 499;
 }
 
 // Το Stripe REST API περιμένουν form-urlencoded body με bracket notation για nested δεδομένα
@@ -80,6 +88,7 @@ exports.handler = async function (event) {
     const { tool, returnUrl, reading_id, src, provider } = JSON.parse(event.body);
     const product = PRODUCTS[tool] && { ...PRODUCTS[tool] };
     if (product && tool === "imerologio") product.price = imerologioPrice();
+    if (product && tool === "tyxeres") product.price = tyxeresPrice();
 
     if (!product || !returnUrl) {
       return { statusCode: 400, body: JSON.stringify({ error: "Άγνωστο εργαλείο ή λείπει το returnUrl." }) };
@@ -130,8 +139,8 @@ exports.handler = async function (event) {
       // Για τον πλήρη χρησμό: τα χρήματα μόνο ΔΕΣΜΕΥΟΝΤΑΙ στην κάρτα. Χρεώνονται οριστικά μόνο όταν ο
       // χρησμός γραφτεί ολόκληρος. Αν δεν γραφτεί, η δέσμευση ακυρώνεται και η πελάτισσα δεν χρεώνεται.
       // Το ίδιο και για την 2η/3η ερώτηση της Επιστροφής: χρέωση μόνο όταν δοθεί απάντηση.
-      // Το ημερολόγιο είναι έτοιμο από πριν, οπότε χρεώνεται κανονικά, χωρίς δέσμευση.
-      ...(((reading_id && tool !== "imerologio") || tool === "epistrofi_q2" || tool === "epistrofi_q3") ? { payment_intent_data: { capture_method: "manual", metadata } } : {})
+      // Το ημερολόγιο και οι τυχερές μέρες είναι έτοιμα από πριν, οπότε χρεώνονται κανονικά, χωρίς δέσμευση.
+      ...(((reading_id && tool !== "imerologio" && tool !== "tyxeres") || tool === "epistrofi_q2" || tool === "epistrofi_q3") ? { payment_intent_data: { capture_method: "manual", metadata } } : {})
     });
 
     const stripeRes = await fetch("https://api.stripe.com/v1/checkout/sessions", {
