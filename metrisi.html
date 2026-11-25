@@ -38,7 +38,7 @@
 <script>
 const SRC = { tiktok:"TikTok", instagram:"Instagram", facebook:"Facebook", messenger:"Messenger", google:"Google", youtube:"YouTube", esoteriki:"Από άλλη σελίδα του manteio.live", agnosti:"Χωρίς πηγή (συνήθως από εφαρμογή)", alli:"Άλλη" };
 const PAGE = { "/":"Αρχική", "/index":"Αρχική", "/oroskopos":"Ωροσκόπος", "/synomilia":"Συνομιλία", "/epistrofi":"Θα επιστρέψει;", "/agapi":"Με σκέφτεται ακόμα;", "/alitheia":"Μου κρύβει κάτι;", "/oikonomika":"Οικονομικά", "/symvatotita":"Ταιριάζουμε;", "/erotima":"Η δική μου ερώτηση", "/arxiki":"Αρχική", "/oles":"Όλες οι προβλέψεις", "/iris":"IRIS", "/karta":"Κάρτα, Apple Pay ή Google Pay", "/fail":"IRIS (απέτυχε)", "/back":"Κάρτα (γύρισαν πίσω)", "/arithmologia":"Αριθμολογία", "/numerology":"Αριθμολογία", "/taro":"Ταρώ", "/xartis":"Γενέθλιος Χάρτης", "/paidi":"Χάρτης του παιδιού", "/eggoni":"Χάρτης του παιδιού", "/2027":"Ημερολόγιο 2027", "/imerologio":"Ημερολόγιο 2027", "/tyxeres-meres":"Τυχερές μέρες εβδομάδας" };
-const EV = { oroskopos:"Υπολόγισαν Ωροσκόπο", dorean:"Δωρεάν απάντηση", "pliromi-koumpi":"Πάτησαν πληρωμή", pliromeni:"Πλήρωσαν και πήραν απάντηση", "oroskopos-mpara":"Ωροσκόπος, πάτησαν πάνω", "oroskopos-plaisio":"Ωροσκόπος, πάτησαν στο πλαίσιο", "oroskopos-apotelesma":"Ωροσκόπος, πάτησαν στο αποτέλεσμα", "arxiki-proti":"Αρχική, πάτησαν την πρώτη ερώτηση", "arxiki-kouti":"Αρχική, πάτησαν πλαίσιο", "epilogi-pliromis":"Διάλεξαν στο παράθυρο πληρωμής", "tropos-pliromis":"Πλήρωσαν με", "pliromi-den-oloklirothike":"Η πληρωμή δεν ολοκληρώθηκε", "pliromi-xanadokimi":"Πάτησαν «Δοκίμασε ξανά»", "pliromi-piso":"Πάτησαν «Πίσω» στο παράθυρο πληρωμής", ksanaeidan:"Ξαναείδαν την απάντηση που πλήρωσαν" };
+const EV = { oroskopos:"Υπολόγισαν Ωροσκόπο", dorean:"Δωρεάν απάντηση", "pliromi-koumpi":"Πάτησαν πληρωμή", pliromeni:"Πλήρωσαν και πήραν απάντηση", "oroskopos-mpara":"Ωροσκόπος, πάτησαν πάνω", "oroskopos-plaisio":"Ωροσκόπος, πάτησαν στο πλαίσιο", "oroskopos-apotelesma":"Ωροσκόπος, πάτησαν στο αποτέλεσμα", "arxiki-proti":"Αρχική, πάτησαν την πρώτη ερώτηση", "arxiki-kouti":"Αρχική, πάτησαν πλαίσιο", "epilogi-pliromis":"Διάλεξαν στο παράθυρο πληρωμής", "tropos-pliromis":"Πλήρωσαν με", "pliromi-den-oloklirothike":"Η πληρωμή δεν ολοκληρώθηκε", "pliromi-xanadokimi":"Πάτησαν «Δοκίμασε ξανά»", "pliromi-piso":"Πάτησαν «Πίσω» στο παράθυρο πληρωμής", epilogi:"Διάλεξαν τρόπο πληρωμής", ksanaeidan:"Ξαναείδαν την απάντηση που πλήρωσαν" };
 const $ = (id) => document.getElementById(id);
 try { $("k").value = localStorage.getItem("metrisi_k") || ""; } catch (e) {}
 function add(a, b) { for (const k in b) a[k] = (a[k] || 0) + b[k]; }
@@ -48,6 +48,23 @@ function table(obj, names) {
   return "<table>" + rows.map(([k, v]) => `<tr><td>${names(k)}</td><td class="n">${v}</td></tr>`).join("") + "</table>";
 }
 function evName(k) { const [a, b] = k.split(":"); return (EV[a] || a) + (b ? " · " + (PAGE["/" + b] || b) : ""); }
+// Σκάλα ανά υπηρεσία: σε ποιο σκαλί χάνεται ο κόσμος.
+// Η ίδια υπηρεσία μπορεί να εμφανίζεται με δύο ονόματα (π.χ. /arithmologia και numerology), τα ενώνουμε.
+const ALIAS = { numerology:"arithmologia", eggoni:"paidi", "2027":"imerologio", tyxeres:"tyxeres-meres", xartis_plus:"xartis" };
+const FUNNEL = ["epistrofi","agapi","alitheia","erotima","symvatotita","oikonomika","arithmologia","taro","tyxeres-meres","imerologio","xartis","paidi","synomilia"];
+function funnel(V, E) {
+  const F = {};
+  const put = (slug, step, n) => { slug = ALIAS[slug] || slug; if (!FUNNEL.includes(slug)) return; (F[slug] = F[slug] || { v:0, d:0, k:0, c:0, p:0 })[step] += n; };
+  for (const k in V) put(k.replace(/^\//, ""), "v", V[k]);
+  for (const k in E) { const [a, b] = k.split(":"); const st = { dorean:"d", "pliromi-koumpi":"k", epilogi:"c", pliromeni:"p" }[a]; if (st && b) put(b, st, E[k]); }
+  const rows = FUNNEL.filter(s => F[s] && (F[s].v || F[s].d || F[s].k || F[s].p)).map(s => {
+    const f = F[s], step = (lab, n, prev) => `<tr><td>${lab}</td><td class="n">${n}${prev && n <= prev ? ` <span class="muted">(${Math.round(100 * n / prev)}%)</span>` : ""}</td></tr>`;
+    return `<p style="margin:14px 0 4px;color:#D9B25C;font-weight:700">${PAGE["/" + s] || s}</p><table>` +
+      step("Άνοιξαν τη σελίδα", f.v) + step("Πήραν δωρεάν απάντηση", f.d, f.v) + step("Πάτησαν πληρωμή", f.k, f.d) +
+      step("Διάλεξαν τρόπο πληρωμής", f.c, f.k) + step("Πλήρωσαν", f.p, f.c || f.k) + `</table>`;
+  }).join("");
+  return `<div class="card"><h2>Σκάλα ανά υπηρεσία</h2><p class="muted" style="margin:0">Σε κάθε σκαλί, το ποσοστό δείχνει πόσοι πέρασαν από το προηγούμενο. Το «Διάλεξαν τρόπο πληρωμής» μετράει από 25/11 απόγευμα. Το «Άνοιξαν τη σελίδα» μετράει κάθε άνοιγμα, μαζί και τις ανανεώσεις. Το «Πάτησαν πληρωμή» μετράει και τη 2η και 3η ερώτηση, γι' αυτό μπορεί να είναι περισσότερα από τις δωρεάν απαντήσεις.</p>${rows || '<p class="muted">Τίποτα ακόμα.</p>'}</div>`;
+}
 async function load() {
   $("err").textContent = ""; $("out").innerHTML = '<p class="muted">Φόρτωση…</p>';
   const k = $("k").value.trim(); const r = +$("r").value;
@@ -79,6 +96,7 @@ async function load() {
     if (r > 2) html += `<p class="muted" style="margin:10px 0 4px">Ανά μέρα</p><table>${d.days.slice(0, r).map(x => { let n = 0; for (const k in (x.e || {})) if (k.split(":")[0] === "pliromeni") n += x.e[k]; return n ? `<tr><td>${x.day.split("-").reverse().join("/")}</td><td class="n">${n}</td></tr>` : ""; }).join("")}</table>`;
   }
   html += `</div>`;
+  html += funnel(V, E);
   // Άνθρωποι: ένα άτομο μία φορά ανά επίσκεψη, με την πηγή της πρώτης σελίδας που άνοιξε (μετράει από 23/11 βράδυ)
   html += `<div class="card"><h2>Άνθρωποι</h2><div class="big">${HP}</div>${nr(HR)}<p class="muted" style="margin:6px 0 0">Κάθε άτομο μετράει μία φορά σε κάθε επίσκεψη, όσες σελίδες κι αν ανοίξει. Μετράει από 23/11 βράδυ.</p></div>`;
   const hRows = Object.entries(HS).sort((a, b) => b[1] - a[1]).map(([k, v]) => `<tr><td>${SRC[k] || k}</td><td class="n">${v}</td></tr>`).join("");

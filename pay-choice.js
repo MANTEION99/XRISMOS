@@ -132,7 +132,7 @@
       bg.querySelectorAll("button").forEach(function (b) { b.onclick = function () {
         var c = b.getAttribute("data-p");
         // Μέτρηση: ποιον τρόπο διάλεξαν στο παράθυρο, ή αν γύρισαν πίσω
-        try { if (window.manteioEvent) manteioEvent(c === "back" ? "pliromi-piso:" + String(tool || "").replace(/_q[23]$/, "") : "epilogi-pliromis:" + (c === "viva" ? "iris" : "karta")); } catch (e) {}
+        try { if (window.manteioEvent) manteioEvent(c === "back" ? "pliromi-piso:" + String(tool || "").replace(/_q[23]$/, "") : "epilogi-pliromis:" + (c === "viva" ? "iris" : "karta")); if (c !== "back" && window.manteioEvent) manteioEvent("epilogi:" + String(tool || "").replace(/_q[23]$/, "")); } catch (e) {}
         bg.remove(); res(c); }; });
     });
   }
