@@ -59,11 +59,11 @@ const NUM_TEXT = {
   1: "Μέρα του ξεκινήματος. Ό,τι αρχίζεις σήμερα έχει δύναμη.",
   2: "Μέρα της υπομονής και της συνεργασίας. Τα πράγματα θέλουν τον χρόνο τους.",
   3: "Μέρα της χαράς και της επικοινωνίας. Οι κουβέντες και οι συναντήσεις κυλούν όμορφα.",
-  4: "Μέρα της δουλειάς και της τάξης. Καλή για να τακτοποιήσεις, όχι για ρίσκα.",
+  4: "Μέρα της δουλειάς και της τάξης. Τα πράγματα μπαίνουν στη θέση τους.",
   5: "Μέρα της αλλαγής και της τύχης. Κάτι απρόσμενο ανοίγει δρόμο.",
   6: "Μέρα της αγάπης και του σπιτιού. Οι άνθρωποί σου είναι κοντά σου.",
   7: "Μέρα της σκέψης και της ησυχίας. Καλή για να ακούσεις τον εαυτό σου.",
-  8: "Μέρα των χρημάτων και της επιτυχίας. Καλή για συμφωνίες και αιτήματα.",
+  8: "Μέρα της δύναμης και της επιτυχίας. Νιώθεις ότι μπορείς.",
   9: "Μέρα που κλείνει κύκλους. Καλή για να αφήσεις κάτι πίσω, όχι για αρχές."
 };
 
@@ -82,6 +82,7 @@ function cardFor(p, date) {
 /* ---------- Αστρολογία ---------- */
 
 const CAT_ORDER = ["love", "money", "dec"];
+const QUIET_DAY = "Μέρα ήσυχη, για ξεκούραση. Ο ουρανός δεν πιέζει και δεν βιάζει τίποτα.";
 const ASTRO_QUIET = "Ο ουρανός δεν σχηματίζει δυνατή όψη με τον χάρτη σου αυτή τη μέρα. Μέρα ήσυχη, χωρίς ιδιαίτερη ώθηση.";
 function astroFor(N, y, m, d) {
   const x = scoreDay(y, m, d, N);
@@ -126,13 +127,21 @@ export async function computeWeek(p, now = new Date()) {
   return { week, days, counts, hasTime: natal.hasTime, placeFound: natal.placeFound };
 }
 
-// Η δωρεάν εικόνα: η εβδομάδα με τα ονόματα των ημερών κλειδωμένα και μία μέρα ανοιχτή ως δείγμα.
-// Το δείγμα είναι πάντα μια απλή μέρα (ή η πιο αδύναμη), ώστε να μη φανερώνεται καμία τυχερή.
-export function teaserOf(data) {
-  const sorted = [...data.days].sort((a, b) => a.rank - b.rank);
-  const sample = sorted.find(x => x.tier === "apli" && !x.best) || sorted.find(x => !x.best);
+// Η δωρεάν εικόνα: οι 7 μέρες κλειδωμένες, χωρίς να λέει πόσες είναι τυχερές ή καλές.
+// Ανοιχτή είναι μόνο μία μέρα: η μέρα που θέλει προσοχή, ή αν δεν υπάρχει, η πιο ήσυχη μέρα.
+// Δεν φανερώνεται ποτέ η πιο δυνατή μέρα. Προτιμάμε μέρα που δεν έχει περάσει ακόμα.
+export function teaserOf(data, now = new Date()) {
+  const today = new Intl.DateTimeFormat("en-CA", { timeZone: "Europe/Athens", year: "numeric", month: "2-digit", day: "2-digit" }).format(now);
+  const pool = data.days.filter(x => !x.best);
+  const ahead = pool.filter(x => x.date >= today);
+  const from = ahead.length ? ahead : pool;
+  const byWeak = [...from].sort((a, b) => a.rank - b.rank);
+  const attn = byWeak.find(x => x.astro.cat === "avoid");
+  const open = attn || byWeak[0];
   return {
-    week: data.week, counts: data.counts, hasTime: data.hasTime,
-    days: data.days.map(x => x.date === sample.date ? { ...x, sample: true } : { date: x.date, label: x.label, wd: x.wd, locked: true })
+    week: data.week, hasTime: data.hasTime,
+    days: data.days.map(x => x.date === open.date
+      ? { date: x.date, label: x.label, wd: x.wd, open: true, kind: attn ? "prosoxi" : "isyxi", why: attn ? x.astro.why : QUIET_DAY }
+      : { date: x.date, label: x.label, wd: x.wd, locked: true })
   };
 }

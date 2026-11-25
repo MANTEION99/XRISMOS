@@ -97,6 +97,12 @@
   .strip .s.kali .m{ color:var(--good); }
   .strip .s.locked .m{ color:var(--gold); }
   .strip .s.past{ opacity:0.55; }
+  .strip .s.open{ border-color:rgba(232,140,120,0.7); background:rgba(232,140,120,0.10); }
+  .strip .s.open .m{ color:#e8a090; }
+  .p-prosoxi{ background:rgba(232,140,120,0.16); color:#e8a090; border:1px solid rgba(232,140,120,0.5); }
+  .p-isyxi{ background:rgba(156,150,174,0.16); color:var(--paper); border:1px solid rgba(156,150,174,0.5); }
+  .day.open{ border-color:rgba(232,140,120,0.5); }
+  .day .why{ font-size:15px; line-height:1.6; color:var(--paper); margin:0; }
 
   .day{ border:1px solid var(--line); border-radius:16px; padding:14px 12px 12px; margin:0 0 14px; background:rgba(255,255,255,0.015); }
   .day.tyxeri{ border:1.5px solid var(--gold-bright); background:linear-gradient(180deg, rgba(217,178,92,0.14), rgba(217,178,92,0.03)); box-shadow:0 0 26px rgba(217,178,92,0.18); }
@@ -215,7 +221,7 @@
     <p class="hello-week" id="helloWeek"></p>
     <p class="headline" id="headline"></p>
     <div class="strip" id="strip"></div>
-    <div class="legend">
+    <div class="legend" id="legend">
       <span><i class="pill p-tyxeri">Τυχερή</i>συμφωνούν και οι τρεις</span>
       <span><i class="pill p-kali">Καλή</i>συμφωνούν οι δύο</span>
     </div>
@@ -284,22 +290,19 @@ priceUI(0);
     : `Παίρνεις την <b>εβδομάδα που διανύουμε</b>:<br><b>${lab}</b>.`;
 })();
 
-const plural = (n, one, many) => n === 1 ? one : `${n} ${many}`;
-function headlineText(c) {
-  if (c.tyxeri > 0) {
-    const t = plural(c.tyxeri, "μία τυχερή μέρα", "τυχερές μέρες");
-    return c.kali > 0 ? `Η εβδομάδα σου έχει ${t} και ${plural(c.kali, "μία καλή", "καλές")}.` : `Η εβδομάδα σου έχει ${t}.`;
-  }
-  if (c.kali > 0) return `Αυτή την εβδομάδα οι τρεις μέθοδοι δεν συμφωνούν σε καμία μέρα, αλλά έχεις ${plural(c.kali, "μία καλή μέρα", "καλές μέρες")}.`;
-  return "Η εβδομάδα σου είναι ήσυχη. Ξεχωρίζει όμως μία μέρα, πιο καθαρή από τις άλλες.";
+const ART = { "Σάββατο": "το" };
+function headlineText(data, full) {
+  if (!full) return "Μία από αυτές τις μέρες είναι η πιο δυνατή σου μέρα της εβδομάδας.";
+  const b = data.days.find(x => x.best);
+  return b ? `Η πιο δυνατή σου μέρα αυτή την εβδομάδα είναι ${ART[b.wd] || "η"} ${b.label}.` : "";
 }
 const isPast = (date) => date < athensDay();
 
 function strip(days) {
   return days.map(x => {
     const d = +x.date.slice(8, 10);
-    const cls = ["s", x.locked ? "locked" : x.tier, isPast(x.date) ? "past" : ""].join(" ");
-    const mark = x.locked ? "🔒" : x.tier === "tyxeri" ? "★" : x.tier === "kali" ? "●" : "·";
+    const cls = ["s", x.locked ? "locked" : x.open ? "open" : x.tier, isPast(x.date) ? "past" : ""].join(" ");
+    const mark = x.locked ? "🔒" : x.open ? (x.kind === "prosoxi" ? "!" : "·") : x.tier === "tyxeri" ? "★" : x.tier === "kali" ? "●" : "·";
     return `<div class="${cls}"><div class="w">${WD_SHORT[x.wd] || ""}</div><div class="n">${d}</div><div class="m">${mark}</div></div>`;
   }).join("");
 }
@@ -318,6 +321,11 @@ function dayCard(x) {
       <span class="card-img"><img src="/tarot-cards/${esc(x.card.file)}" alt="${esc(x.card.name)}" class="${x.card.reversed ? "rev" : ""}" loading="lazy"></span></div>
   </section>`;
 }
+function openCard(x) {
+  const pill = x.kind === "prosoxi" ? `<span class="pill p-prosoxi">Θέλει προσοχή</span>` : `<span class="pill p-isyxi">Μέρα για ξεκούραση</span>`;
+  const past = isPast(x.date) ? `<div class="past-note">Η μέρα αυτή έχει περάσει.</div>` : "";
+  return `<section class="day open"><div class="dh"><b>${esc(x.label)}</b>${pill}</div>${past}<p class="why">${esc(x.why)}</p></section>`;
+}
 const cap = (s) => String(s || "").charAt(0).toLocaleUpperCase("el") + String(s || "").slice(1);
 
 function show(data, full) {
@@ -325,7 +333,8 @@ function show(data, full) {
   $("res").style.display = "block";
   $("hello").textContent = full ? `${data.name}, οι τυχερές σου μέρες` : `${data.name}, η εβδομάδα σου`;
   $("helloWeek").textContent = data.week.label;
-  $("headline").textContent = headlineText(data.counts);
+  $("headline").textContent = headlineText(data, full);
+  $("legend").style.display = full ? "" : "none";
   $("strip").innerHTML = strip(data.days);
   if (full) {
     // Πρώτα οι τυχερές, μετά οι καλές, μετά οι υπόλοιπες, η καθεμία με τη σειρά της εβδομάδας.
@@ -334,10 +343,10 @@ function show(data, full) {
     $("days").innerHTML = list.map(dayCard).join("");
     $("seal").style.display = "none";
   } else {
-    const s = data.days.find(x => x.sample);
-    $("days").innerHTML = s ? `<p class="sample-tag">Δείγμα: μία από τις μέρες σου, ολόκληρη</p>${dayCard(s)}` : "";
+    const o = data.days.find(x => x.open);
+    $("days").innerHTML = o ? openCard(o) : "";
     const left = data.days.filter(x => x.locked).length;
-    $("sealSub").textContent = `Οι υπόλοιπες ${left} μέρες είναι ήδη υπολογισμένες από τα στοιχεία σου. Για καθεμία βλέπεις αν είναι τυχερή ή καλή, τι λέει ο ουρανός, τον αριθμό της και το χαρτί της.`;
+    $("sealSub").textContent = `Οι άλλες ${left} μέρες είναι ήδη υπολογισμένες από τα στοιχεία σου. Βλέπεις ποια είναι η πιο δυνατή σου μέρα και, για κάθε μέρα, τι λέει ο ουρανός, τον αριθμό της και το χαρτί της.`;
     $("seal").style.display = "block";
     if (data.price) priceUI(data.price.cents);
   }
