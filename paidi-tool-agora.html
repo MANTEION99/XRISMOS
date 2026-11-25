@@ -8,7 +8,7 @@
 <meta name="description" content="Ο ουρανός τη στιγμή που γεννήθηκες. Ο Ιάκωβος διαβάζει όλο τον χάρτη σου: ποιος είσαι, πώς αγαπάς, τι ήρθες να κάνεις και πού βρίσκεται η τύχη σου.">
 <meta property="og:title" content="Ο χάρτης του παιδιού ή του εγγονιού σου | Μαντείο">
 <meta property="og:description" content="Δώρο Χριστουγέννων: ο γενέθλιος χάρτης του παιδιού ή του εγγονιού σου. Τι χρειάζεται η καρδιά του, πώς μαθαίνει, ποια είναι τα ταλέντα του και πώς να το στηρίξεις. Η αρχή είναι δωρεάν.">
-<meta property="og:image" content="https://manteio.live/images/iakovos.jpg">
+<meta property="og:image" content="https://manteio.live/images/leto.jpg">
 <meta property="og:url" content="https://manteio.live/paidi">
 <meta property="og:type" content="website">
 <meta property="og:locale" content="el_GR">
@@ -335,6 +335,7 @@
 <script src="/consent.js" defer></script>
 <script src="/metrisi.js"></script>
 <script src="/pay-choice.js" defer></script>
+<script src="/hero.js"></script>
 <script src="/reviews.js" defer></script>
 <script src="/vitals.js" defer></script>
 </head>
@@ -349,7 +350,7 @@
     <div class="corner br"><svg viewBox="0 0 22 22"><path d="M2,2 L2,14 M2,2 L14,2" stroke="#D9B25C" stroke-width="1.2" fill="none"/></svg></div>
 
     <h1>Ο χάρτης του παιδιού<br>ή του εγγονιού σου</h1>
-    <img class="illus" src="images/iakovos.jpg" alt="Ο χάρτης του παιδιού ή του εγγονιού σου" onerror="this.style.display='none'">
+    <img class="illus" src="images/leto.jpg" alt="Ο χάρτης του παιδιού ή του εγγονιού σου" onerror="this.style.display='none'">
     <p class="sub">Ο ουρανός τη στιγμή που γεννήθηκε το παιδί που αγαπάς. Ο Ιάκωβος διαβάζει τον χάρτη του: ποιος είναι στ' αλήθεια, τι χρειάζεται η καρδούλα του, πώς μαθαίνει, ποια είναι τα ταλέντα του και πώς να το στηρίξεις.</p>
     <p class="price-line" style="margin-bottom:10px;">Δώρο Χριστουγέννων · Η αρχή είναι δωρεάν</p>
     <p class="ask-line" style="font-size:15px;line-height:1.5;color:var(--muted);margin:0 auto 22px;max-width:340px;">Δωρεάν βλέπεις τον Ήλιο, τη Σελήνη και τον Ωροσκόπο του παιδιού. Μετά, αν θέλεις, ο Ιάκωβος γράφει το βιβλίο του, 10 κεφάλαια μόνο για εκείνο, για να το κρατάει η οικογένεια και να του το διαβάσει όταν μεγαλώσει.</p>
@@ -454,6 +455,7 @@
     <div class="full-wrap" id="fullWrap">
       <div class="question-head" id="questionHead"><div class="ql">Η ΕΡΩΤΗΣΗ ΣΟΥ</div><div class="qt" id="questionShown"></div></div>
       <div id="ritualFull"></div>
+      <div class="hero-intro" id="heroIntro" style="display:none;font-family:'Cormorant Garamond',serif;font-style:italic;font-size:20px;line-height:1.45;color:#D9B25C;text-align:center;max-width:440px;margin:4px auto 18px;"></div>
       <div class="reading" id="readingtext"></div>
       <p class="safety-note">Το Μαντείο δεν απαντά σε θέματα υγείας, εγκυμοσύνης, νομικά ή δικαστικά, ούτε δίνει οικονομικές ή επενδυτικές συμβουλές. Αν σε κάποιο σημείο ο χρησμός σου φαίνεται να αγγίζει τέτοιο θέμα, μην τον λάβεις υπόψη σε καμία περίπτωση και απευθύνσου σε γιατρό, δικηγόρο ή οικονομικό σύμβουλο. Αν περνάς κάτι πολύ δύσκολο, μίλησε τώρα με έναν ειδικό: Γραμμή Παρέμβασης για την Αυτοκτονία 1018, Γραμμή SOS για τη βία κατά των γυναικών 15900, και σε άμεσο κίνδυνο 112.</p>
       <p id="pauseNote" class="pause-note" style="display:none;">Ο χρησμός σου συνεχίζει να γράφεται, μείνε εδώ<span class="dots"><i>.</i><i>.</i><i>.</i></span></p>
@@ -497,7 +499,7 @@
 </script>
 <script src="/dt.js"></script>
 <script>
-const CFG = {"tool": "paidi", "kind": "natal", "title": "Ο χάρτης του παιδιού σου", "needDob2": false, "needQuestion": false, "pctLabel": null, "teaserRitual": ["Τα άστρα ανοίγουν τον χάρτη της γέννησης{name}...", "Οι πλανήτες παίρνουν τις θέσεις που είχαν τη στιγμή που γεννήθηκε...", "Ο Ιάκωβος διαβάζει τον Ήλιο, τη Σελήνη και τον Ωροσκόπο του..."], "fullRitual": ["Η σφραγίδα της ανάλυσης ανοίγει...", "Ο Ιάκωβος διαβάζει έναν έναν τους πλανήτες του...", "Τα κεφάλαια του χάρτη γράφονται...", "Η ανάλυση γράφεται{name}..."], "questionRitual": ["Η ερώτησή σου φτάνει στα άστρα{name}...", "Αναζητούμε την απάντηση στους ίδιους χάρτες...", "Η απάντησή σου γράφεται..."], "waitSteps": ["Η πληρωμή σου επιβεβαιώθηκε", "Ο χάρτης του παιδιού ανοίγει ολόκληρος", "Τα 10 κεφάλαια γράφονται ένα ένα", "Η ανάλυση εμφανίζεται εδώ, κεφάλαιο κεφάλαιο"], "questionSteps": ["Η πληρωμή σου επιβεβαιώθηκε", "Η ερώτησή σου διαβάζεται", "Αναζητούμε την απάντηση", "Η απάντηση γράφεται ειδικά για σένα"], "questionPlaceholder": "", "questionHint": "", "sameData": "με τον ίδιο χάρτη", "waitNote": "Η πλήρης ανάλυση γράφεται σε 4 με 6 λεπτά και τα κεφάλαια εμφανίζονται εδώ ένα ένα. Κι αν κλείσεις τη σελίδα, η ανάλυση θα σε περιμένει εδώ, χωρίς νέα χρέωση.", "waitSeconds": 330, "noQuestions": true, "btnText": "Δες δωρεάν τον χάρτη του"};
+const CFG = {"tool": "paidi", "kind": "natal", "title": "Ο χάρτης του παιδιού σου", "needDob2": false, "needQuestion": false, "pctLabel": null, "teaserRitual": ["Τα άστρα ανοίγουν τον χάρτη της γέννησης{name}...", "Οι πλανήτες παίρνουν τις θέσεις που είχαν τη στιγμή που γεννήθηκε...", "Η Λητώ διαβάζει τον Ήλιο, τη Σελήνη και τον Ωροσκόπο του..."], "fullRitual": ["Η σφραγίδα της ανάλυσης ανοίγει...", "Η Λητώ διαβάζει έναν έναν τους πλανήτες του...", "Τα κεφάλαια του χάρτη γράφονται...", "Η ανάλυση γράφεται{name}..."], "questionRitual": ["Η ερώτησή σου φτάνει στα άστρα{name}...", "Αναζητούμε την απάντηση στους ίδιους χάρτες...", "Η απάντησή σου γράφεται..."], "waitSteps": ["Η πληρωμή σου επιβεβαιώθηκε", "Ο χάρτης του παιδιού ανοίγει ολόκληρος", "Τα 10 κεφάλαια γράφονται ένα ένα", "Η ανάλυση εμφανίζεται εδώ, κεφάλαιο κεφάλαιο"], "questionSteps": ["Η πληρωμή σου επιβεβαιώθηκε", "Η ερώτησή σου διαβάζεται", "Αναζητούμε την απάντηση", "Η απάντηση γράφεται ειδικά για σένα"], "questionPlaceholder": "", "questionHint": "", "sameData": "με τον ίδιο χάρτη", "waitNote": "Η πλήρης ανάλυση γράφεται σε 4 με 6 λεπτά και τα κεφάλαια εμφανίζονται εδώ ένα ένα. Κι αν κλείσεις τη σελίδα, η ανάλυση θα σε περιμένει εδώ, χωρίς νέα χρέωση.", "waitSeconds": 330, "noQuestions": true, "btnText": "Δες δωρεάν τον χάρτη του"};
 /* Κοινή λογική σελίδας για τα εργαλεία του κοινού μηχανισμού.
    Η σελίδα κάθε εργαλείου ορίζει πριν από αυτό το script το αντικείμενο CFG (δες build-oracle-pages.py).
    Ροή: δωρεάν άνοιγμα με email, σφραγισμένη συνέχεια, πληρωμή (δέσμευση), χρησμός που γράφεται
@@ -1102,11 +1104,13 @@ function loadFullReading() {
 
     if (data.status === 'done' && firstPoll && !typerStarted) {
       stopRitual();
+      if (window.manteioHeroIntro) window.manteioHeroIntro(TOOL, data.stage);
       fullTyper.instant(data.text);
       renderExtraActions(data);
       return;
     }
     firstPoll = false;
+    if (data.text) if (window.manteioHeroIntro) window.manteioHeroIntro(TOOL, data.stage);
     if (data.text) { typerStarted = true; fullTyper.set(data.text, data.status === 'done'); }
 
     if (data.status === 'done') {
@@ -1181,6 +1185,8 @@ function renderExtraActions(data) {
   if (readingIdParam && sessionId && window.manteioReviewForm) window.manteioReviewForm(readingIdParam, sessionId);
   const box = $('extraActions');
   box.innerHTML = '';
+  const hc = window.manteioHeroClose && window.manteioHeroClose(TOOL, data.stage || 'q1', CFG.noQuestions);
+  if (hc) box.appendChild(hc);
   if (CFG.noQuestions) return;
   const stage = data.stage || 'q1';
   const nextStage = stage === 'q1' ? 'q2' : (stage === 'q2' ? 'q3' : null);

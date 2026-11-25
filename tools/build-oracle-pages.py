@@ -140,15 +140,15 @@ TARO_UNLOCK = DEFAULT_UNLOCK.replace('        <p class="lucky-note" style="font-
 TOOLS = {
   "xartis": dict(
     slug="xartis", file="xartis-tool-agora.html", kind="natal", needDob2=False, needQuestion=False,
-    title="Ο Γενέθλιος Χάρτης σου", h1="Ο Γενέθλιος<br>Χάρτης σου", img="images/iakovos.jpg",
+    title="Ο Γενέθλιος Χάρτης σου", h1="Ο Γενέθλιος<br>Χάρτης σου", img="images/ourania.jpg",
     sub="Ο ουρανός τη στιγμή που γεννήθηκες. Ο Ιάκωβος διαβάζει όλο τον χάρτη σου: ποιος είσαι, πώς αγαπάς, τι ήρθες να κάνεις και πού βρίσκεται η τύχη σου.",
     ask="Δωρεάν βλέπεις τον Ήλιο, τη Σελήνη και τον Ωροσκόπο σου. Μετά, αν θέλεις, ο Ιάκωβος γράφει το δικό σου βιβλίο, 14 κεφάλαια μόνο για σένα, και σου το στέλνουμε και στο email σου σε PDF.",
     fields=lambda: field("name1", "Το όνομά σου", placeholder="π.χ. Μαρία") + field("dob1", "Ημερομηνία γέννησής σου", "date") + field("tob1", "Ώρα γέννησής σου", "time", note=NATAL_TIME) + field("pob1", "Πόλη γέννησής σου", placeholder="π.χ. Αθήνα", note=NOTE_PLACE),
     pctLabel=None,
     blur="Η Σελήνη σου δείχνει τι χρειάζεται η καρδιά σου για να ησυχάσει, η Αφροδίτη και ο Άρης πώς αγαπάς και τι σε ελκύει, το Μεσουράνημα σε τι είσαι προικισμένη. Οι Δεσμοί της Σελήνης φανερώνουν τι ήρθες να κάνεις σε αυτή τη ζωή, και ο Χείρωνας ποια πληγή σου γίνεται δώρο για τους άλλους. Ο Δίας δείχνει πού έρχεται η τύχη εύκολα και ο Κρόνος τα μεγάλα μαθήματα της ζωής σου.",
     sealSub="Το δικό σου βιβλίο, 14 κεφάλαια γραμμένα μόνο για σένα, που σου στέλνουμε και στο email σου σε PDF.",
-    teaserRitual=["Τα άστρα ανοίγουν τον χάρτη της γέννησής σου{name}...", "Οι πλανήτες παίρνουν τις θέσεις που είχαν τη στιγμή που γεννήθηκες...", "Ο Ιάκωβος διαβάζει τον Ήλιο, τη Σελήνη και τον Ωροσκόπο σου..."],
-    fullRitual=["Η σφραγίδα της ανάλυσής σου ανοίγει...", "Ο Ιάκωβος διαβάζει έναν έναν τους πλανήτες σου...", "Τα κεφάλαια του χάρτη σου γράφονται...", "Η ανάλυσή σου γράφεται{name}..."],
+    teaserRitual=["Τα άστρα ανοίγουν τον χάρτη της γέννησής σου{name}...", "Οι πλανήτες παίρνουν τις θέσεις που είχαν τη στιγμή που γεννήθηκες...", "Η Ουρανία διαβάζει τον Ήλιο, τη Σελήνη και τον Ωροσκόπο σου..."],
+    fullRitual=["Η σφραγίδα της ανάλυσής σου ανοίγει...", "Η Ουρανία διαβάζει έναν έναν τους πλανήτες σου...", "Τα κεφάλαια του χάρτη σου γράφονται...", "Η ανάλυσή σου γράφεται{name}..."],
     waitSteps=["Η πληρωμή σου επιβεβαιώθηκε", "Ο χάρτης σου ανοίγει ολόκληρος", "Τα 14 κεφάλαια γράφονται ένα ένα", "Η ανάλυσή σου εμφανίζεται εδώ, κεφάλαιο κεφάλαιο"],
     waitNote="Η πλήρης ανάλυση γράφεται σε 5 με 8 λεπτά και τα κεφάλαια εμφανίζονται εδώ ένα ένα. Κι αν κλείσεις τη σελίδα, η ανάλυσή σου θα σε περιμένει εδώ, χωρίς νέα χρέωση.",
     waitSeconds=420, noQuestions=True, plusTool="xartis_plus", unlock=NATAL_UNLOCK, coverExtra=COVER_PROOF,
@@ -156,7 +156,7 @@ TOOLS = {
     qPh="", qHint="", sameData="με τον ίδιο χάρτη"),
   "erotima": dict(
     slug="erotima", file="erotima-tool-agora.html", kind="open", needDob2=False, needQuestion=True,
-    title="Ρώτα το Μαντείο", h1="Ρώτα<br>το Μαντείο", img="images/manteio-advisor.jpg",
+    title="Ρώτα το Μαντείο", h1="Ρώτα<br>το Μαντείο", img="images/pythia.jpg",
     sub="Γράψε ό,τι σε απασχολεί, με δικά σου λόγια. Ο χάρτης της γέννησής σου έχει ήδη την απάντηση.",
     ask="Και μετά τον χρησμό σου, μπορείς να κάνεις και δεύτερη και τρίτη ερώτηση πάνω στον ίδιο χάρτη.",
     fields=lambda: person1() + field("question", "Τι θέλεις να ρωτήσεις;", "textarea", "π.χ. Θα βρει δουλειά ο γιος μου φέτος; Να μετακομίσω; Τι μου φέρνει ο χειμώνας;", '<div class="time-note">Γράψε με δικά σου λόγια αυτό που σε απασχολεί. Όσο πιο συγκεκριμένα, τόσο πιο καθαρή η απάντηση.</div>') + '      <div class="divider">ΑΝ Η ΕΡΩΤΗΣΗ ΑΦΟΡΑ ΚΑΙ ΑΛΛΟ ΠΡΟΣΩΠΟ (ΠΡΟΑΙΡΕΤΙΚΟ)</div>\n' + field("name2", "Το όνομά του/της", placeholder="π.χ. Γιώργος") + field("dob2", "Ημερομηνία γέννησής του/της (αν την ξέρεις)", "date") + field("tob2", "Ώρα γέννησής του/της (αν την ξέρεις)", "time", note=NOTE_TIME2) + field("pob2", "Πόλη γέννησής του/της (αν την ξέρεις)", placeholder="π.χ. Θεσσαλονίκη", note=NOTE_PLACE),
@@ -208,7 +208,7 @@ TOOLS = {
     qPh="π.χ. Γιατί νιώθω ότι κάτι δεν λέγεται μεταξύ μας;", qHint="Ρώτα ό,τι σε καίει για εσάς τους δύο.", sameData="με τους ίδιους χάρτες"),
   "oikonomika": dict(
     slug="oikonomika", file="oikonomika-tool-agora.html", kind="astro1", needDob2=False, needQuestion=True,
-    title="Μια Φωτισμένη Οικονομική Αρχή", h1="Μια Φωτισμένη<br>Οικονομική Αρχή", img="images/afthonia.jpg",
+    title="Μια Φωτισμένη Οικονομική Αρχή", h1="Μια Φωτισμένη<br>Οικονομική Αρχή", img="images/midas.jpg",
     sub="Κατανόησε τι δείχνει ο χάρτης σου για τα οικονομικά σου, και πότε ανοίγει το παράθυρο ανακούφισης.",
     ask="Και μετά τον χρησμό σου, μπορείς να ρωτήσεις τα άστρα ό,τι σε απασχολεί για τα χρήματα και τη δουλειά σου.",
     fields=lambda: person1() + field("question", "Ποια είναι η ερώτησή σου;", "textarea", "π.χ. Πότε θα ξεχρεώσω; Πότε θα πουληθεί το σπίτι μου;", '<div class="time-note">Γράψε με δικά σου λόγια αυτό που σε απασχολεί.</div>'),
@@ -295,6 +295,7 @@ def build(tool, c):
         y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
     }})(window, document, "clarity", "script", "ydrxibksl6");
 </script>
+<script src="/hero.js"></script>
 <script src="/reviews.js" defer></script>
 <script src="/vitals.js" defer></script>
 </head>
@@ -365,7 +366,8 @@ def build(tool, c):
     <div class="full-wrap" id="fullWrap">
       <div class="question-head" id="questionHead"><div class="ql">Η ΕΡΩΤΗΣΗ ΣΟΥ</div><div class="qt" id="questionShown"></div></div>
       <div id="ritualFull"></div>
-{pct}      <div class="reading" id="readingtext"></div>
+{pct}      <div class="hero-intro" id="heroIntro" style="display:none;font-family:\'Cormorant Garamond\',serif;font-style:italic;font-size:20px;line-height:1.45;color:#D9B25C;text-align:center;max-width:440px;margin:4px auto 18px;"></div>
+      <div class="reading" id="readingtext"></div>
       <p class="safety-note">{SAFETY_NOTE}</p>
       <p id="pauseNote" class="pause-note" style="display:none;">Ο χρησμός σου συνεχίζει να γράφεται, μείνε εδώ<span class="dots"><i>.</i><i>.</i><i>.</i></span></p>
       <div id="adviceWrap" style="display:none; margin-top:20px; padding-top:18px; border-top:1px solid var(--line);">
