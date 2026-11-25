@@ -122,6 +122,16 @@
   .mrow .card-img img{ width:100%; height:100%; object-fit:cover; display:block; }
   .mrow .card-img img.rev{ transform:rotate(180deg); }
   @media (max-width:340px){ .day{ padding:12px 9px 10px; } .mrow{ gap:8px; } .mrow .card-img{ flex-basis:34px; width:34px; height:58px; } }
+  .methods{ text-align:center; margin:0 0 14px; }
+  .methods .mm{ display:flex; flex-wrap:wrap; justify-content:center; gap:6px 14px; font-size:14px; font-weight:600; color:var(--gold-bright); }
+  .methods .mm span{ white-space:nowrap; }
+  .methods p{ font-size:13px; color:var(--muted); margin:6px 0 0; }
+  .day.blur .mk{ border:1px solid rgba(217,178,92,0.45); color:var(--gold); }
+  .day.blur .bl{ filter:blur(5px); -webkit-filter:blur(5px); user-select:none; pointer-events:none; }
+  .day.blur .card-back{ width:100%; height:100%; display:flex; align-items:center; justify-content:center; background:radial-gradient(circle at 50% 50%, #2a2140, #120f22); }
+  .day.blur .card-back span{ width:24px; height:24px; border-radius:50%; border:1px solid var(--gold); color:var(--gold); display:flex; align-items:center; justify-content:center; font-family:'Cormorant Garamond',serif; font-size:14px; }
+  .lock-note{ font-size:12.5px; color:var(--gold); margin:-4px 0 6px; }
+  .power{ font-family:'Cormorant Garamond',serif; font-style:italic; font-size:20px; line-height:1.45; color:var(--gold-bright); margin:6px auto 16px; max-width:340px; }
   .sample-tag{ text-align:center; font-size:12.5px; color:var(--muted); margin:0 0 8px; }
 
   /* Η πληρωμή: ίδιο κουμπί και ίδιο πλαίσιο με τα άλλα εργαλεία. Το πλαίσιο μεγαλώνει όσο χρειάζεται. */
@@ -225,12 +235,14 @@
       <span><i class="pill p-tyxeri">Τυχερή</i>συμφωνούν και οι τρεις</span>
       <span><i class="pill p-kali">Καλή</i>συμφωνούν οι δύο</span>
     </div>
+    <div class="methods" id="methods" style="display:none"><div class="mm"><span>☉ Αστρολογία</span><span>9 Αριθμολογία</span><span>✦ Ταρό</span></div><p>Τρεις μέθοδοι κοιτάζουν κάθε μέρα σου χωριστά.</p></div>
     <div id="days"></div>
 
     <div class="seal" id="seal" style="display:none">
       <div class="wax">Μ</div>
       <h3>Ποιες είναι οι τυχερές σου μέρες</h3>
       <p class="ss" id="sealSub"></p>
+      <p class="power">Ο ουρανός δείχνει τι φέρνει η μέρα. Ο αριθμός δείχνει τον ρυθμό σου. Το χαρτί δείχνει τι κρύβει. Όταν συμφωνούν και τα τρία, η μέρα είναι δική σου.</p>
       <p class="value-note" id="valueNote"></p>
       <div class="enter-btn" id="unlockBtn"><span class="ub-main">Δες τις τυχερές σου μέρες</span><span class="ub-price" id="ubPrice">ΜΟΝΟ&nbsp;2,99€</span></div>
       <p class="value-note after">Ο χάρτης σου υπολογίζεται με τα ίδια αστρονομικά δεδομένα που χρησιμοποιούν οι επαγγελματίες αστρολόγοι, με ακρίβεια λεπτού.</p>
@@ -321,6 +333,17 @@ function dayCard(x) {
       <span class="card-img"><img src="/tarot-cards/${esc(x.card.file)}" alt="${esc(x.card.name)}" class="${x.card.reversed ? "rev" : ""}" loading="lazy"></span></div>
   </section>`;
 }
+// Θολή κάρτα για κλειδωμένη μέρα. Τα κείμενα είναι πάντα τα ίδια και δεν βγαίνουν από την πραγματική μέρα,
+// ώστε να μη φαίνεται από τίποτα ποια μέρα είναι καλή ή τυχερή.
+const BLUR_TXT = "Η Σελήνη περνά από τον χάρτη σου και δείχνει τι φέρνει αυτή η μέρα για σένα.";
+function blurCard(x) {
+  const past = isPast(x.date) ? `<div class="past-note">Η μέρα αυτή έχει περάσει.</div>` : "";
+  return `<section class="day blur"><div class="dh"><b>${esc(x.label)}</b></div>${past}<div class="lock-note">🔒 Κλειδωμένη</div>
+    <div class="mrow"><span class="mk">☉</span><span class="tx"><span class="lb">Αστρολογία</span><span class="bl">${BLUR_TXT}</span></span></div>
+    <div class="mrow"><span class="mk">9</span><span class="tx"><span class="lb">Αριθμολογία</span><span class="bl">Ο αριθμός της μέρας σου και τι σημαίνει.</span></span></div>
+    <div class="mrow"><span class="mk">✦</span><span class="tx"><span class="lb">Ταρό</span><span class="bl">Το χαρτί της μέρας σου και τι σου λέει.</span></span><span class="card-img"><div class="card-back"><span>Μ</span></div></span></div>
+  </section>`;
+}
 function openCard(x) {
   const pill = x.kind === "prosoxi" ? `<span class="pill p-prosoxi">Θέλει προσοχή</span>` : `<span class="pill p-isyxi">Μέρα για ξεκούραση</span>`;
   const past = isPast(x.date) ? `<div class="past-note">Η μέρα αυτή έχει περάσει.</div>` : "";
@@ -335,6 +358,7 @@ function show(data, full) {
   $("helloWeek").textContent = data.week.label;
   $("headline").textContent = headlineText(data, full);
   $("legend").style.display = full ? "" : "none";
+  $("methods").style.display = full ? "none" : "";
   $("strip").innerHTML = strip(data.days);
   if (full) {
     // Πρώτα οι τυχερές, μετά οι καλές, μετά οι υπόλοιπες, η καθεμία με τη σειρά της εβδομάδας.
@@ -343,8 +367,7 @@ function show(data, full) {
     $("days").innerHTML = list.map(dayCard).join("");
     $("seal").style.display = "none";
   } else {
-    const o = data.days.find(x => x.open);
-    $("days").innerHTML = o ? openCard(o) : "";
+    $("days").innerHTML = data.days.map(x => x.open ? openCard(x) : blurCard(x)).join("");
     const left = data.days.filter(x => x.locked).length;
     $("sealSub").textContent = `Οι άλλες ${left} μέρες είναι ήδη υπολογισμένες από τα στοιχεία σου. Βλέπεις ποια είναι η πιο δυνατή σου μέρα και, για κάθε μέρα, τι λέει ο ουρανός, τον αριθμό της και το χαρτί της.`;
     $("seal").style.display = "block";
