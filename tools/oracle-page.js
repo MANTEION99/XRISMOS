@@ -700,6 +700,14 @@ function renderExtraActions(data) {
   const nextStage = stage === 'q1' ? 'q2' : (stage === 'q2' ? 'q3' : null);
   if (!nextStage) return;
   const priceLabel = nextStage === 'q2' ? '2,99€' : '1,99€';
+  // Υπενθύμιση ότι οι επόμενες ερωτήσεις κοστίζουν λιγότερο.
+  const remind = document.createElement('div');
+  remind.className = 'q-remind';
+  remind.style.cssText = 'margin:4px auto 18px;padding:14px 16px;border:1px solid rgba(217,178,92,.55);border-radius:14px;background:rgba(217,178,92,.06);font-family:Inter,sans-serif;font-size:14.5px;line-height:1.6;color:var(--paper);text-align:center;max-width:420px;';
+  remind.innerHTML = nextStage === 'q2'
+    ? 'Μην ξεχνάς: όποια απορία σού έμεινε, το Μαντείο είναι εδώ. Η δεύτερη ερώτησή σου κοστίζει μόνο <b style="color:#D9B25C">2,99€</b> και η τρίτη ακόμη λιγότερο, μόνο <b style="color:#D9B25C">1,99€</b>, πάνω στα ίδια σου στοιχεία.'
+    : 'Μην ξεχνάς: το Μαντείο σού κρατά και μια τρίτη ερώτηση, για ακόμη λιγότερα: μόνο <b style="color:#D9B25C">1,99€</b>, πάνω στα ίδια σου στοιχεία.';
+  box.appendChild(remind);
   const title = document.createElement('p');
   title.className = 'ask-title';
   title.textContent = nextStage === 'q2' ? 'Θέλεις να ρωτήσεις κάτι ακόμα;' : 'Μια τελευταία ερώτηση;';
