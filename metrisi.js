@@ -50,20 +50,14 @@
       else if (/teaser/.test(s)) ev("dorean:" + tool);
       else if (/create-checkout|synomilia-buy/.test(s)) ev("pliromi-koumpi:" + tool);
       else if (/-full|epistrofi-agora/.test(s)) {
-        // Πληρωμένη απάντηση: μετριέται μία φορά ανά πληρωμή (όχι σε κάθε άνοιγμα ή ανανέωση της σελίδας)
+        // Άνοιξε την πληρωμένη απάντηση. Η ίδια η πληρωμή μετριέται στον server, όταν την επιβεβαιώσει το Stripe ή η Viva.
+        // Εδώ στέλνουμε μόνο ότι άνοιξε, για τη γραμμή «Ξαναείδαν την απάντηση που πλήρωσαν».
         var sid = new URLSearchParams(location.search).get("session_id") || "";
         var p = of.apply(this, arguments);
         p.then(function (r) {
-          if (!r.ok || !sid) return;
-          var key = "manteio_paid_" + sid;
-          try { if (localStorage.getItem(key)) return; localStorage.setItem(key, "1"); } catch (e) {}
-          send({ t: "e", e: "pliromeni:" + tool, u: sid, r: ret });
-          // Με ποιον τρόπο πλήρωσε: vv_ είναι Viva (IRIS), cs_ είναι Stripe (κάρτα, Apple Pay, Google Pay)
-          send({ t: "e", e: "tropos-pliromis:" + (/^vv_/.test(sid) ? "iris" : "karta"), u: sid + "#m" });
-          // Ποια ερώτηση πλήρωσε: 1η (4,99€), 2η ή 3η (επιπλέον ερωτήσεις)
-          var st = (new URLSearchParams(location.search).get("stage") || "q1").replace(/[^q123]/g, "");
-          if (!/^q[123]$/.test(st)) st = "q1";
-          send({ t: "e", e: "erotisi:" + st, u: sid + "#q" });
+          if (!r.ok || !sid || once["p:" + sid]) return;
+          once["p:" + sid] = 1;
+          send({ t: "p", p: tool, u: sid, r: ret });
         }).catch(function () {});
         return p;
       }

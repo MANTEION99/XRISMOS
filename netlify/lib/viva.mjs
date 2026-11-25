@@ -123,7 +123,7 @@ export async function vivaSession(sessionId, tool, readingId) {
   if (!rec || !rec.paid) return null;
   if (tool && rec.tool !== tool) return null;
   if (readingId && rec.readingId !== readingId) return null;
-  return { id: sessionId, viva: true, payment_status: "paid", payment_intent: null,
+  return { id: sessionId, viva: true, payment_status: "paid", payment_intent: null, paid_at: rec.paidAt || rec.createdAt || null,
     metadata: { tool: rec.tool, reading_id: rec.readingId, src: rec.src },
     customer_details: { name: rec.fullName || "", email: rec.email || "" } };
 }

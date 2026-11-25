@@ -34,7 +34,10 @@ async function verifyPaidSession(sessionId, expectedTool) {
     // Οι πληρωμές του νέου πλήρους χρησμού εξυπηρετούνται μόνο από το epistrofi-full.
     if (session.metadata.reading_id) return null;
     const paidTool = session.metadata.tool;
-    return (paidTool === expectedTool || paidTool.startsWith(expectedTool + "_q")) ? session : null;
+    if (!(paidTool === expectedTool || paidTool.startsWith(expectedTool + "_q"))) return null;
+    // Μέτρηση: μία φορά ανά πληρωμή, μόνο όταν η χρέωση είναι οριστική.
+    try { (await import("../lib/metrisi-pliromes.mjs")).recordSession(session).catch(() => {}); } catch (e) {}
+    return session;
   } catch (e) {
     return null;
   }
@@ -45,10 +48,13 @@ async function capturePayment(session) {
   const pi = session && session.payment_intent;
   if (!pi || typeof pi !== "object" || pi.status !== "requires_capture") return;
   try {
-    await fetch(`https://api.stripe.com/v1/payment_intents/${pi.id}/capture`, {
+    const res = await fetch(`https://api.stripe.com/v1/payment_intents/${pi.id}/capture`, {
       method: "POST",
       headers: { "Authorization": `Bearer ${process.env.STRIPE_SECRET_KEY}` }
     });
+    // Η δέσμευση έγινε οριστική χρέωση: τώρα μετράει η πληρωμή, στη μέρα που έγινε.
+    if (res.ok && session.id) await (await import("../lib/metrisi-pliromes.mjs")).recordPayment({
+      id: session.id, tool: session.metadata && session.metadata.tool, method: "karta", ts: (pi.created || 0) * 1000 || Date.now() });
   } catch (e) {
     console.error("[capture]", e.message);
   }

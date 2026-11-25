@@ -8,6 +8,7 @@ const sky = makeSky(Astronomy);
 const { zoneOffset, moonChangesSign } = sky;
 import placeLib from "./place.cjs";
 import localChartLib from "./local-chart.cjs";
+import { recordSession, recordPayment } from "./metrisi-pliromes.mjs";
 const { localChart } = localChartLib;
 export const skyBlock = sky.skyBlock;
 
@@ -388,7 +389,12 @@ async function streamClaudeOnceInner(prompt, maxTokens, onText, signal, bump, us
 // Επαληθεύει στο Stripe ότι η πληρωμή έγινε, ότι αφορά αυτό το εργαλείο
 // και, όταν δίνεται, ότι αφορά ΑΥΤΟΝ τον συγκεκριμένο χρησμό.
 export async function verifyStripeSession(sessionId, tool, readingId) {
-  if (/^vv_/.test(String(sessionId || ""))) { const { vivaSession } = await import("./viva.mjs"); return vivaSession(sessionId, tool, readingId); }
+  if (/^vv_/.test(String(sessionId || ""))) {
+    const { vivaSession } = await import("./viva.mjs");
+    const v = await vivaSession(sessionId, tool, readingId);
+    if (v) await recordSession(v);                 // μέτρηση: μία φορά ανά πληρωμή, στη μέρα που έγινε
+    return v;
+  }
   if (!sessionId || !/^cs_[A-Za-z0-9_]+$/.test(sessionId)) return null;
   try {
     const res = await fetch(`https://api.stripe.com/v1/checkout/sessions/${sessionId}?expand[]=payment_intent`, {
@@ -403,6 +409,7 @@ export async function verifyStripeSession(sessionId, tool, readingId) {
     const held = pi && pi.status === "requires_capture";
     const captured = pi && pi.status === "succeeded";
     if (s.payment_status !== "paid" && !held && !captured) return null;
+    await recordSession(s);                         // μετράει μόνο αν η χρέωση έχει ολοκληρωθεί, όχι όσο είναι δεσμευμένη
     return s;
   } catch {
     return null;
@@ -424,7 +431,11 @@ export async function capturePayment(session) {
   const pi = session && session.payment_intent;
   const id = pi && (typeof pi === "string" ? pi : pi.id);
   if (!id || (typeof pi === "object" && pi.status !== "requires_capture")) return { ok: true, skipped: true };
-  return stripePost(`payment_intents/${id}/capture`);
+  const r = await stripePost(`payment_intents/${id}/capture`);
+  // Η δέσμευση έγινε οριστική χρέωση: τώρα μετράει η πληρωμή, στη μέρα που έγινε.
+  if (r.ok && session.id) await recordPayment({ id: session.id, tool: session.metadata && session.metadata.tool, method: "karta",
+    ts: ((typeof pi === "object" && pi.created) || r.data.created || 0) * 1000 || Date.now() });
+  return r;
 }
 
 // Ακύρωση της δέσμευσης αν ο χρησμός δεν μπόρεσε να γραφτεί: η πελάτισσα δεν χρεώνεται.

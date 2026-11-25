@@ -3,6 +3,7 @@
 // GET  /api/metrisi?k=ΚΛΕΙΔΙ&days=30                                 -> σύνολα ανά μέρα (μόνο με το κλειδί: METRISI_KEY στο Netlify)
 import { getStore } from "@netlify/blobs";
 import { createHash } from "node:crypto";
+import { recordView } from "../lib/metrisi-pliromes.mjs";
 
 const KEY_HASH = "a3bfa830fa037de76ee54ebe1d5320fac7d8f48d65e4629a030bee9588ad1e42";
 const store = () => getStore({ name: "metrisi", consistency: "strong" });
@@ -19,10 +20,19 @@ export default async (req) => {
     let b; try { b = await req.json(); } catch { return json(400, { ok: false }); }
     const ua = req.headers.get("user-agent") || "";
     if (/bot|crawl|spider|preview|headless|facebookexternalhit/i.test(ua)) return json(200, { ok: true });
+    // Άνοιγμα πληρωμένης απάντησης: το πρώτο δεν μετράει, τα επόμενα πάνε στο «Ξαναείδαν την απάντηση που πλήρωσαν».
+    // Οι ίδιες οι πληρωμές μετριούνται πλέον μόνο από τον server, όταν τις επιβεβαιώσει το Stripe ή η Viva.
+    if (b.t === "p") {
+      const sid = String(b.u || "");
+      if (/^(cs|vv)_[A-Za-z0-9_]{4,200}$/.test(sid)) await recordView({ id: sid, page: clean(b.p, 40), r: b.r === 1 || b.r === "1" ? "r" : (b.r === 0 || b.r === "0" ? "n" : "") });
+      return json(200, { ok: true });
+    }
     const t = b.t === "e" ? "e" : "v";
     const p = clean(b.p, 40) || "/";
     const s = SOURCES.has(b.s) ? b.s : "alli";
-    const e = clean(b.e, 40);
+    let e = clean(b.e, 40);
+    // Παλιές εκδόσεις της σελίδας (από την προσωρινή μνήμη του κινητού) στέλνουν ακόμα πληρωμές: δεν τις μετράμε εδώ.
+    if (/^(pliromeni|tropos-pliromis|erotisi):/.test(e)) return json(200, { ok: true });
     const r = b.r === 1 || b.r === "1" ? "r" : (b.r === 0 || b.r === "0" ? "n" : "");
     // Για τις πληρωμές κρατάμε μόνο ένα σύντομο αποτύπωμα της πληρωμής, για να μη μετριέται δύο φορές
     const u = b.u ? createHash("sha256").update(String(b.u)).digest("hex").slice(0, 16) : "";
