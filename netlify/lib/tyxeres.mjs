@@ -26,22 +26,20 @@ const DAYS_GR = ["Κυριακή", "Δευτέρα", "Τρίτη", "Τετάρτ
 const MONTHS_GEN = ["Ιανουαρίου", "Φεβρουαρίου", "Μαρτίου", "Απριλίου", "Μαΐου", "Ιουνίου", "Ιουλίου", "Αυγούστου", "Σεπτεμβρίου", "Οκτωβρίου", "Νοεμβρίου", "Δεκεμβρίου"];
 const iso = (dt) => dt.toISOString().slice(0, 10);
 
-// Ποια εβδομάδα αγοράζει: από Δευτέρα ως Πέμπτη την τρέχουσα, από Παρασκευή ως Κυριακή αυτή που ξεκινά τη Δευτέρα.
-export function weekFor(now = new Date()) {
+// Ποιες 7 μέρες αγοράζει: είτε 7 ολόκληρες μέρες από σήμερα (προεπιλογή), είτε όλη την επόμενη εβδομάδα,
+// από την επόμενη Δευτέρα ως την Κυριακή. Έτσι δεν πληρώνει ποτέ για μέρες που έχουν ήδη περάσει.
+export function weekFor(now = new Date(), mode = "today") {
   const [y, m, d] = athensDay(now).split("-").map(Number);
   const today = new Date(Date.UTC(y, m - 1, d));
-  const wd = today.getUTCDay();                      // 0 Κυριακή ... 6 Σάββατο
-  const sinceMonday = (wd + 6) % 7;                  // Δευτέρα 0 ... Κυριακή 6
-  const next = sinceMonday >= 4;                     // Παρασκευή, Σάββατο, Κυριακή
-  const start = new Date(today.getTime() - sinceMonday * 86400000 + (next ? 7 * 86400000 : 0));
+  const sinceMonday = (today.getUTCDay() + 6) % 7;   // Δευτέρα 0 ... Κυριακή 6
+  const next = mode === "next";
+  const start = next ? new Date(today.getTime() + (7 - sinceMonday) * 86400000) : today;
   const end = new Date(start.getTime() + 6 * 86400000);
   return { start: iso(start), end: iso(end), next, label: weekLabel(start, end) };
 }
 function weekLabel(a, b) {
-  const da = a.getUTCDate(), db = b.getUTCDate();
-  return a.getUTCMonth() === b.getUTCMonth()
-    ? `Δευτέρα ${da} έως Κυριακή ${db} ${MONTHS_GEN[b.getUTCMonth()]}`
-    : `Δευτέρα ${da} ${MONTHS_GEN[a.getUTCMonth()]} έως Κυριακή ${db} ${MONTHS_GEN[b.getUTCMonth()]}`;
+  const da = `${DAYS_GR[a.getUTCDay()]} ${a.getUTCDate()}`, db = `${DAYS_GR[b.getUTCDay()]} ${b.getUTCDate()} ${MONTHS_GEN[b.getUTCMonth()]}`;
+  return a.getUTCMonth() === b.getUTCMonth() ? `${da} έως ${db}` : `${da} ${MONTHS_GEN[a.getUTCMonth()]} έως ${db}`;
 }
 
 /* ---------- Αριθμολογία ---------- */
@@ -99,9 +97,9 @@ function astroFor(N, y, m, d) {
 
 /* ---------- Η εβδομάδα ---------- */
 
-export async function computeWeek(p, now = new Date()) {
+export async function computeWeek(p, now = new Date(), mode = "today") {
   const natal = await natalPoints(p);
-  const week = weekFor(now);
+  const week = weekFor(now, mode);
   const [sy, sm, sd] = week.start.split("-").map(Number);
   const days = [];
   for (let i = 0; i < 7; i++) {

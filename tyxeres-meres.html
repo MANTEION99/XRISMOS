@@ -45,10 +45,17 @@
 
   p.sub{ font-size:15.5px; line-height:1.65; color:#d8d1e2; margin:0 0 16px; text-align:center; }
   .offer{ text-align:center; border:1.5px dashed var(--gold); border-radius:14px; padding:12px 12px; margin:0 0 18px; background:rgba(217,178,92,0.08); }
-  .offer b{ display:block; font-family:'Cormorant Garamond',serif; font-size:23px; line-height:1.25; color:var(--gold-bright); }
+  .offer b{ display:block; font-family:'Inter',sans-serif; font-size:19px; font-weight:700; line-height:1.35; color:var(--gold-bright); }
   .offer span{ display:block; font-size:14.5px; color:var(--paper); margin-top:4px; }
   .weekline{ text-align:center; font-size:14.5px; line-height:1.55; color:var(--paper); margin:0 0 18px; }
   .weekline b{ color:var(--gold-bright); }
+  .wk .wk-opt{ display:flex; gap:10px; align-items:flex-start; border:1px solid var(--line); border-radius:12px; padding:10px 12px; margin:0 0 8px; cursor:pointer; background:rgba(255,255,255,0.02); }
+  .wk .wk-opt input{ width:auto; height:auto; padding:0; margin:3px 0 0; accent-color:#D9B25C; flex:0 0 auto; }
+  .wk label.wk-opt{ font-size:inherit; letter-spacing:0; text-transform:none; }
+  .wk .wk-opt span{ display:flex; flex-direction:column; gap:2px; min-width:0; }
+  .wk .wk-opt b{ color:var(--paper); font-size:15px; }
+  .wk .wk-opt i{ font-style:normal; font-size:13px; color:var(--muted); }
+  .wk .wk-opt:has(input:checked){ border-color:var(--gold); background:rgba(217,178,92,0.08); }
 
   .methods{ list-style:none; padding:0; margin:0 0 14px; }
   .methods li{ display:flex; gap:12px; align-items:flex-start; font-size:14.5px; line-height:1.55; padding:9px 0; border-bottom:1px solid rgba(217,178,92,0.14); }
@@ -217,6 +224,10 @@
         <div class="hint">Αν γεννήθηκες σε χωριό, γράψε την κοντινότερη πόλη.</div></div>
       <div class="field"><label for="email">Email</label><input id="email" type="email" placeholder="π.χ. maria@gmail.com" autocomplete="email"></div>
       <div class="field consent"><input type="checkbox" id="consent"><label for="consent">Θέλω να λαμβάνω τους χρησμούς και τα νέα του Μαντείου στο email μου. Μπορώ να διαγραφώ όποτε θέλω.</label></div>
+      <div class="field wk"><label>Ποιες μέρες θέλεις να δεις;</label>
+        <label class="wk-opt"><input type="radio" name="wk" value="today" checked><span><b>7 μέρες από σήμερα</b><i id="wkTodayLab"></i></span></label>
+        <label class="wk-opt"><input type="radio" name="wk" value="next"><span><b>Την επόμενη εβδομάδα</b><i id="wkNextLab"></i></span></label>
+      </div>
       <div class="error" id="err"></div>
       <button class="submit" id="go" type="submit">Δες δωρεάν την εβδομάδα σου</button>
       <div class="spinner" id="spin"></div>
@@ -286,20 +297,20 @@ function priceUI(cents) {
 }
 priceUI(0);
 
-// Ποια εβδομάδα: από Δευτέρα ως Πέμπτη η τρέχουσα, από Παρασκευή ως Κυριακή αυτή που ξεκινά τη Δευτέρα.
+// Οι δύο επιλογές: 7 μέρες από σήμερα, ή όλη η επόμενη εβδομάδα από Δευτέρα ως Κυριακή.
+const WD_FULL = ["Κυριακή", "Δευτέρα", "Τρίτη", "Τετάρτη", "Πέμπτη", "Παρασκευή", "Σάββατο"];
+function rangeLabel(a, b) {
+  const da = `${WD_FULL[a.getUTCDay()]} ${a.getUTCDate()}`, db = `${WD_FULL[b.getUTCDay()]} ${b.getUTCDate()} ${MONTHS_GEN[b.getUTCMonth()]}`;
+  return a.getUTCMonth() === b.getUTCMonth() ? `${da} έως ${db}` : `${da} ${MONTHS_GEN[a.getUTCMonth()]} έως ${db}`;
+}
 (function () {
   const [y, m, d] = athensDay().split("-").map(Number);
   const t = new Date(Date.UTC(y, m - 1, d));
   const since = (t.getUTCDay() + 6) % 7;
-  const next = since >= 4;
-  const a = new Date(t.getTime() - since * 86400000 + (next ? 7 * 86400000 : 0));
-  const b = new Date(a.getTime() + 6 * 86400000);
-  const lab = a.getUTCMonth() === b.getUTCMonth()
-    ? `Δευτέρα ${a.getUTCDate()} έως Κυριακή ${b.getUTCDate()} ${MONTHS_GEN[b.getUTCMonth()]}`
-    : `Δευτέρα ${a.getUTCDate()} ${MONTHS_GEN[a.getUTCMonth()]} έως Κυριακή ${b.getUTCDate()} ${MONTHS_GEN[b.getUTCMonth()]}`;
-  $("weekline").innerHTML = next
-    ? `Από Παρασκευή ως Κυριακή παίρνεις την <b>εβδομάδα που έρχεται</b>:<br><b>${lab}</b>.`
-    : `Παίρνεις την <b>εβδομάδα που διανύουμε</b>:<br><b>${lab}</b>.`;
+  const n = new Date(t.getTime() + (7 - since) * 86400000);
+  $("wkTodayLab").textContent = rangeLabel(t, new Date(t.getTime() + 6 * 86400000));
+  $("wkNextLab").textContent = rangeLabel(n, new Date(n.getTime() + 6 * 86400000));
+  $("weekline").innerHTML = `Παίρνεις <b>7 ολόκληρες μέρες από σήμερα</b>, ή αν προτιμάς, <b>όλη την επόμενη εβδομάδα</b> από Δευτέρα ως Κυριακή.`;
 })();
 
 const ART = { "Σάββατο": "το" };
@@ -395,7 +406,7 @@ $("f").addEventListener("submit", async (e) => {
   try {
     const r = await fetch("/api/tyxeres-teaser", {
       method: "POST", headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ ...f, consent: $("consent").checked, src: window.manteioSource ? window.manteioSource() : "" })
+      body: JSON.stringify({ ...f, week: (document.querySelector('input[name="wk"]:checked') || {}).value || "today", consent: $("consent").checked, src: window.manteioSource ? window.manteioSource() : "" })
     });
     const d = await r.json();
     if (!r.ok) throw new Error(d.error || "Κάτι πήγε στραβά. Δοκίμασε ξανά.");

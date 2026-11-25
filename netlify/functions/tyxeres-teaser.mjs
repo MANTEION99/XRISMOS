@@ -24,7 +24,7 @@ export default async (req) => {
 
   let data;
   try {
-    data = await computeWeek(p);
+    data = await computeWeek(p, new Date(), b.week === "next" ? "next" : "today");
   } catch (e) {
     console.error("[tyxeres]", e);
     return json(500, { error: "Κάτι πήγε στραβά στον υπολογισμό. Δοκίμασε ξανά σε λίγο." });
