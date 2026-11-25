@@ -119,7 +119,7 @@ NATAL_UNLOCK = (
 
 DEFAULT_UNLOCK = (
     '        <p class="value-note" style="font-size:12.5px;line-height:1.55;color:var(--muted);max-width:320px;margin:10px auto 18px;text-align:center;">Μια τέτοια πρόβλεψη κοστίζει περίπου 100€. Εδώ γράφεται μόνο για σένα, με 4,99€. Χρεώνεσαι μόνο όταν ολοκληρωθεί ο χρησμός σου.</p>\n'
-    '        <div class="enter-btn" id="unlockBtn"><span class="ub-main">Δες την απάντηση</span><span class="ub-price">4,99€</span></div>\n')
+    '        <div class="enter-btn" id="unlockBtn"><span class="ub-main">Δες την απάντηση</span><span class="ub-price">ΜΟΝΟ&nbsp;4,99€</span></div>\n')
 
 TOOLS = {
   "xartis": dict(
