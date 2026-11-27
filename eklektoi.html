@@ -41,6 +41,7 @@
   .link{ word-break:break-all; background:#0f0d22; border:1px dashed var(--line); border-radius:10px; padding:10px; font-size:13.5px; color:var(--gold); }
   .demo{ text-align:center; background:#3a2a10; border:1px solid var(--gold); color:var(--gold); border-radius:10px; padding:8px; font-size:13px; margin-bottom:16px; }
   .hide{ display:none; }
+  .prof.hide{ display:none; }
   .prof{ display:flex; flex-direction:column; align-items:center; margin:6px 0 20px; }
   .av{ width:108px; height:108px; border-radius:50%; border:2px solid var(--gold); background:#1f1b3d center/cover no-repeat; display:flex; align-items:center; justify-content:center; font-family:'Cormorant Garamond',serif; font-size:48px; color:var(--gold); cursor:pointer; position:relative; box-shadow:0 0 28px rgba(217,178,92,.25); }
   .av .cam{ position:absolute; right:-2px; bottom:2px; width:32px; height:32px; border-radius:50%; background:var(--gold); color:#14122a; font-size:16px; display:flex; align-items:center; justify-content:center; font-family:Inter,Arial,sans-serif; }
@@ -83,25 +84,38 @@
     <a class="btn hide" id="seeAnswer" href="#">Δες τώρα την απάντησή σου</a>
   </div>
 
-  <div class="card hide" id="none">
-    <h2>Δεν βρέθηκε συνδρομή</h2>
-    <p>Αν είσαι ήδη μέλος και άλλαξες κινητό ή browser, στείλε μήνυμα στο Μαντείο και θα σου στείλει τον προσωπικό σου σύνδεσμο.</p>
-    <a class="btn" href="https://ig.me/m/to_manteio" target="_blank" rel="noopener">Μήνυμα στο Instagram</a>
-    <a class="btn ghost" href="https://www.tiktok.com/@zodiac_manteio" target="_blank" rel="noopener">TikTok</a>
-  </div>
-
-  <div id="member" class="hide">
-    <div class="card">
-      <h2>Τι παίρνεις ως Εκλεκτό μέλος</h2>
+    <div class="card hide" id="perks">
+      <h2 id="perksH">Τι παίρνεις ως Εκλεκτό μέλος</h2>
       <ul class="perks">
         <li><b>Μία ερώτηση κάθε μήνα, χωρίς χρέωση</b><span>Διαλέγεις το θέμα που σε απασχολεί: επιστροφή, αγάπη, αλήθεια, συναστρία, οικονομικά, δική σου ερώτηση, αριθμολογία ή ταρώ. Κανονικά κοστίζει 20€.</span></li>
         <li><b>Κάθε εβδομάδα οι τυχερές σου μέρες</b><span>Το Μαντείο συνδυάζει τον χάρτη σου, τους αριθμούς σου και το ταρώ και σου δείχνει ποιες μέρες της εβδομάδας είναι οι δικές σου. Κανονικά κοστίζει 20€ κάθε εβδομάδα.</span></li>
+        <li><b>Ειδοποίηση για τις μεγάλες στιγμές του χάρτη σου</b><span>Όταν ο ουρανός αγγίζει δυνατά τον δικό σου χάρτη, με μια έκλειψη, έναν ανάδρομο ή μια μεγάλη όψη, το Μαντείο σού στέλνει μήνυμα πριν έρθει, για να ξέρεις τι ζεις και πότε περνά.</span></li>
         <li><b>Τα στοιχεία σου αποθηκευμένα</b><span>Τα γράφεις μία φορά και συμπληρώνονται μόνα τους στις ερωτήσεις σου.</span></li>
         <li><b>Η δική σου σελίδα στο Μαντείο</b><span>Με το όνομα και τη φωτογραφία σου, από οποιοδήποτε κινητό.</span></li>
         <li><b>Ακυρώνεις όποτε θέλεις</b><span>Με ένα πάτημα, χωρίς δέσμευση. Κρατάς όσα πλήρωσες μέχρι το τέλος του μήνα.</span></li>
       </ul>
     </div>
 
+  <div class="card hide" id="none">
+    <h2>Πώς μπαίνεις στην ομάδα</h2>
+    <p>Διάλεξε την ερώτηση που σε καίει, γράψε τα στοιχεία σου και δες δωρεάν την πρώτη απάντηση. Στο τέλος πατάς «Μπες στην ομάδα των Εκλεκτών του Μαντείου» και η πλήρης απάντηση είναι η πρώτη σου ερώτηση ως μέλος.</p>
+    <p class="muted">12,90€ τον μήνα, μόνο με κάρτα, γιατί η IRIS δεν υποστηρίζει μηνιαίες χρεώσεις. Ακυρώνεις όποτε θέλεις.</p>
+    <div class="grid">
+      <a href="/epistrofi?src=eklektoi-join"><b>Η Επιστροφή</b>Θα γυρίσει;</a>
+      <a href="/agapi?src=eklektoi-join"><b>Η Αγάπη</b>Με σκέφτεται ακόμα;</a>
+      <a href="/alitheia?src=eklektoi-join"><b>Η Αλήθεια</b>Μου κρύβει κάτι;</a>
+      <a href="/symvatotita?src=eklektoi-join"><b>Η Συναστρία</b>Ταιριάζουμε;</a>
+      <a href="/oikonomika?src=eklektoi-join"><b>Η Αφθονία</b>Τα οικονομικά μου</a>
+      <a href="/erotima?src=eklektoi-join"><b>Ρώτα το Μαντείο</b>Η δική μου ερώτηση</a>
+      <a href="/arithmologia?src=eklektoi-join"><b>Οι Αριθμοί</b>Αριθμολογία</a>
+      <a href="/taro?src=eklektoi-join"><b>Το Ταρώ</b>Τρία χαρτιά</a>
+    </div>
+    <p class="muted" style="margin-top:16px">Είσαι ήδη μέλος και άλλαξες κινητό; Στείλε μήνυμα στο Μαντείο και θα σου στείλει τον προσωπικό σου σύνδεσμο.</p>
+    <a class="btn ghost" href="https://ig.me/m/to_manteio" target="_blank" rel="noopener">Μήνυμα στο Instagram</a>
+    <a class="btn ghost" href="https://www.tiktok.com/@zodiac_manteio" target="_blank" rel="noopener">Μήνυμα στο TikTok</a>
+  </div>
+
+  <div id="member" class="hide">
     <div class="card">
       <h2>Τα στοιχεία σου</h2>
       <form id="birthForm">
@@ -232,8 +246,14 @@ function applyBirth(b) {
   });
 }
 
+function showJoin() {
+  show("perks"); show("none");
+  $("perksH").textContent = "Τι παίρνει ένα Εκλεκτό μέλος";
+  $("hello").textContent = "Η ομάδα που το Μαντείο προσέχει κάθε μήνα.";
+}
+
 function renderMe(me, demo) {
-  show("member");
+  show("member"); show("perks");
   renderProfile(me.name, me.photo, me.since);
   show("qOpen", !me.creditUsed); show("qUsed", !!me.creditUsed);
   $("nextMonth").textContent = nextMonthLabel();
@@ -274,14 +294,14 @@ async function start() {
     }
   }
   if (token) setTok(token); else token = getTok();
-  if (!/^[0-9a-f]{32}$/.test(token)) { show("none"); return; }
+  if (!/^[0-9a-f]{32}$/.test(token)) { showJoin(); return; }
   const link = location.origin + "/eklektoi?m=" + token;
   $("myLink").textContent = link;
   $("copyLink").onclick = () => { navigator.clipboard && navigator.clipboard.writeText(link); $("copyLink").textContent = "Αντιγράφηκε"; };
   if (q.get("sid") || q.get("m")) history.replaceState(null, "", "/eklektoi");
 
   const me = await api({ action: "me", token });
-  if (!me.ok) { show("none"); return; }
+  if (!me.ok) { showJoin(); return; }
   renderMe(me.d);
   bindPhoto(token, me.d.name);
   if (me.d.birth) { applyBirth(me.d.birth); loadWeek(token); } else show("needBirth");

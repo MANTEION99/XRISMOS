@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>Εκλεκτοί: ειδοποιήσεις</title>
+<style>
+  :root{ --navy:#0B0A16; --paper:#F5F1E8; --muted:#9C96AE; --gold:#D9B25C; --line:rgba(217,178,92,0.35); }
+  *{ box-sizing:border-box; }
+  body{ margin:0; background:var(--navy); color:var(--paper); font:15px/1.55 Inter,Arial,sans-serif; }
+  .wrap{ max-width:640px; margin:0 auto; padding:22px 14px 60px; }
+  h1{ font-size:22px; color:var(--gold); margin:0 0 4px; }
+  .muted{ color:var(--muted); font-size:13px; }
+  .card{ border:1px solid var(--line); border-radius:14px; padding:14px; margin:12px 0; background:#14122a; }
+  .card.sent{ opacity:.5; }
+  .card h3{ margin:0 0 2px; font-size:16px; }
+  .who{ font-size:13.5px; color:var(--gold); word-break:break-all; }
+  textarea{ width:100%; min-height:170px; margin:8px 0; background:#0f0d22; color:var(--paper); border:1px solid var(--line); border-radius:10px; padding:10px; font:14px/1.5 Inter,Arial,sans-serif; }
+  button{ background:var(--gold); color:#14122a; border:0; border-radius:10px; padding:9px 12px; font:600 14px Inter,Arial,sans-serif; cursor:pointer; margin:3px 4px 3px 0; }
+  button.ghost{ background:transparent; color:var(--paper); border:1px solid var(--line); }
+  input{ width:100%; padding:10px; border-radius:10px; border:1px solid var(--line); background:#0f0d22; color:var(--paper); font:15px Inter,Arial,sans-serif; }
+  .row{ display:flex; gap:8px; }
+  .hide{ display:none; }
+  .err{ color:#f0a0ac; }
+  ul{ padding-left:18px; margin:6px 0 0; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Εκλεκτοί: ειδοποιήσεις</h1>
+  <div class="muted">Ο έλεγχος τρέχει μόνος του κάθε Δευτέρα πρωί και κοιτάει τις επόμενες 21 μέρες. Κάθε ειδοποίηση εμφανίζεται μία φορά.</div>
+
+  <div id="login" class="card">
+    <div class="row"><input id="k" type="password" placeholder="Κωδικός (ο ίδιος με τη Μέτρηση)"><button id="go">Μπες</button></div>
+    <div class="err" id="lerr"></div>
+  </div>
+
+  <div id="main" class="hide">
+    <div class="card">
+      <div id="last" class="muted"></div>
+      <button id="run">Έλεγχος τώρα</button>
+      <div id="mem" class="muted"></div>
+    </div>
+    <div id="list"></div>
+  </div>
+</div>
+<script>
+const $ = (id) => document.getElementById(id);
+const esc = (s) => String(s == null ? "" : s).replace(/[&<>"]/g, c => ({ "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;" }[c]));
+let K = ""; try { K = sessionStorage.getItem("ek_k") || ""; } catch (e) {}
+const fmt = (iso) => iso ? new Date(iso).toLocaleDateString("el-GR", { day: "numeric", month: "long", year: "numeric" }) : "";
+
+async function load() {
+  const r = await fetch("/api/eklektoi-alerts?k=" + encodeURIComponent(K));
+  const d = await r.json().catch(() => ({}));
+  if (!r.ok) { $("lerr").textContent = d.error || "Λάθος"; show(false); return; }
+  try { sessionStorage.setItem("ek_k", K); } catch (e) {}
+  show(true);
+  const lr = d.lastRun;
+  $("last").textContent = lr ? `Τελευταίος έλεγχος: ${new Date(lr.at).toLocaleString("el-GR")} · μέλη με στοιχεία: ${lr.members} · νέες ειδοποιήσεις: ${lr.added}` : "Δεν έχει γίνει ακόμα έλεγχος.";
+  const noBirth = d.members.filter(m => !m.hasBirth);
+  $("mem").innerHTML = `Μέλη: ${d.members.length}` + (noBirth.length ? `<br>Χωρίς στοιχεία γέννησης (δεν παίρνουν ειδοποιήσεις):<ul>${noBirth.map(m => `<li>${esc(m.name || "χωρίς όνομα")} · ${esc(m.email)}</li>`).join("")}</ul>` : "");
+  const pending = d.items.filter(i => !i.sent).length;
+  $("list").innerHTML = (d.items.length ? `<div class="muted">Για αποστολή: ${pending}</div>` : `<div class="card muted">Καμία ειδοποίηση ακόμα.</div>`) +
+    d.items.map((i, n) => `<div class="card${i.sent ? " sent" : ""}">
+      <h3>${esc(fmt(i.date))} · ${esc(i.title)}</h3>
+      <div class="who">${esc(i.name || "χωρίς όνομα")} · ${esc(i.email)}</div>
+      <textarea id="t${n}">Θέμα: ${esc(i.title)}\n\n${esc(i.text)}</textarea>
+      <button data-c="${n}">Αντιγραφή κειμένου</button>
+      <button class="ghost" data-e="${esc(i.email)}">Αντιγραφή email</button>
+      <button class="ghost" data-s="${n}">${i.sent ? "Δεν στάλθηκε" : "Στάλθηκε"}</button>
+    </div>`).join("");
+  $("list").querySelectorAll("[data-c]").forEach(b => b.onclick = () => { navigator.clipboard.writeText($("t" + b.dataset.c).value); b.textContent = "Αντιγράφηκε"; });
+  $("list").querySelectorAll("[data-e]").forEach(b => b.onclick = () => { navigator.clipboard.writeText(b.dataset.e); b.textContent = "Αντιγράφηκε"; });
+  $("list").querySelectorAll("[data-s]").forEach(b => b.onclick = async () => {
+    const i = d.items[+b.dataset.s];
+    await fetch("/api/eklektoi-alerts", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ k: K, action: "sent", token: i.token, key: i.key, sent: !i.sent }) });
+    load();
+  });
+}
+function show(on) { $("login").classList.toggle("hide", on); $("main").classList.toggle("hide", !on); }
+$("go").onclick = () => { K = $("k").value; load(); };
+$("k").onkeydown = (e) => { if (e.key === "Enter") $("go").click(); };
+$("run").onclick = async () => {
+  $("run").textContent = "Γίνεται έλεγχος…";
+  const r = await fetch("/api/eklektoi-alerts", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ k: K, action: "run" }) });
+  const d = await r.json().catch(() => ({}));
+  $("run").textContent = r.ok ? `Έγινε · νέες ειδοποιήσεις: ${d.added}` : "Κάτι πήγε στραβά";
+  load();
+};
+if (K) load();
+</script>
+</body>
+</html>

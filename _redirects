@@ -24,6 +24,7 @@
 /aporrito       /aporrito.html                 200
 /epikoinonia    /epikoinonia.html              200
 /eklektoi       /eklektoi.html                 200
+/eklektoi-admin /eklektoi-admin.html           200
 
 # Οι παλιές δωρεάν σελίδες (για τη μελλοντική συνδρομή) οδηγούν στις κανονικές σελίδες των εργαλείων
 /agapi-tool.html            /agapi            301!
