@@ -52,6 +52,8 @@
   var NAMES = { epistrofi: "Θα επιστρέψει;", agapi: "Με σκέφτεται ακόμα;", alitheia: "Μου κρύβει κάτι;", oikonomika: "Το οικονομικό σου μέλλον",
     symvatotita: "Ταιριάζετε; Η Συναστρία σας", erotima: "Η δική σου ερώτηση", numerology: "Ο Χρησμός της Αριθμολογίας", taro: "Το Τρίφυλλο Ταρώ", xartis_plus: "Ο Γενέθλιος Χάρτης σου και πρόβλεψη 12 μηνών", imerologio: "Οι καλές σου μέρες του 2027", tyxeres: "Οι τυχερές μέρες της εβδομάδας" };
   var QUESTION_TOOLS = /^(epistrofi|agapi|alitheia|oikonomika|symvatotita|erotima|numerology|taro)(_q[23])?$/;
+  function isQ1(t) { var m = String(t || "").match(QUESTION_TOOLS); return !!(m && !m[2]); }
+  function memberToken() { try { var t = localStorage.getItem("manteio_member") || ""; return /^[0-9a-f]{32}$/.test(t) ? t : ""; } catch (e) { return ""; } }
   function eur(c) { return (c % 100 ? (c / 100).toFixed(2).replace(".", ",") : String(c / 100)) + "€"; }
   function info(tool) {
     tool = String(tool || ""); var m = tool.match(QUESTION_TOOLS), name = "", price = 0;
@@ -125,6 +127,19 @@
         "<span class='pcLogos'><span class='pcB pcAp'><svg width=\"12\" height=\"12\" viewBox=\"0 0 24 24\" fill=\"#fff\" style=\"vertical-align:-2px\"><path d=\"M12.152 6.896c-.948 0-2.415-1.078-3.96-1.04-2.04.027-3.91 1.183-4.961 3.014-2.117 3.675-.546 9.103 1.519 12.09 1.013 1.454 2.208 3.09 3.792 3.039 1.52-.065 2.09-.987 3.935-.987 1.831 0 2.35.987 3.96.948 1.637-.026 2.676-1.48 3.676-2.948 1.156-1.688 1.636-3.325 1.662-3.415-.039-.013-3.182-1.221-3.22-4.857-.026-3.04 2.48-4.494 2.597-4.559-1.429-2.09-3.623-2.324-4.39-2.376-2-.156-3.675 1.09-4.61 1.09zM15.53 3.83c.843-1.012 1.4-2.427 1.245-3.83-1.207.052-2.662.805-3.532 1.818-.78.896-1.454 2.338-1.273 3.714 1.338.104 2.715-.688 3.559-1.701\"/></svg><b>Pay</b></span><span class='pcB pcGp'><svg width=\"12\" height=\"12\" viewBox=\"0 0 48 48\" style=\"vertical-align:-2px\"><path fill=\"#EA4335\" d=\"M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z\"/><path fill=\"#4285F4\" d=\"M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z\"/><path fill=\"#FBBC05\" d=\"M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z\"/><path fill=\"#34A853\" d=\"M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z\"/></svg><b>Pay</b></span></span></button>" +
         "</div>";
       document.body.appendChild(bg);
+      try {
+        if (!ready) { var ir = bg.querySelector("#pcIris"); if (ir) ir.remove(); }
+        if (isQ1(tool)) {
+          var box = bg.querySelector("#pcBox"), mt = memberToken();
+          var x = document.createElement("div");
+          x.innerHTML = mt
+            ? "<button type='button' data-p='member' id='pcMem'><b style='color:#D9B25C'>Εκλεκτοί του Μαντείου</b><br><span style='font-size:13.5px;color:#cfc8b8'>Χρησιμοποίησε την ερώτηση του μήνα</span></button>"
+            : "<div style='text-align:center;color:#cfc8b8;font-size:13px;margin:6px 0 8px'>ή</div>" +
+              "<button type='button' data-p='sub' id='pcSub'><b style='color:#D9B25C'>Μπες στην ομάδα των Εκλεκτών του Μαντείου</b><br><span style='font-size:15px;font-weight:700'>12,90€ τον μήνα</span><br><span style='font-size:13px;color:#cfc8b8'>Αυτή η απάντηση περιλαμβάνεται. Κάθε μήνα μία νέα ερώτηση και κάθε εβδομάδα οι τυχερές σου μέρες. Ακυρώνεις όποτε θέλεις.</span></button>" +
+              "<div style='text-align:center;color:#9C96AE;font-size:12px;margin:-2px 0 4px'>Η συνδρομή γίνεται μόνο με κάρτα, γιατί η IRIS δεν υποστηρίζει μηνιαίες χρεώσεις.</div>";
+          while (x.firstChild) box.appendChild(x.firstChild);
+        }
+      } catch (e) {}
       bg.addEventListener("click", function (e) {
         if (e.target !== bg) return;
         try { if (window.manteioEvent) manteioEvent("pliromi-piso:" + String(tool || "").replace(/_q[23]$/, "")); } catch (x) {}
@@ -132,7 +147,7 @@
       bg.querySelectorAll("button").forEach(function (b) { b.onclick = function () {
         var c = b.getAttribute("data-p");
         // Μέτρηση: ποιον τρόπο διάλεξαν στο παράθυρο, ή αν γύρισαν πίσω
-        try { if (window.manteioEvent) manteioEvent(c === "back" ? "pliromi-piso:" + String(tool || "").replace(/_q[23]$/, "") : "epilogi-pliromis:" + (c === "viva" ? "iris" : "karta")); if (c !== "back" && window.manteioEvent) manteioEvent("epilogi:" + String(tool || "").replace(/_q[23]$/, "")); } catch (e) {}
+        try { if (window.manteioEvent) manteioEvent(c === "back" ? "pliromi-piso:" + String(tool || "").replace(/_q[23]$/, "") : "epilogi-pliromis:" + (c === "viva" ? "iris" : c === "sub" ? "eklektoi" : c === "member" ? "melos" : "karta")); if (c !== "back" && window.manteioEvent) manteioEvent("epilogi:" + String(tool || "").replace(/_q[23]$/, "")); } catch (e) {}
         bg.remove(); res(c); }; });
     });
   }
@@ -163,13 +178,25 @@
   if (of) window.fetch = function (u, opts) {
     try {
       var url = typeof u === "string" ? u : (u && u.url) || "";
-      if (ready && /create-checkout/.test(url) && opts && typeof opts.body === "string") {
+      if (/create-checkout/.test(url) && opts && typeof opts.body === "string") {
         var b = JSON.parse(opts.body);
-        if (!b.provider) {
+        if (!b.provider && (ready || isQ1(b.tool))) {
           var self = this;
           return choose(b.tool).then(function (p) {
             // «Πίσω»: η πληρωμή δεν ξεκινά, το κουμπί της σελίδας επανέρχεται και η σελίδα μένει όπως ήταν
             if (p === "back") { restoreBtn(); return new Promise(function () {}); }
+            // Μέλος: η ερώτηση του μήνα, χωρίς πληρωμή
+            if (p === "member") {
+              var mt = memberToken();
+              return rawFetch.call(window, "/api/eklektoi", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ action: "me", token: mt }) })
+                .then(function (r) { return r.json(); }).then(function (d) {
+                  if (!d || !d.active) { restoreBtn(); toast("Η συνδρομή σου δεν είναι ενεργή. Στείλε μήνυμα στο Μαντείο αν χρειάζεσαι βοήθεια."); return new Promise(function () {}); }
+                  if (d.creditUsed) { restoreBtn(); toast("Η ερώτηση αυτού του μήνα έχει ήδη χρησιμοποιηθεί. Η επόμενη ανοίγει την 1η του επόμενου μήνα."); return new Promise(function () {}); }
+                  var ru = b.returnUrl; location.href = ru + (ru.indexOf("?") >= 0 ? "&" : "?") + "session_id=mb_" + mt;
+                  return new Promise(function () {});
+                });
+            }
+            if (p === "sub") { b.provider = "eklektoi"; opts = Object.assign({}, opts, { body: JSON.stringify(b) }); return withWait(of.call(self, u, opts), true); }
             if (p !== "viva") return withWait(of.call(self, u, opts), true);
             b.provider = "viva"; opts = Object.assign({}, opts, { body: JSON.stringify(b) });
             var w = wait();

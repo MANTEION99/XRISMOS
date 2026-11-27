@@ -112,6 +112,29 @@ exports.handler = async function (event) {
       metadata.reading_id = String(reading_id);
     }
 
+    // Οι Εκλεκτοί του Μαντείου: μηνιαία συνδρομή (μόνο κάρτα). Η ερώτηση που άνοιξε την πληρωμή περιλαμβάνεται.
+    if (provider === "eklektoi") {
+      const Q1 = ["epistrofi", "agapi", "alitheia", "symvatotita", "oikonomika", "erotima", "numerology", "taro"];
+      if (!Q1.includes(tool)) return { statusCode: 400, body: JSON.stringify({ error: "Η συνδρομή δεν ισχύει για αυτή την υπηρεσία." }) };
+      const origin = new URL(returnUrl).origin;
+      const subBody = toFormBody({
+        mode: "subscription",
+        success_url: `${origin}/eklektoi?sid={CHECKOUT_SESSION_ID}&ret=${encodeURIComponent(returnUrl)}`,
+        cancel_url: cancelUrl,
+        line_items: [{ quantity: 1, price_data: { currency: "eur", unit_amount: 1290, recurring: { interval: "month" }, product_data: { name: "Οι Εκλεκτοί του Μαντείου" } } }],
+        metadata: { ...metadata, kind: "eklektoi" },
+        subscription_data: { metadata: { ...metadata, kind: "eklektoi" } }
+      }).replace(encodeURIComponent("{CHECKOUT_SESSION_ID}"), "{CHECKOUT_SESSION_ID}");
+      const r = await fetch("https://api.stripe.com/v1/checkout/sessions", {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded", "Authorization": `Bearer ${process.env.STRIPE_SECRET_KEY}` },
+        body: subBody
+      });
+      const ss = await r.json();
+      if (!ss.url) return { statusCode: 500, body: JSON.stringify({ error: "Το Stripe δεν επέστρεψε session.", details: ss }) };
+      return { statusCode: 200, headers: { "Content-Type": "application/json" }, body: JSON.stringify({ url: ss.url }) };
+    }
+
     // IRIS και άλλοι τρόποι μέσω Viva, όταν η πελάτισσα το διαλέξει.
     if (provider === "viva") {
       require("@netlify/blobs").connectLambda(event);

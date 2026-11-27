@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex">
+<title>Οι Εκλεκτοί του Μαντείου</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{ --navy:#0B0A16; --card:#14122a; --paper:#F5F1E8; --muted:#9C96AE; --gold:#D9B25C; --line:rgba(217,178,92,0.35); }
+  *{ box-sizing:border-box; }
+  body{ margin:0; background:radial-gradient(ellipse at top,#1b1838 0%,var(--navy) 60%); color:var(--paper); font:16px/1.6 Inter,Arial,sans-serif; min-height:100vh; }
+  .wrap{ max-width:560px; margin:0 auto; padding:28px 18px 90px; }
+  .top{ text-align:center; margin-bottom:22px; }
+  .eyebrow{ font-size:12px; letter-spacing:3px; text-transform:uppercase; color:var(--gold); }
+  h1{ font-family:'Cormorant Garamond',serif; font-size:36px; line-height:1.15; margin:8px 0 6px; font-weight:700; }
+  .sub{ color:#d8d2c4; margin:0; }
+  .card{ background:rgba(20,18,42,.85); border:1px solid var(--line); border-radius:18px; padding:18px 16px; margin:0 0 16px; }
+  .card h2{ font-family:'Cormorant Garamond',serif; color:var(--gold); font-size:25px; margin:0 0 8px; font-weight:600; }
+  .card p{ margin:0 0 10px; }
+  .muted{ color:var(--muted); font-size:14px; }
+  .grid{ display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:12px; }
+  .grid a{ display:block; text-align:center; text-decoration:none; color:var(--paper); border:1px solid var(--line); border-radius:12px; padding:12px 8px; background:rgba(217,178,92,.06); font-size:14.5px; line-height:1.35; }
+  .grid a b{ display:block; color:var(--gold); font-family:'Cormorant Garamond',serif; font-size:19px; }
+  .btn{ display:block; width:100%; text-align:center; text-decoration:none; background:var(--gold); color:#14122a; border:0; border-radius:12px; padding:13px; font:600 15px Inter,Arial,sans-serif; cursor:pointer; margin-top:10px; }
+  .btn.ghost{ background:transparent; color:var(--paper); border:1px solid var(--line); }
+  .day{ border-top:1px solid rgba(217,178,92,.18); padding:10px 0; }
+  .day:first-of-type{ border-top:0; }
+  .dh{ display:flex; justify-content:space-between; align-items:center; gap:8px; }
+  .dh b{ font-size:15px; }
+  .pill{ font-size:12px; border-radius:20px; padding:2px 10px; white-space:nowrap; }
+  .p-tyxeri{ background:var(--gold); color:#14122a; font-weight:700; }
+  .p-kali{ border:1px solid var(--gold); color:var(--gold); }
+  .p-apli{ border:1px solid rgba(255,255,255,.25); color:var(--muted); }
+  .why{ font-size:14.5px; color:#e6e0d1; margin:4px 0 0; }
+  .best{ background:rgba(217,178,92,.08); border:1px solid var(--line); border-radius:12px; padding:10px 12px; margin:6px 0; }
+  form label{ display:block; font-size:13px; color:var(--muted); margin:10px 0 4px; }
+  form input{ width:100%; padding:11px 12px; border-radius:10px; border:1px solid var(--line); background:#0f0d22; color:var(--paper); font:15px Inter,Arial,sans-serif; }
+  .err{ color:#f0a0ac; font-size:14px; margin-top:8px; display:none; }
+  .link{ word-break:break-all; background:#0f0d22; border:1px dashed var(--line); border-radius:10px; padding:10px; font-size:13.5px; color:var(--gold); }
+  .demo{ text-align:center; background:#3a2a10; border:1px solid var(--gold); color:var(--gold); border-radius:10px; padding:8px; font-size:13px; margin-bottom:16px; }
+  .hide{ display:none; }
+  .prof{ display:flex; flex-direction:column; align-items:center; margin:6px 0 20px; }
+  .av{ width:108px; height:108px; border-radius:50%; border:2px solid var(--gold); background:#1f1b3d center/cover no-repeat; display:flex; align-items:center; justify-content:center; font-family:'Cormorant Garamond',serif; font-size:48px; color:var(--gold); cursor:pointer; position:relative; box-shadow:0 0 28px rgba(217,178,92,.25); }
+  .av .cam{ position:absolute; right:-2px; bottom:2px; width:32px; height:32px; border-radius:50%; background:var(--gold); color:#14122a; font-size:16px; display:flex; align-items:center; justify-content:center; font-family:Inter,Arial,sans-serif; }
+  .pname{ font-family:'Cormorant Garamond',serif; font-size:30px; font-weight:700; margin:10px 0 0; line-height:1.15; text-align:center; }
+  .badge{ margin-top:6px; font-size:12.5px; letter-spacing:1.5px; text-transform:uppercase; color:var(--gold); border:1px solid var(--line); border-radius:20px; padding:3px 12px; }
+  .since{ font-size:13px; color:var(--muted); margin-top:6px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="demo hide" id="demoBar">Προεπισκόπηση: έτσι βλέπει τη σελίδα του ένα μέλος</div>
+  <div class="top">
+    <div class="eyebrow">manteio.live</div>
+    <h1>Οι Εκλεκτοί του Μαντείου</h1>
+    <p class="sub" id="hello">Καλώς ήρθες στους Εκλεκτούς του Μαντείου.</p>
+  </div>
+
+  <div class="prof hide" id="prof">
+    <label class="av" id="av" title="Άλλαξε φωτογραφία"><span id="avInit"></span><span class="cam">📷</span><input type="file" id="avFile" accept="image/*" class="hide"></label>
+    <div class="pname" id="pname"></div>
+    <div class="badge">Εκλεκτό μέλος του Μαντείου</div>
+    <div class="since" id="since"></div>
+    <div class="err" id="avErr"></div>
+  </div>
+
+  <div class="card hide" id="welcome">
+    <h2>Η συνδρομή σου ξεκίνησε</h2>
+    <p>Αυτή είναι η προσωπική σου σελίδα. Κράτα τον σύνδεσμο, για να μπαίνεις από οποιοδήποτε κινητό:</p>
+    <div class="link" id="myLink"></div>
+    <button class="btn ghost" type="button" id="copyLink">Αντιγραφή συνδέσμου</button>
+    <a class="btn hide" id="seeAnswer" href="#">Δες τώρα την απάντησή σου</a>
+  </div>
+
+  <div class="card hide" id="none">
+    <h2>Δεν βρέθηκε συνδρομή</h2>
+    <p>Αν είσαι ήδη μέλος και άλλαξες κινητό ή browser, στείλε μήνυμα στο Μαντείο και θα σου στείλει τον προσωπικό σου σύνδεσμο.</p>
+    <a class="btn" href="https://ig.me/m/to_manteio" target="_blank" rel="noopener">Μήνυμα στο Instagram</a>
+    <a class="btn ghost" href="https://www.tiktok.com/@zodiac_manteio" target="_blank" rel="noopener">TikTok</a>
+  </div>
+
+  <div id="member" class="hide">
+    <div class="card">
+      <h2>Η ερώτηση του μήνα</h2>
+      <div id="qOpen">
+        <p>Η ερώτηση του μήνα σε περιμένει. Διάλεξε για ποιο θέμα θέλεις να σου απαντήσει το Μαντείο. Στο τέλος, αντί για πληρωμή, πατάς «Χρησιμοποίησε την ερώτηση του μήνα».</p>
+        <div class="grid">
+          <a href="/epistrofi"><b>Η Επιστροφή</b>Θα γυρίσει;</a>
+          <a href="/agapi"><b>Η Αγάπη</b>Με σκέφτεται ακόμα;</a>
+          <a href="/alitheia"><b>Η Αλήθεια</b>Μου κρύβει κάτι;</a>
+          <a href="/symvatotita"><b>Η Συναστρία</b>Ταιριάζουμε;</a>
+          <a href="/oikonomika"><b>Η Αφθονία</b>Τα οικονομικά μου</a>
+          <a href="/erotima"><b>Ρώτα το Μαντείο</b>Η δική μου ερώτηση</a>
+          <a href="/arithmologia"><b>Οι Αριθμοί</b>Αριθμολογία</a>
+          <a href="/taro"><b>Το Ταρώ</b>Τρία χαρτιά</a>
+        </div>
+      </div>
+      <div id="qUsed" class="hide">
+        <p>Την ερώτηση αυτού του μήνα την έχεις ήδη χρησιμοποιήσει. Η επόμενη ανοίγει την <b id="nextMonth"></b>.</p>
+        <p class="muted">Αν θέλεις κι άλλη απάντηση μέσα στον μήνα, τη δεύτερη και την τρίτη ερώτηση τις παίρνεις με 12€ και 8€.</p>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>Οι τυχερές σου μέρες</h2>
+      <form id="birthForm" class="hide">
+        <p>Γράψε μία φορά τα στοιχεία σου και το Μαντείο σού δείχνει κάθε εβδομάδα ποιες μέρες είναι οι δικές σου.</p>
+        <label for="bName">Όνομα</label><input id="bName" autocomplete="given-name">
+        <label for="bDob">Ημερομηνία γέννησης</label><input id="bDob" type="date">
+        <label for="bTob">Ώρα γέννησης (αν την ξέρεις)</label><input id="bTob" type="time">
+        <label for="bPob">Τόπος γέννησης</label><input id="bPob" placeholder="π.χ. Αθήνα">
+        <button class="btn" type="submit">Δες τις τυχερές μου μέρες</button>
+        <div class="err" id="bErr"></div>
+      </form>
+      <div id="weekBox" class="hide">
+        <p class="muted" id="weekLabel"></p>
+        <div id="bestBox"></div>
+        <div id="days"></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>Η συνδρομή σου</h2>
+      <p id="subLine">12,90€ τον μήνα, με κάρτα.</p>
+      <button class="btn ghost" type="button" id="portal">Διαχείριση ή ακύρωση συνδρομής</button>
+      <div class="err" id="pErr"></div>
+    </div>
+  </div>
+</div>
+<script>
+const $ = (id) => document.getElementById(id);
+const esc = (s) => String(s == null ? "" : s).replace(/[&<>"]/g, c => ({ "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;" }[c]));
+const q = new URLSearchParams(location.search);
+const MONTHS = ["Ιανουαρίου","Φεβρουαρίου","Μαρτίου","Απριλίου","Μαΐου","Ιουνίου","Ιουλίου","Αυγούστου","Σεπτεμβρίου","Οκτωβρίου","Νοεμβρίου","Δεκεμβρίου"];
+const api = (body) => fetch("/api/eklektoi", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) }).then(r => r.json().then(d => ({ ok: r.ok, d })));
+const getTok = () => { try { return localStorage.getItem("manteio_member") || ""; } catch (e) { return ""; } };
+const setTok = (t) => { try { localStorage.setItem("manteio_member", t); } catch (e) {} };
+const show = (id, on = true) => $(id).classList.toggle("hide", !on);
+const TIER = { tyxeri: ["Τυχερή μέρα", "p-tyxeri"], kali: ["Καλή μέρα", "p-kali"], apli: ["Απλή μέρα", "p-apli"] };
+
+function nextMonthLabel() { const d = new Date(); const n = new Date(d.getFullYear(), d.getMonth() + 1, 1); return `1η ${MONTHS[n.getMonth()]}`; }
+
+function renderWeek(w) {
+  $("weekLabel").textContent = w.week.label || "";
+  const best = w.days.find(x => x.best);
+  $("bestBox").innerHTML = best ? `<div class="best"><b style="color:var(--gold)">Η πιο δυνατή σου μέρα: ${esc(best.label)}</b><p class="why">${esc(best.why)}</p></div>` : "";
+  $("days").innerHTML = w.days.map(x => {
+    const t = TIER[x.tier] || TIER.apli;
+    return `<div class="day"><div class="dh"><b>${esc(x.label)}</b><span class="pill ${t[1]}">${t[0]}</span></div><p class="why">${esc(x.why)}</p><p class="why muted" style="margin-top:2px">Αριθμός ${esc(x.num)}${x.card ? " · " + esc(x.card) : ""}</p></div>`;
+  }).join("");
+  show("birthForm", false); show("weekBox");
+}
+
+const MONTHS_ACC = ["Ιανουάριο","Φεβρουάριο","Μάρτιο","Απρίλιο","Μάιο","Ιούνιο","Ιούλιο","Αύγουστο","Σεπτέμβριο","Οκτώβριο","Νοέμβριο","Δεκέμβριο"];
+function renderProfile(name, photo, since) {
+  show("prof");
+  $("pname").textContent = name || "Εκλεκτό μέλος";
+  $("avInit").textContent = photo ? "" : (name || "Μ").trim().charAt(0).toUpperCase();
+  $("av").style.backgroundImage = photo ? `url("${photo}")` : "";
+  const d = since ? new Date(since) : new Date();
+  $("since").textContent = `Μέλος από τον ${MONTHS_ACC[d.getMonth()]} ${d.getFullYear()}`;
+}
+// Η φωτογραφία μικραίνει στο κινητό (320px) πριν σταλεί, ώστε να είναι ελαφριά.
+function shrink(file) {
+  return new Promise((res, rej) => {
+    const img = new Image(), url = URL.createObjectURL(file);
+    img.onload = () => {
+      const S = 320, c = document.createElement("canvas"); c.width = c.height = S;
+      const k = Math.max(S / img.width, S / img.height), w = img.width * k, h = img.height * k;
+      c.getContext("2d").drawImage(img, (S - w) / 2, (S - h) / 2, w, h);
+      URL.revokeObjectURL(url); res(c.toDataURL("image/jpeg", 0.82));
+    };
+    img.onerror = rej; img.src = url;
+  });
+}
+function bindPhoto(token, name) {
+  $("avFile").onchange = async () => {
+    const f = $("avFile").files[0]; if (!f) return;
+    try {
+      const data = await shrink(f);
+      $("av").style.backgroundImage = `url("${data}")`; $("avInit").textContent = "";
+      if (!token) return;
+      const r = await api({ action: "photo", token, img: data });
+      if (!r.ok) { $("avErr").textContent = r.d.error || "Η φωτογραφία δεν ανέβηκε."; $("avErr").style.display = "block"; }
+    } catch (e) { $("avErr").textContent = "Η φωτογραφία δεν ανέβηκε. Δοκίμασε μια άλλη."; $("avErr").style.display = "block"; }
+  };
+}
+
+function renderMe(me, demo) {
+  show("member");
+  renderProfile(me.name, me.photo, me.since);
+  show("qOpen", !me.creditUsed); show("qUsed", !!me.creditUsed);
+  $("nextMonth").textContent = nextMonthLabel();
+  if (me.cancelAt) $("subLine").textContent = `Η συνδρομή σου λήγει στις ${new Date(me.cancelAt * 1000).toLocaleDateString("el-GR")} και δεν θα ανανεωθεί.`;
+  else if (me.periodEnd) $("subLine").textContent = `12,90€ τον μήνα, με κάρτα. Επόμενη ανανέωση: ${new Date(me.periodEnd * 1000).toLocaleDateString("el-GR")}.`;
+  if (!me.active && !demo) { $("subLine").textContent = "Η συνδρομή σου δεν είναι ενεργή."; show("qOpen", false); }
+}
+
+async function loadWeek(token) {
+  const r = await api({ action: "week", token });
+  if (r.ok) renderWeek(r.d.week); else { show("birthForm"); }
+}
+
+async function start() {
+  // Προεπισκόπηση με δείγμα στοιχείων, χωρίς πραγματικό μέλος.
+  if (q.get("demo")) {
+    show("demoBar");
+    renderMe({ active: true, creditUsed: false, periodEnd: Math.floor(Date.now() / 1000) + 30 * 86400, name: "Σάββας", since: new Date().toISOString() }, true);
+    bindPhoto("", "Σάββας");
+    const r = await api({ action: "demo" });
+    if (r.ok) renderWeek(r.d.week);
+    $("portal").onclick = () => alert("Στην πραγματική σελίδα εδώ ανοίγει η σελίδα του Stripe για διαχείριση ή ακύρωση.");
+    return;
+  }
+  let token = q.get("m") || "";
+  if (q.get("sid")) {
+    const r = await api({ action: "join", sid: q.get("sid") });
+    if (r.ok && r.d.token) {
+      token = r.d.token;
+      show("welcome");
+      const ret = q.get("ret") || "";
+      if (/^https:\/\/[^/]*manteio\.live\//.test(ret) || ret.startsWith(location.origin + "/")) {
+        $("seeAnswer").href = ret + (ret.includes("?") ? "&" : "?") + "session_id=mb_" + token;
+        show("seeAnswer");
+      }
+    }
+  }
+  if (token) setTok(token); else token = getTok();
+  if (!/^[0-9a-f]{32}$/.test(token)) { show("none"); return; }
+  const link = location.origin + "/eklektoi?m=" + token;
+  $("myLink").textContent = link;
+  $("copyLink").onclick = () => { navigator.clipboard && navigator.clipboard.writeText(link); $("copyLink").textContent = "Αντιγράφηκε"; };
+  if (q.get("sid") || q.get("m")) history.replaceState(null, "", "/eklektoi");
+
+  const me = await api({ action: "me", token });
+  if (!me.ok) { show("none"); return; }
+  renderMe(me.d);
+  bindPhoto(token, me.d.name);
+  if (me.d.birth) loadWeek(token); else show("birthForm");
+
+  $("birthForm").onsubmit = async (e) => {
+    e.preventDefault(); $("bErr").style.display = "none";
+    const r = await api({ action: "birth", token, name: $("bName").value, dob: $("bDob").value, tob: $("bTob").value, pob: $("bPob").value });
+    if (!r.ok) { $("bErr").textContent = r.d.error || "Κάτι πήγε στραβά."; $("bErr").style.display = "block"; return; }
+    $("pname").textContent = $("bName").value; if (!$("av").style.backgroundImage) $("avInit").textContent = $("bName").value.trim().charAt(0).toUpperCase();
+    loadWeek(token);
+  };
+  $("portal").onclick = async () => {
+    const r = await api({ action: "portal", token });
+    if (r.ok && r.d.url) location.href = r.d.url; else { $("pErr").textContent = (r.d && r.d.error) || "Δοκίμασε ξανά."; $("pErr").style.display = "block"; }
+  };
+}
+start();
+</script>
+<script src="/help.js" defer></script>
+</body>
+</html>
