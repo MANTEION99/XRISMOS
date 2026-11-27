@@ -416,9 +416,9 @@
         <div class="seal-title">Ο χρησμός σου συνεχίζεται</div>
         <div class="seal-sub">Το Παρόν, το Μέλλον και η καθαρή απάντηση στο ερώτημά σου.</div>
         <div class="seal-note" style="font-size:13.5px;line-height:1.55;color:#d8cfb8;margin:10px auto 14px;max-width:420px;">Η δωρεάν απάντηση είναι μια γεύση, για να δεις πώς δουλεύει Το Μαντείο. <b>Η πληρωμένη απάντηση είναι η πραγματική:</b> απαντά ακριβώς σε αυτό που ρώτησες, πάνω στον δικό σου χάρτη, με ημερομηνίες και τι να κάνεις.</div>
-        <p class="value-note" style="font-size:12.5px;line-height:1.55;color:var(--muted);max-width:320px;margin:10px auto 18px;text-align:center;">Μια τέτοια πρόβλεψη κοστίζει περίπου 100€. Εδώ γράφεται μόνο για σένα, με 4,99€. Χρεώνεσαι μόνο όταν ολοκληρωθεί ο χρησμός σου.</p>
-        <div class="enter-btn" id="unlockBtn"><span class="ub-main">Δες την απάντηση</span><span class="ub-price">ΜΟΝΟ&nbsp;4,99€</span></div>
-        <p class="ladder-note" style="font-family:'Inter',sans-serif;font-size:14px;font-weight:400;line-height:1.55;color:#F4EEDF;max-width:330px;margin:10px auto 4px;text-align:center;">Όσο ρωτάς, τόσο πιο φθηνά σού απαντά το Μαντείο. Η πρώτη ερώτηση <b style="color:#D9B25C;">4,99€</b>, η δεύτερη μόνο <b style="color:#D9B25C;">2,99€</b> και η τρίτη ακόμη λιγότερο, μόνο <b style="color:#D9B25C;">1,99€</b>, πάνω στα ίδια σου στοιχεία.</p>
+        <p class="value-note" style="font-size:12.5px;line-height:1.55;color:var(--muted);max-width:320px;margin:10px auto 18px;text-align:center;">Μια τέτοια πρόβλεψη κοστίζει περίπου 100€. Εδώ γράφεται μόνο για σένα, με 20€. Χρεώνεσαι μόνο όταν ολοκληρωθεί ο χρησμός σου.</p>
+        <div class="enter-btn" id="unlockBtn"><span class="ub-main">Δες την απάντηση</span><span class="ub-price">ΜΟΝΟ&nbsp;20€</span></div>
+        <p class="ladder-note" style="font-family:'Inter',sans-serif;font-size:14px;font-weight:400;line-height:1.55;color:#F4EEDF;max-width:330px;margin:10px auto 4px;text-align:center;">Όσο ρωτάς, τόσο πιο φθηνά σού απαντά το Μαντείο. Η πρώτη ερώτηση <b style="color:#D9B25C;">20€</b>, η δεύτερη μόνο <b style="color:#D9B25C;">12€</b> και η τρίτη ακόμη λιγότερο, μόνο <b style="color:#D9B25C;">8€</b>, πάνω στα ίδια σου στοιχεία.</p>
         <div class="secure-note"><svg viewBox="0 0 24 24" fill="none"><rect x="5" y="11" width="14" height="10" rx="2" stroke="currentColor" stroke-width="1.6"/><path d="M8 11V7a4 4 0 0 1 8 0v4" stroke="currentColor" stroke-width="1.6"/></svg> Ασφαλής πληρωμή μέσω Stripe</div>
       </div>
     </div>
@@ -1187,7 +1187,7 @@ function renderExtraActions(data) {
   const stage = data.stage || 'q1';
   const nextStage = stage === 'q1' ? 'q2' : (stage === 'q2' ? 'q3' : null);
   if (!nextStage) return;
-  const priceLabel = nextStage === 'q2' ? '2,99€' : '1,99€';
+  const priceLabel = nextStage === 'q2' ? '12€' : '8€';
   const title = document.createElement('p');
   title.className = 'ask-title';
   title.textContent = nextStage === 'q2' ? 'Θέλεις να ρωτήσεις κάτι ακόμα;' : 'Μια τελευταία ερώτηση;';

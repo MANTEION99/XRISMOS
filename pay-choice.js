@@ -57,16 +57,16 @@
     tool = String(tool || ""); var m = tool.match(QUESTION_TOOLS), name = "", price = 0;
     if (m) {
       name = "Η πλήρης απάντηση: " + NAMES[m[1]] + (m[2] ? " · " + m[2].slice(2) + "η ερώτηση" : "");
-      price = m[2] === "_q2" ? 299 : m[2] === "_q3" ? 199 : 499;
+      price = m[2] === "_q2" ? 1200 : m[2] === "_q3" ? 800 : 2000;
     } else if (NAMES[tool]) {
       name = NAMES[tool];
       if (tool === "imerologio") {
         var d = new Intl.DateTimeFormat("en-CA", { timeZone: "Europe/Athens", year: "numeric", month: "2-digit", day: "2-digit" }).format(new Date());
-        price = d >= "2026-11-27" && d <= "2026-11-30" ? 1499 : 2999;
+        price = d >= "2026-11-27" && d <= "2026-11-30" ? 1499 : 4900;
       } else if (tool === "tyxeres") {
         var d2 = new Intl.DateTimeFormat("en-CA", { timeZone: "Europe/Athens", year: "numeric", month: "2-digit", day: "2-digit" }).format(new Date());
-        price = d2 <= "2026-12-02" ? 299 : 499;
-      } else price = { xartis: 3900, xartis_plus: 5900, paidi: 2499 }[tool] || 0;
+        price = 2000;
+      } else price = { xartis: 6900, xartis_plus: 9900, paidi: 4900 }[tool] || 0;
     }
     return { name: name, price: price ? eur(price) : "" };
   }

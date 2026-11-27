@@ -19,7 +19,7 @@ export const EARLY_UNTIL = "2026-12-02";
 const athensDay = (now) => new Intl.DateTimeFormat("en-CA", { timeZone: "Europe/Athens", year: "numeric", month: "2-digit", day: "2-digit" }).format(now);
 export function priceNow(now = new Date()) {
   const early = athensDay(now) <= EARLY_UNTIL;
-  return { cents: early ? 299 : 499, regular: 499, early };
+  return { cents: 2000, regular: 2000, early: false };
 }
 
 const DAYS_GR = ["Κυριακή", "Δευτέρα", "Τρίτη", "Τετάρτη", "Πέμπτη", "Παρασκευή", "Σάββατο"];

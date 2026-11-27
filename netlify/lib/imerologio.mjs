@@ -17,7 +17,7 @@ export const TOOL = "imerologio";
 export function priceNow(now = new Date()) {
   const day = new Intl.DateTimeFormat("en-CA", { timeZone: "Europe/Athens", year: "numeric", month: "2-digit", day: "2-digit" }).format(now);
   const bf = day >= "2026-11-27" && day <= "2026-11-30";
-  return { cents: bf ? 1499 : 2999, regular: 2999, bf };
+  return { cents: bf ? 1499 : 4900, regular: 2999, bf };
 }
 
 const norm = (x) => ((x % 360) + 360) % 360;

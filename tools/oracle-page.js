@@ -703,7 +703,7 @@ function renderExtraActions(data) {
   const stage = data.stage || 'q1';
   const nextStage = stage === 'q1' ? 'q2' : (stage === 'q2' ? 'q3' : null);
   if (!nextStage) return;
-  const priceLabel = nextStage === 'q2' ? '2,99€' : '1,99€';
+  const priceLabel = nextStage === 'q2' ? '12€' : '8€';
   const title = document.createElement('p');
   title.className = 'ask-title';
   title.textContent = nextStage === 'q2' ? 'Θέλεις να ρωτήσεις κάτι ακόμα;' : 'Μια τελευταία ερώτηση;';

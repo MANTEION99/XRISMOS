@@ -203,7 +203,7 @@
     <h1>Οι τυχερές μέρες της εβδομάδας <span class="neo">ΝΕΟ</span></h1>
     <p class="sub">Ποιες μέρες αυτής της εβδομάδας είναι οι δικές σου; Τρεις μέθοδοι κοιτάζουν κάθε μέρα χωριστά, από τα δικά σου στοιχεία γέννησης.</p>
 
-    <div class="offer" id="offer"><b>2,99€ μόνο ως την Τετάρτη 2 Δεκεμβρίου</b><span>Μετά 4,99€</span></div>
+    <div class="offer" id="offer"><b></b><span></span></div>
     <p class="weekline" id="weekline"></p>
 
     <ul class="methods">
@@ -255,7 +255,7 @@
       <p class="ss" id="sealSub"></p>
       <p class="power">Το σύμπαν δείχνει τι φέρνει η μέρα. Ο αριθμός δείχνει τον ρυθμό σου. Το χαρτί δείχνει τι κρύβει. Όταν συμφωνούν και τα τρία, η μέρα είναι δική σου.</p>
       <p class="value-note" id="valueNote"></p>
-      <div class="enter-btn" id="unlockBtn"><span class="ub-main">Δες τις τυχερές σου μέρες</span><span class="ub-price" id="ubPrice">ΜΟΝΟ&nbsp;2,99€</span></div>
+      <div class="enter-btn" id="unlockBtn"><span class="ub-main">Δες τις τυχερές σου μέρες</span><span class="ub-price" id="ubPrice">ΜΟΝΟ&nbsp;20€</span></div>
       <p class="value-note after">Ο χάρτης σου υπολογίζεται με τα ίδια αστρονομικά δεδομένα που χρησιμοποιούν οι επαγγελματίες αστρολόγοι, με ακρίβεια λεπτού.</p>
       <p class="offer-mini" id="offerMini"></p>
       <p class="pay-error" id="payErr"></p>
@@ -278,7 +278,7 @@ const WD_SHORT = { "Δευτέρα":"Δευ", "Τρίτη":"Τρί", "Τετάρ
 const TIER = { tyxeri:"Τυχερή μέρα", kali:"Καλή μέρα", apli:"Απλή μέρα" };
 const SAVE_KEY = "manteio_tyxeres";
 const FORM_KEY = "manteio_2027_form";   // ίδια στοιχεία με το Ημερολόγιο, για να μη χρειαστεί να ξαναγραφτούν
-const EARLY_UNTIL = "2026-12-02";       // ίδιο με το netlify/lib/tyxeres.mjs
+const EARLY_UNTIL = "2026-11-26";       // ίδιο με το netlify/lib/tyxeres.mjs
 const esc = (s) => String(s).replace(/[&<>"]/g, c => ({ "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;" }[c]));
 const eur = (c) => (c / 100).toFixed(2).replace(".", ",") + "€";
 let readingId = null;
@@ -288,12 +288,12 @@ const early = () => athensDay() <= EARLY_UNTIL;
 
 // Η τιμή αλλάζει μόνη της μετά την Τετάρτη 2 Δεκεμβρίου (ώρα Ελλάδας).
 function priceUI(cents) {
-  const isEarly = cents ? cents < 499 : early();
-  const c = cents || (isEarly ? 299 : 499);
+  const isEarly = cents ? cents < 2000 : early();
+  const c = cents || (isEarly ? 299 : 2000);
   $("offer").style.display = isEarly ? "block" : "none";
   $("ubPrice").innerHTML = "ΜΟΝΟ&nbsp;" + eur(c);
   $("valueNote").textContent = `Σε αστρολόγο, μια προσωπική πρόβλεψη κοστίζει συνήθως από 40 έως 80€. Το Μαντείο σού δίνει όλη την εβδομάδα σου με ${eur(c)}.`;
-  $("offerMini").textContent = isEarly ? "2,99€ μόνο ως την Τετάρτη 2 Δεκεμβρίου. Μετά 4,99€." : "";
+  $("offerMini").textContent = isEarly ? "" : "";
 }
 priceUI(0);
 

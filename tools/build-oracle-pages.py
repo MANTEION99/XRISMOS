@@ -112,16 +112,16 @@ COVER_PROOF = (
     + '      </div>\n    </div>\n')
 
 NATAL_UNLOCK = (
-    '        <div class="enter-btn" id="unlockBtn">Η πλήρης ανάλυση · 39€</div>\n'
+    '        <div class="enter-btn" id="unlockBtn">Η πλήρης ανάλυση · 69€</div>\n'
     '        <div class="plus-tag">Η ΠΙΟ ΟΛΟΚΛΗΡΩΜΕΝΗ</div>\n'
-    '        <div class="enter-btn" id="plusBtn">Ανάλυση και πρόβλεψη 12 μηνών · 59€</div>\n'
+    '        <div class="enter-btn" id="plusBtn">Ανάλυση και πρόβλεψη 12 μηνών · 99€</div>\n'
     '        <p class="value-note" style="font-size:12.5px;line-height:1.55;color:var(--muted);max-width:320px;margin:6px auto 12px;text-align:center;">Το δικό σου βιβλίο: 14 κεφάλαια, πάνω από 10.000 λέξεις, γραμμένα από τον Ιάκωβο μόνο για σένα, πάνω στον πραγματικό σου χάρτη. Σου το στέλνουμε και στο email σου σε PDF. Η πρόβλεψη προσθέτει τον χάρτη των γενεθλίων σου και τους 12 επόμενους μήνες, εποχή με εποχή. Χρεώνεσαι μόνο όταν ολοκληρωθεί η ανάλυσή σου.</p>\n')
 
 DEFAULT_UNLOCK = (
-    '        <p class="value-note" style="font-size:12.5px;line-height:1.55;color:var(--muted);max-width:320px;margin:10px auto 18px;text-align:center;">Μια τέτοια πρόβλεψη κοστίζει περίπου 100€. Εδώ γράφεται μόνο για σένα, με 4,99€. Χρεώνεσαι μόνο όταν ολοκληρωθεί ο χρησμός σου.</p>\n'
-    '        <div class="enter-btn" id="unlockBtn"><span class="ub-main">Δες την απάντηση</span><span class="ub-price">ΜΟΝΟ&nbsp;4,99€</span></div>\n'
+    '        <p class="value-note" style="font-size:12.5px;line-height:1.55;color:var(--muted);max-width:320px;margin:10px auto 18px;text-align:center;">Μια τέτοια πρόβλεψη κοστίζει περίπου 100€. Εδώ γράφεται μόνο για σένα, με 20€. Χρεώνεσαι μόνο όταν ολοκληρωθεί ο χρησμός σου.</p>\n'
+    '        <div class="enter-btn" id="unlockBtn"><span class="ub-main">Δες την απάντηση</span><span class="ub-price">ΜΟΝΟ&nbsp;20€</span></div>\n'
     '        <p class="lucky-note" style="font-family:\'Inter\',sans-serif;font-size:16px;font-weight:400;line-height:1.5;color:#D9B25C;max-width:330px;margin:8px auto 4px;text-align:center;"><span style="display:block;font-size:28px;font-weight:300;line-height:1;margin-bottom:6px;">+</span>Μαζί παίρνεις και την πιο τυχερή σου μέρα για την εβδομάδα που έρχεται</p>\n'
-    '        <p class="ladder-note" style="font-family:\'Inter\',sans-serif;font-size:14px;font-weight:400;line-height:1.55;color:#F4EEDF;max-width:330px;margin:10px auto 4px;text-align:center;">Όσο ρωτάς, τόσο πιο φθηνά σού απαντά το Μαντείο. Η πρώτη ερώτηση <b style="color:#D9B25C;">4,99€</b>, η δεύτερη μόνο <b style="color:#D9B25C;">2,99€</b> και η τρίτη ακόμη λιγότερο, μόνο <b style="color:#D9B25C;">1,99€</b>, πάνω στα ίδια σου στοιχεία.</p>\n')
+    '        <p class="ladder-note" style="font-family:\'Inter\',sans-serif;font-size:14px;font-weight:400;line-height:1.55;color:#F4EEDF;max-width:330px;margin:10px auto 4px;text-align:center;">Όσο ρωτάς, τόσο πιο φθηνά σού απαντά το Μαντείο. Η πρώτη ερώτηση <b style="color:#D9B25C;">20€</b>, η δεύτερη μόνο <b style="color:#D9B25C;">12€</b> και η τρίτη ακόμη λιγότερο, μόνο <b style="color:#D9B25C;">8€</b>, πάνω στα ίδια σου στοιχεία.</p>\n')
 
 # Το δώρο κάθε υπηρεσίας, γραμμένο κάτω από το κουμπί (ίδιο με το netlify/lib/lucky.mjs).
 LUCKY_GEN = "Μαζί παίρνεις και την πιο τυχερή σου μέρα για την εβδομάδα που έρχεται"

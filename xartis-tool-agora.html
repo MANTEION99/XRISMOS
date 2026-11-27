@@ -433,9 +433,9 @@
         <div class="seal-title">Ο χρησμός σου συνεχίζεται</div>
         <div class="seal-sub">Το δικό σου βιβλίο, 14 κεφάλαια γραμμένα μόνο για σένα, που σου στέλνουμε και στο email σου σε PDF.</div>
         <div class="seal-note" style="font-size:13.5px;line-height:1.55;color:#d8cfb8;margin:10px auto 14px;max-width:420px;">Αυτό που διάβασες είναι μια γεύση, για να δεις πώς δουλεύει Το Μαντείο. <b>Η πλήρης ανάλυση είναι η πραγματική:</b> όλος ο χάρτης σου, κεφάλαιο προς κεφάλαιο, μόνο για σένα.</div>
-        <div class="enter-btn" id="unlockBtn">Η πλήρης ανάλυση · 39€</div>
+        <div class="enter-btn" id="unlockBtn">Η πλήρης ανάλυση · 69€</div>
         <div class="plus-tag">Η ΠΙΟ ΟΛΟΚΛΗΡΩΜΕΝΗ</div>
-        <div class="enter-btn" id="plusBtn">Ανάλυση και πρόβλεψη 12 μηνών · 59€</div>
+        <div class="enter-btn" id="plusBtn">Ανάλυση και πρόβλεψη 12 μηνών · 99€</div>
         <p class="value-note" style="font-size:12.5px;line-height:1.55;color:var(--muted);max-width:320px;margin:6px auto 12px;text-align:center;">Το δικό σου βιβλίο: 14 κεφάλαια, πάνω από 10.000 λέξεις, γραμμένα από τον Ιάκωβο μόνο για σένα, πάνω στον πραγματικό σου χάρτη. Σου το στέλνουμε και στο email σου σε PDF. Η πρόβλεψη προσθέτει τον χάρτη των γενεθλίων σου και τους 12 επόμενους μήνες, εποχή με εποχή. Χρεώνεσαι μόνο όταν ολοκληρωθεί η ανάλυσή σου.</p>
         <div class="secure-note"><svg viewBox="0 0 24 24" fill="none"><rect x="5" y="11" width="14" height="10" rx="2" stroke="currentColor" stroke-width="1.6"/><path d="M8 11V7a4 4 0 0 1 8 0v4" stroke="currentColor" stroke-width="1.6"/></svg> Ασφαλής πληρωμή μέσω Stripe</div>
       </div>
@@ -1183,7 +1183,7 @@ function renderExtraActions(data) {
   const stage = data.stage || 'q1';
   const nextStage = stage === 'q1' ? 'q2' : (stage === 'q2' ? 'q3' : null);
   if (!nextStage) return;
-  const priceLabel = nextStage === 'q2' ? '2,99€' : '1,99€';
+  const priceLabel = nextStage === 'q2' ? '12€' : '8€';
   const title = document.createElement('p');
   title.className = 'ask-title';
   title.textContent = nextStage === 'q2' ? 'Θέλεις να ρωτήσεις κάτι ακόμα;' : 'Μια τελευταία ερώτηση;';
