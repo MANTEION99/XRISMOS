@@ -1217,5 +1217,6 @@ form.addEventListener('submit', (e) => {
   function fill(){ Object.keys(m).forEach(function(k){ var v=q.get(k), el=document.getElementById(m[k]); if(v && el && !el.value){ el.value=v; el.dispatchEvent(new Event("input",{bubbles:true})); el.dispatchEvent(new Event("change",{bubbles:true})); } }); if(window.syncDateFields) window.syncDateFields(); }
   if(document.readyState==="loading") document.addEventListener("DOMContentLoaded",fill); else fill(); }catch(e){} })();
 </script>
+<script src="/help.js" defer></script>
 </body>
 </html>

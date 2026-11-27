@@ -296,6 +296,7 @@ def build(tool, c):
     }})(window, document, "clarity", "script", "ydrxibksl6");
 </script>
 <script src="/hero.js"></script>
+<script src="/help.js" defer></script>
 <script src="/reviews.js" defer></script>
 <script src="/vitals.js" defer></script>
 </head>
