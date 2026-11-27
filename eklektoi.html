@@ -55,6 +55,14 @@
   .perks li:before{ content:"✦"; position:absolute; left:4px; top:0; color:var(--gold); }
   .perks li b{ display:block; color:var(--ink,#fff); }
   .perks li span{ color:var(--muted); font-size:14.5px; }
+  .wheel{ display:block; width:100%; max-width:380px; margin:4px auto 6px; }
+  .wheel text{ font-family:'DejaVu Sans','Segoe UI Symbol','Noto Sans Symbols 2','Apple Symbols',sans-serif; }
+  .born{ text-align:center; color:var(--muted); font-size:13.5px; margin:0 0 6px; }
+  .sky h3{ font-family:'Cormorant Garamond',serif; color:var(--gold); font-size:21px; margin:16px 0 6px; font-weight:600; }
+  .sky .it{ border-top:1px solid rgba(217,178,92,.18); padding:9px 0; }
+  .sky .it:first-of-type{ border-top:0; }
+  .sky .it b{ display:block; }
+  .sky .it span{ color:#d8d2c4; font-size:14.5px; }
   .ok{ color:#9fd8a8; font-size:14px; margin-top:8px; display:none; }
 </style>
 </head>
@@ -83,6 +91,14 @@
     <button class="btn ghost" type="button" id="copyLink">Αντιγραφή συνδέσμου</button>
     <a class="btn hide" id="seeAnswer" href="#">Δες τώρα την απάντησή σου</a>
   </div>
+
+    <div class="card hide" id="chartCard">
+      <h2>Ο γενέθλιος χάρτης σου</h2>
+      <p class="born" id="bornLine"></p>
+      <div id="wheelBox"></div>
+      <div class="sky" id="skyBox"></div>
+      <p class="muted hide" id="noChart">Γράψε πιο κάτω τα στοιχεία σου και εδώ θα εμφανιστεί ο χάρτης σου, όπως ήταν ο ουρανός τη στιγμή που γεννήθηκες.</p>
+    </div>
 
     <div class="card hide" id="perks">
       <h2 id="perksH">Τι παίρνεις ως Εκλεκτό μέλος</h2>
@@ -246,6 +262,125 @@ function applyBirth(b) {
   });
 }
 
+
+/* ---------- Ο γενέθλιος χάρτης ---------- */
+const VS = "︎";
+const SIGN_GL = ["♈","♉","♊","♋","♌","♍","♎","♏","♐","♑","♒","♓"].map(g => g + VS);
+const SIGN_IN = ["στον Κριό","στον Ταύρο","στους Διδύμους","στον Καρκίνο","στον Λέοντα","στην Παρθένο","στον Ζυγό","στον Σκορπιό","στον Τοξότη","στον Αιγόκερω","στον Υδροχόο","στους Ιχθύες"];
+const SIGN_NOM = ["ο Κριός","ο Ταύρος","οι Δίδυμοι","ο Καρκίνος","ο Λέων","η Παρθένος","ο Ζυγός","ο Σκορπιός","ο Τοξότης","ο Αιγόκερως","ο Υδροχόος","οι Ιχθύες"];
+const ELEM = ["fire","earth","air","water"];
+const ELEM_COL = { fire:"rgba(226,110,80,.16)", earth:"rgba(150,180,110,.14)", air:"rgba(150,190,230,.14)", water:"rgba(110,140,220,.16)" };
+const PL = {
+  Sun:{ g:"☉", nom:"ο Ήλιος", acc:"τον Ήλιο" }, Moon:{ g:"☽", nom:"η Σελήνη", acc:"τη Σελήνη" }, Mercury:{ g:"☿", nom:"ο Ερμής", acc:"τον Ερμή" },
+  Venus:{ g:"♀", nom:"η Αφροδίτη", acc:"την Αφροδίτη" }, Mars:{ g:"♂", nom:"ο Άρης", acc:"τον Άρη" }, Jupiter:{ g:"♃", nom:"ο Δίας", acc:"τον Δία" },
+  Saturn:{ g:"♄", nom:"ο Κρόνος", acc:"τον Κρόνο" }, Uranus:{ g:"♅", nom:"ο Ουρανός", acc:"τον Ουρανό" }, Neptune:{ g:"♆", nom:"ο Ποσειδώνας", acc:"τον Ποσειδώνα" },
+  Pluto:{ g:"♇", nom:"ο Πλούτωνας", acc:"τον Πλούτωνα" }, Node:{ g:"☊", nom:"ο Βόρειος Δεσμός", acc:"τον Βόρειο Δεσμό" }
+};
+const ASP = { Conjunction:{ t:"σε σύνοδο με", m:"Οι δύο δυνάμεις δουλεύουν ενωμένες μέσα σου.", c:null },
+  Trine:{ t:"σε τρίγωνο με", m:"Κυλούν αρμονικά και σε βοηθούν χωρίς κόπο.", c:"#D9B25C" },
+  Sextile:{ t:"σε εξάγωνο με", m:"Σου ανοίγουν ευκαιρίες όταν κάνεις το πρώτο βήμα.", c:"#D9B25C" },
+  Square:{ t:"σε τετράγωνο με", m:"Δημιουργούν μια ένταση που σε σπρώχνει μπροστά.", c:"#E06A6A" },
+  Opposition:{ t:"σε αντίθεση με", m:"Σε μαθαίνουν να βρίσκεις την ισορροπία ανάμεσα σε δύο κόσμους.", c:"#E06A6A" } };
+const cap = (x) => x.charAt(0).toUpperCase() + x.slice(1);
+const nrm = (x) => ((x % 360) + 360) % 360;
+
+function drawWheel(c) {
+  const S = 400, C = 200, R1 = 192, R2 = 160, R3 = 108, RP = 136;
+  const ref = c.hasTime ? c.asc : 0;
+  const pt = (lon, r) => { const t = Math.PI + (lon - ref) * Math.PI / 180; return [C + r * Math.cos(t), C - r * Math.sin(t)]; };
+  const f = (n) => n.toFixed(1);
+  let o = `<svg class="wheel" viewBox="-14 -14 ${S + 28} ${S + 28}" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Ο γενέθλιος χάρτης σου">`;
+  o += `<defs><radialGradient id="wg"><stop offset="0" stop-color="#221d44"/><stop offset="1" stop-color="#100e22"/></radialGradient></defs>`;
+  o += `<circle cx="${C}" cy="${C}" r="${R1}" fill="url(#wg)" stroke="#D9B25C" stroke-width="1.6"/>`;
+  for (let i = 0; i < 12; i++) {
+    const a0 = i * 30, a1 = a0 + 30, [x0, y0] = pt(a0, R1), [x1, y1] = pt(a1, R1), [x2, y2] = pt(a1, R2), [x3, y3] = pt(a0, R2);
+    o += `<path d="M${f(x0)} ${f(y0)} A${R1} ${R1} 0 0 0 ${f(x1)} ${f(y1)} L${f(x2)} ${f(y2)} A${R2} ${R2} 0 0 1 ${f(x3)} ${f(y3)}Z" fill="${ELEM_COL[ELEM[i % 4]]}" stroke="rgba(217,178,92,.55)" stroke-width="0.8"/>`;
+    const [gx, gy] = pt(a0 + 15, (R1 + R2) / 2);
+    o += `<text x="${f(gx)}" y="${f(gy)}" fill="#F0D78C" font-size="17" text-anchor="middle" dominant-baseline="central">${SIGN_GL[i]}</text>`;
+  }
+  o += `<circle cx="${C}" cy="${C}" r="${R2}" fill="none" stroke="#D9B25C" stroke-width="1"/>`;
+  for (let d = 0; d < 360; d += 5) { const [a, b] = pt(d, R2), [x, y] = pt(d, R2 - (d % 10 ? 4 : 7)); o += `<line x1="${f(a)}" y1="${f(b)}" x2="${f(x)}" y2="${f(y)}" stroke="rgba(217,178,92,.5)" stroke-width="0.7"/>`; }
+  if (c.hasTime && c.cusps) {
+    c.cusps.forEach((h, i) => {
+      const main = i % 3 === 0, [a, b] = pt(h, R3), [x, y] = pt(h, R2);
+      o += `<line x1="${f(a)}" y1="${f(b)}" x2="${f(x)}" y2="${f(y)}" stroke="${main ? "#D9B25C" : "rgba(217,178,92,.35)"}" stroke-width="${main ? 1.6 : 0.8}"/>`;
+      const nx = c.cusps[(i + 1) % 12], mid = h + nrm(nx - h) / 2, [tx, ty] = pt(mid, R3 + 9);
+      o += `<text x="${f(tx)}" y="${f(ty)}" fill="rgba(245,241,232,.45)" font-size="9" text-anchor="middle" dominant-baseline="central">${i + 1}</text>`;
+    });
+    const [ax, ay] = pt(c.asc, R1 + 2); o += `<text x="${f(ax - 2)}" y="${f(ay - 9)}" fill="#F0D78C" font-size="10" font-weight="700" text-anchor="start">ΩΡ</text>`;
+    const [mx, my] = pt(c.mc, R1 + 2); o += `<text x="${f(mx)}" y="${f(my - 3)}" fill="#F0D78C" font-size="10" font-weight="700" text-anchor="middle">ΜΕ</text>`;
+  }
+  o += `<circle cx="${C}" cy="${C}" r="${R3}" fill="rgba(11,10,22,.55)" stroke="rgba(217,178,92,.6)" stroke-width="1"/>`;
+  const pos = {}; c.planets.forEach(p => pos[p.name] = p.lon);
+  (c.aspects || []).forEach(a => {
+    const k = ASP[a.type]; if (!k || !k.c || pos[a.a] == null || pos[a.b] == null) return;
+    const [x1, y1] = pt(pos[a.a], R3 - 2), [x2, y2] = pt(pos[a.b], R3 - 2);
+    o += `<line x1="${f(x1)}" y1="${f(y1)}" x2="${f(x2)}" y2="${f(y2)}" stroke="${k.c}" stroke-opacity="${a.orb < 3 ? .85 : .45}" stroke-width="${a.orb < 3 ? 1.3 : 0.8}"/>`;
+  });
+  // Οι πλανήτες: αν πέφτουν πολύ κοντά, απλώνονται λίγο για να διαβάζονται.
+  const list = c.planets.map(p => ({ ...p, d: p.lon })).sort((a, b) => a.lon - b.lon);
+  for (let it = 0; it < 300; it++) {
+    let moved = false;
+    list.sort((x, y) => x.d - y.d);
+    for (let i = 0; i < list.length; i++) {
+      const a = list[i], b = list[(i + 1) % list.length], gap = i === list.length - 1 ? b.d + 360 - a.d : b.d - a.d;
+      if (gap < 11 && list.length > 1) { const k = (11 - gap) / 2 + 0.05; a.d -= k; b.d += k; moved = true; }
+    }
+    if (!moved) break;
+  }
+  list.forEach(p => {
+    const [tx, ty] = pt(p.lon, R2), [ux, uy] = pt(p.lon, R2 - 9), [gx, gy] = pt(p.d, RP);
+    o += `<line x1="${f(tx)}" y1="${f(ty)}" x2="${f(ux)}" y2="${f(uy)}" stroke="#F5F1E8" stroke-width="1.4"/>`;
+    o += `<text x="${f(gx)}" y="${f(gy)}" fill="${p.name === "Sun" || p.name === "Moon" ? "#F6DD8A" : "#F5F1E8"}" font-size="${p.name === "Sun" || p.name === "Moon" ? 19 : 16}" text-anchor="middle" dominant-baseline="central">${PL[p.name].g}${VS}</text>`;
+    if (p.retro) { const [rx, ry] = pt(p.d, RP - 15); o += `<text x="${f(rx)}" y="${f(ry)}" fill="#E06A6A" font-size="8.5" text-anchor="middle" dominant-baseline="central">R</text>`; }
+  });
+  return o + `</svg>`;
+}
+
+function skyText(c) {
+  const at = (n) => c.planets.find(p => p.name === n);
+  const sg = (lon) => Math.floor(nrm(lon) / 30), deg = (lon) => Math.floor(nrm(lon) % 30);
+  const it = (t, m) => `<div class="it"><b>${t}</b><span>${m}</span></div>`;
+  const sun = at("Sun"), moon = at("Moon");
+  let h = `<h3>Τι συνέβαινε στον ουρανό τη στιγμή που γεννήθηκες</h3>`;
+  h += it(`${cap(PL.Sun.nom)} βρισκόταν ${SIGN_IN[sg(sun.lon)]}, στις ${deg(sun.lon)} μοίρες.`, "Είναι το ζώδιό σου: ο πυρήνας σου και ο τρόπος που λάμπεις.");
+  h += it(`${cap(PL.Moon.nom)} βρισκόταν ${SIGN_IN[sg(moon.lon)]}.`, c.hasTime ? "Δείχνει τον συναισθηματικό σου κόσμο και τι σε κάνει να νιώθεις ασφάλεια." : "Δείχνει τον συναισθηματικό σου κόσμο. Χωρίς ώρα γέννησης η θέση της είναι κατά προσέγγιση.");
+  if (c.hasTime) h += it(`Στον ανατολικό ορίζοντα ανέβαινε ${SIGN_NOM[sg(c.asc)]}: αυτός είναι ο Ωροσκόπος σου.`, "Δείχνει πώς σε βλέπουν οι άλλοι από την πρώτη ματιά και πώς ξεκινάς κάθε τι καινούργιο.");
+  const el = nrm(moon.lon - sun.lon);
+  const ph = el < 15 || el > 345 ? ["Η Σελήνη ήταν νέα.", "Όσοι γεννιούνται στη Νέα Σελήνη ξεκινούν καινούργια πράγματα με ορμή και εμπιστεύονται το ένστικτό τους."]
+    : el < 165 ? ["Η Σελήνη μεγάλωνε.", "Όσοι γεννιούνται με τη Σελήνη να μεγαλώνει έχουν μέσα τους την ανάγκη να χτίζουν και να μεγαλώνουν ό,τι αγαπούν."]
+    : el < 195 ? ["Ήταν Πανσέληνος.", "Όσοι γεννιούνται στην Πανσέληνο νιώθουν τα πάντα έντονα και φέρνουν στο φως ό,τι άλλοι κρύβουν."]
+    : ["Η Σελήνη λιγόστευε.", "Όσοι γεννιούνται με τη Σελήνη να λιγοστεύει έχουν σοφία και ξέρουν να αφήνουν πίσω ό,τι τελείωσε."];
+  h += it(ph[0], ph[1]);
+  const cnt = { fire: 0, earth: 0, air: 0, water: 0 };
+  ["Sun","Moon","Mercury","Venus","Mars","Jupiter","Saturn"].forEach(n => cnt[ELEM[sg(at(n).lon) % 4]]++);
+  if (c.hasTime) cnt[ELEM[sg(c.asc) % 4]]++;
+  const top = Object.keys(cnt).sort((a, b) => cnt[b] - cnt[a])[0];
+  const EL = { fire:["η Φωτιά","πάθος, θάρρος και ορμή"], earth:["η Γη","σταθερότητα και πρακτικό μυαλό"], air:["ο Αέρας","σκέψη, λόγο και επαφή με τους ανθρώπους"], water:["το Νερό","ευαισθησία και δυνατή διαίσθηση"] };
+  h += it(`Στον χάρτη σου κυριαρχεί ${EL[top][0]}.`, `Σου δίνει ${EL[top][1]}.`);
+  const retro = c.planets.filter(p => p.retro && p.name !== "Node").map(p => PL[p.name].nom);
+  h += it(retro.length ? `Ανάδρομ${retro.length > 1 ? "οι ήταν" : "ος ήταν"} ${retro.join(", ").replace(/, ([^,]*)$/, " και $1")}.` : "Κανένας πλανήτης δεν ήταν ανάδρομος.",
+    retro.length ? "Ένας ανάδρομος πλανήτης στη γέννηση δείχνει ένα θέμα που ζεις πιο εσωτερικά, με τον δικό σου τρόπο." : "Οι πλανήτες σου κινούνταν όλοι μπροστά: ό,τι νιώθεις το δείχνεις καθαρά.");
+  const PERS = ["Sun","Moon","Mercury","Venus","Mars","Jupiter","Saturn"];
+  const strong = (c.aspects || []).filter(a => PERS.includes(a.a) && PERS.includes(a.b) && (c.hasTime || (a.a !== "Moon" && a.b !== "Moon"))).sort((a, b) => a.orb - b.orb).slice(0, 3);
+  if (strong.length) {
+    h += `<h3>Οι πιο δυνατές όψεις του χάρτη σου</h3>`;
+    strong.forEach(a => { h += it(`${cap(PL[a.a].nom)} ${ASP[a.type].t} ${PL[a.b].acc}.`, ASP[a.type].m); });
+  }
+  return h;
+}
+
+function renderChart(c) {
+  show("chartCard"); show("noChart", false);
+  const d = new Date(c.dob + "T12:00:00");
+  const day = d.toLocaleDateString("el-GR", { weekday: "long", day: "numeric", month: "long", year: "numeric" });
+  $("bornLine").textContent = cap(day) + (c.tob ? `, ώρα ${c.tob}` : "") + (c.place ? ` · ${c.place}` : "");
+  $("wheelBox").innerHTML = drawWheel(c);
+  $("skyBox").innerHTML = skyText(c) + (c.hasTime ? "" : `<p class="muted" style="margin-top:10px">Χωρίς ώρα γέννησης δεν φαίνονται ο Ωροσκόπος και οι οίκοι. Γράψε την ώρα στα στοιχεία σου για τον πλήρη χάρτη.</p>`);
+}
+function noChart() { show("chartCard"); show("noChart"); $("wheelBox").innerHTML = ""; $("skyBox").innerHTML = ""; $("bornLine").textContent = ""; }
+async function loadChart(token) { const r = await api({ action: "chart", token }); if (r.ok) renderChart(r.d.chart); else noChart(); }
+
 function showJoin() {
   show("perks"); show("none");
   $("perksH").textContent = "Τι παίρνει ένα Εκλεκτό μέλος";
@@ -276,7 +411,7 @@ async function start() {
     applyBirth({ name: "Σάββας", dob: "1980-08-15", tob: "10:30", pob: "Αθήνα" });
     $("birthForm").onsubmit = (e) => { e.preventDefault(); $("bOk").style.display = "block"; };
     const r = await api({ action: "demo" });
-    if (r.ok) renderWeek(r.d.week);
+    if (r.ok) { renderWeek(r.d.week); if (r.d.chart) renderChart(r.d.chart); }
     $("portal").onclick = () => alert("Στην πραγματική σελίδα εδώ ανοίγει η σελίδα του Stripe για διαχείριση ή ακύρωση.");
     return;
   }
@@ -304,7 +439,7 @@ async function start() {
   if (!me.ok) { showJoin(); return; }
   renderMe(me.d);
   bindPhoto(token, me.d.name);
-  if (me.d.birth) { applyBirth(me.d.birth); loadWeek(token); } else show("needBirth");
+  if (me.d.birth) { applyBirth(me.d.birth); loadWeek(token); loadChart(token); } else { show("needBirth"); noChart(); }
 
   $("birthForm").onsubmit = async (e) => {
     e.preventDefault(); $("bErr").style.display = "none"; $("bOk").style.display = "none";
@@ -312,6 +447,7 @@ async function start() {
     if (!r.ok) { $("bErr").textContent = r.d.error || "Κάτι πήγε στραβά."; $("bErr").style.display = "block"; return; }
     $("bOk").style.display = "block";
     applyBirth({ name: $("bName").value.trim(), dob: $("bDob").value, tob: $("bTob").value, pob: $("bPob").value.trim() });
+    loadChart(token);
     $("pname").textContent = $("bName").value; if (!$("av").style.backgroundImage) $("avInit").textContent = $("bName").value.trim().charAt(0).toUpperCase();
     loadWeek(token);
   };

@@ -2,6 +2,7 @@
 import { json, isAdult, ADULTS_ONLY } from "../lib/epistrofi-common.mjs";
 import { store, getMember, saveMember, subStatus, stripeGet, monthKey, validToken } from "../lib/eklektoi.mjs";
 import { computeWeek } from "../lib/tyxeres.mjs";
+import { memberChart } from "../lib/eklektoi-chart.mjs";
 
 const clip = (v, n) => String(v || "").trim().slice(0, n);
 const DEMO = { name: "Σάββας", dob: "1980-08-15", tob: "10:30", pob: "Αθήνα" };
@@ -21,7 +22,7 @@ export default async (req) => {
 
   // Δείγμα της σελίδας (για προεπισκόπηση), χωρίς μέλος.
   if (action === "demo") {
-    try { return json(200, { week: slimWeek(await computeWeek(DEMO)) }); } catch { return json(500, { error: "Δοκίμασε ξανά." }); }
+    try { return json(200, { week: slimWeek(await computeWeek(DEMO)), chart: await memberChart(DEMO) }); } catch { return json(500, { error: "Δοκίμασε ξανά." }); }
   }
 
   // Μετά την πληρωμή της συνδρομής: δημιουργεί (μία φορά) το προσωπικό κλειδί του μέλους.
@@ -72,6 +73,12 @@ export default async (req) => {
     if (!/^data:image\/(jpeg|png|webp);base64,[A-Za-z0-9+/=]+$/.test(img) || img.length > 200000) return json(400, { error: "Η φωτογραφία δεν ανέβηκε. Δοκίμασε μια άλλη." });
     m.photo = img; await saveMember(m);
     return json(200, { ok: true });
+  }
+
+  // Ο γενέθλιος χάρτης του μέλους (σχήμα και «τι συνέβαινε στον ουρανό»).
+  if (action === "chart") {
+    if (!m.birth) return json(404, { error: "Γράψε πρώτα τα στοιχεία σου." });
+    try { return json(200, { chart: await memberChart(m.birth) }); } catch { return json(500, { error: "Δοκίμασε ξανά." }); }
   }
 
   if (action === "week") {
