@@ -57,6 +57,11 @@
   .perks li span{ color:var(--muted); font-size:14.5px; }
   .wheel{ display:block; width:100%; max-width:380px; margin:4px auto 6px; }
   .wheel text{ font-family:'DejaVu Sans','Segoe UI Symbol','Noto Sans Symbols 2','Apple Symbols',sans-serif; }
+  .wstar{ animation:wtw 3.2s ease-in-out infinite; opacity:.25; }
+  @keyframes wtw{ 0%,100%{ opacity:.12; } 50%{ opacity:.85; } }
+  .wglow{ opacity:.18; transform-box:fill-box; transform-origin:center; animation:wbr 3.6s ease-in-out infinite; filter:blur(3px); }
+  @keyframes wbr{ 0%,100%{ opacity:.10; transform:scale(.8); } 50%{ opacity:.38; transform:scale(1.25); } }
+  @media (prefers-reduced-motion: reduce){ .wstar, .wglow{ animation:none; } }
   .born{ text-align:center; color:var(--muted); font-size:13.5px; margin:0 0 6px; }
   .sky h3{ font-family:'Cormorant Garamond',serif; color:var(--gold); font-size:21px; margin:16px 0 6px; font-weight:600; }
   .sky .it{ border-top:1px solid rgba(217,178,92,.18); padding:9px 0; }
@@ -292,6 +297,10 @@ function drawWheel(c) {
   let o = `<svg class="wheel" viewBox="-14 -14 ${S + 28} ${S + 28}" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Ο γενέθλιος χάρτης σου">`;
   o += `<defs><radialGradient id="wg"><stop offset="0" stop-color="#221d44"/><stop offset="1" stop-color="#100e22"/></radialGradient></defs>`;
   o += `<circle cx="${C}" cy="${C}" r="${R1}" fill="url(#wg)" stroke="#D9B25C" stroke-width="1.6"/>`;
+  // Αστέρια στο φόντο που τρεμοπαίζουν.
+  let sd = 7; const rnd = () => (sd = (sd * 9301 + 49297) % 233280) / 233280;
+  for (let i = 0; i < 26; i++) { const an = rnd() * 6.283, rr = Math.sqrt(rnd()) * (R3 - 8); o += `<circle class="wstar" cx="${f(C + rr * Math.cos(an))}" cy="${f(C + rr * Math.sin(an))}" r="${f(0.6 + rnd() * 1.1)}" fill="#F5F1E8" style="animation-delay:${f(rnd() * 3)}s"/>`; }
+  o += `<g class="wzod">`;
   for (let i = 0; i < 12; i++) {
     const a0 = i * 30, a1 = a0 + 30, [x0, y0] = pt(a0, R1), [x1, y1] = pt(a1, R1), [x2, y2] = pt(a1, R2), [x3, y3] = pt(a0, R2);
     o += `<path d="M${f(x0)} ${f(y0)} A${R1} ${R1} 0 0 0 ${f(x1)} ${f(y1)} L${f(x2)} ${f(y2)} A${R2} ${R2} 0 0 1 ${f(x3)} ${f(y3)}Z" fill="${ELEM_COL[ELEM[i % 4]]}" stroke="rgba(217,178,92,.55)" stroke-width="0.8"/>`;
@@ -300,6 +309,7 @@ function drawWheel(c) {
   }
   o += `<circle cx="${C}" cy="${C}" r="${R2}" fill="none" stroke="#D9B25C" stroke-width="1"/>`;
   for (let d = 0; d < 360; d += 5) { const [a, b] = pt(d, R2), [x, y] = pt(d, R2 - (d % 10 ? 4 : 7)); o += `<line x1="${f(a)}" y1="${f(b)}" x2="${f(x)}" y2="${f(y)}" stroke="rgba(217,178,92,.5)" stroke-width="0.7"/>`; }
+  o += `</g><g class="whouse">`;
   if (c.hasTime && c.cusps) {
     c.cusps.forEach((h, i) => {
       const main = i % 3 === 0, [a, b] = pt(h, R3), [x, y] = pt(h, R2);
@@ -310,12 +320,12 @@ function drawWheel(c) {
     const [ax, ay] = pt(c.asc, R1 + 2); o += `<text x="${f(ax - 2)}" y="${f(ay - 9)}" fill="#F0D78C" font-size="10" font-weight="700" text-anchor="start">ΩΡ</text>`;
     const [mx, my] = pt(c.mc, R1 + 2); o += `<text x="${f(mx)}" y="${f(my - 3)}" fill="#F0D78C" font-size="10" font-weight="700" text-anchor="middle">ΜΕ</text>`;
   }
-  o += `<circle cx="${C}" cy="${C}" r="${R3}" fill="rgba(11,10,22,.55)" stroke="rgba(217,178,92,.6)" stroke-width="1"/>`;
+  o += `</g><circle cx="${C}" cy="${C}" r="${R3}" fill="rgba(11,10,22,.35)" stroke="rgba(217,178,92,.6)" stroke-width="1"/>`;
   const pos = {}; c.planets.forEach(p => pos[p.name] = p.lon);
   (c.aspects || []).forEach(a => {
     const k = ASP[a.type]; if (!k || !k.c || pos[a.a] == null || pos[a.b] == null) return;
     const [x1, y1] = pt(pos[a.a], R3 - 2), [x2, y2] = pt(pos[a.b], R3 - 2);
-    o += `<line x1="${f(x1)}" y1="${f(y1)}" x2="${f(x2)}" y2="${f(y2)}" stroke="${k.c}" stroke-opacity="${a.orb < 3 ? .85 : .45}" stroke-width="${a.orb < 3 ? 1.3 : 0.8}"/>`;
+    o += `<line class="wasp" x1="${f(x1)}" y1="${f(y1)}" x2="${f(x2)}" y2="${f(y2)}" stroke="${k.c}" stroke-opacity="${a.orb < 3 ? .85 : .45}" stroke-width="${a.orb < 3 ? 1.3 : 0.8}"/>`;
   });
   // Οι πλανήτες: αν πέφτουν πολύ κοντά, απλώνονται λίγο για να διαβάζονται.
   const list = c.planets.map(p => ({ ...p, d: p.lon })).sort((a, b) => a.lon - b.lon);
@@ -330,9 +340,13 @@ function drawWheel(c) {
   }
   list.forEach(p => {
     const [tx, ty] = pt(p.lon, R2), [ux, uy] = pt(p.lon, R2 - 9), [gx, gy] = pt(p.d, RP);
+    const lum = p.name === "Sun" || p.name === "Moon";
+    o += `<g class="wpl" data-dx="${f(C - gx)}" data-dy="${f(C - gy)}" data-o="${["Sun","Moon"].indexOf(p.name)}">`;
     o += `<line x1="${f(tx)}" y1="${f(ty)}" x2="${f(ux)}" y2="${f(uy)}" stroke="#F5F1E8" stroke-width="1.4"/>`;
+    if (lum) o += `<circle class="wglow" cx="${f(gx)}" cy="${f(gy)}" r="13" fill="#F6DD8A"/>`;
     o += `<text x="${f(gx)}" y="${f(gy)}" fill="${p.name === "Sun" || p.name === "Moon" ? "#F6DD8A" : "#F5F1E8"}" font-size="${p.name === "Sun" || p.name === "Moon" ? 19 : 16}" text-anchor="middle" dominant-baseline="central">${PL[p.name].g}${VS}</text>`;
     if (p.retro) { const [rx, ry] = pt(p.d, RP - 15); o += `<text x="${f(rx)}" y="${f(ry)}" fill="#E06A6A" font-size="8.5" text-anchor="middle" dominant-baseline="central">R</text>`; }
+    o += `</g>`;
   });
   return o + `</svg>`;
 }
@@ -370,12 +384,45 @@ function skyText(c) {
   return h;
 }
 
+// Η κίνηση του χάρτη: ο ζωδιακός γυρίζει πίσω στη στιγμή της γέννησης, οι πλανήτες
+// έρχονται από το κέντρο στη θέση τους και οι όψεις ζωγραφίζονται μία μία.
+function animateWheel(svg) {
+  if (!svg || (window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches)) return;
+  const zod = svg.querySelector(".wzod"), house = svg.querySelector(".whouse");
+  const pls = [...svg.querySelectorAll(".wpl")].sort((a, b) => {
+    const oa = +a.dataset.o, ob = +b.dataset.o; return (oa < 0 ? 9 : oa) - (ob < 0 ? 9 : ob);
+  });
+  const asp = [...svg.querySelectorAll(".wasp")];
+  const ease = (u) => 1 - Math.pow(1 - Math.min(Math.max(u, 0), 1), 3);
+  const T_ZOD = 2600, T_PL0 = 1500, T_STEP = 160, T_PL = 700;
+  const T_ASP0 = T_PL0 + T_STEP * pls.length + 300, T_ASTEP = 120, T_ASP = 600;
+  asp.forEach(l => { const L = Math.hypot(l.x2.baseVal.value - l.x1.baseVal.value, l.y2.baseVal.value - l.y1.baseVal.value); l.dataset.len = L; l.style.strokeDasharray = L; l.style.strokeDashoffset = L; });
+  pls.forEach(g => { g.style.opacity = 0; });
+  if (house) house.style.opacity = 0;
+  const t0 = performance.now();
+  function frame(now) {
+    const t = now - t0;
+    const kz = ease(t / T_ZOD);
+    zod.setAttribute("transform", `rotate(${(1 - kz) * 540} 200 200)`);
+    if (house) house.style.opacity = ease((t - 900) / 900);
+    pls.forEach((g, i) => {
+      const k = ease((t - T_PL0 - i * T_STEP) / T_PL);
+      g.style.opacity = Math.min(1, k * 1.6);
+      g.setAttribute("transform", `translate(${(+g.dataset.dx * (1 - k)).toFixed(1)} ${(+g.dataset.dy * (1 - k)).toFixed(1)})`);
+    });
+    asp.forEach((l, i) => { const k = ease((t - T_ASP0 - i * T_ASTEP) / T_ASP); l.style.strokeDashoffset = (+l.dataset.len * (1 - k)).toFixed(1); });
+    if (t < T_ASP0 + asp.length * T_ASTEP + T_ASP + 50) requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
+}
+
 function renderChart(c) {
   show("chartCard"); show("noChart", false);
   const d = new Date(c.dob + "T12:00:00");
   const day = d.toLocaleDateString("el-GR", { weekday: "long", day: "numeric", month: "long", year: "numeric" });
   $("bornLine").textContent = cap(day) + (c.tob ? `, ώρα ${c.tob}` : "") + (c.place ? ` · ${c.place}` : "");
   $("wheelBox").innerHTML = drawWheel(c);
+  animateWheel($("wheelBox").querySelector("svg"));
   $("skyBox").innerHTML = skyText(c) + (c.hasTime ? "" : `<p class="muted" style="margin-top:10px">Χωρίς ώρα γέννησης δεν φαίνονται ο Ωροσκόπος και οι οίκοι. Γράψε την ώρα στα στοιχεία σου για τον πλήρη χάρτη.</p>`);
 }
 function noChart() { show("chartCard"); show("noChart"); $("wheelBox").innerHTML = ""; $("skyBox").innerHTML = ""; $("bornLine").textContent = ""; }
