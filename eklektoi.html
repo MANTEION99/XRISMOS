@@ -47,6 +47,14 @@
   .pname{ font-family:'Cormorant Garamond',serif; font-size:30px; font-weight:700; margin:10px 0 0; line-height:1.15; text-align:center; }
   .badge{ margin-top:6px; font-size:12.5px; letter-spacing:1.5px; text-transform:uppercase; color:var(--gold); border:1px solid var(--line); border-radius:20px; padding:3px 12px; }
   .since{ font-size:13px; color:var(--muted); margin-top:6px; }
+  .avNote{ font-size:12.5px; color:var(--muted); margin-top:8px; text-align:center; max-width:280px; line-height:1.45; }
+  .avNote b{ color:var(--gold); font-weight:600; }
+  .perks{ list-style:none; padding:0; margin:6px 0 0; }
+  .perks li{ position:relative; padding:0 0 14px 30px; line-height:1.5; }
+  .perks li:before{ content:"✦"; position:absolute; left:4px; top:0; color:var(--gold); }
+  .perks li b{ display:block; color:var(--ink,#fff); }
+  .perks li span{ color:var(--muted); font-size:14.5px; }
+  .ok{ color:#9fd8a8; font-size:14px; margin-top:8px; display:none; }
 </style>
 </head>
 <body>
@@ -63,6 +71,7 @@
     <div class="pname" id="pname"></div>
     <div class="badge">Εκλεκτό μέλος του Μαντείου</div>
     <div class="since" id="since"></div>
+    <div class="avNote" id="avNote">Πάτα τον κύκλο για να βάλεις τη φωτογραφία σου. Το ανέβασμα μπορεί να πάρει λίγα δευτερόλεπτα.</div>
     <div class="err" id="avErr"></div>
   </div>
 
@@ -82,6 +91,31 @@
   </div>
 
   <div id="member" class="hide">
+    <div class="card">
+      <h2>Τι παίρνεις ως Εκλεκτό μέλος</h2>
+      <ul class="perks">
+        <li><b>Μία ερώτηση κάθε μήνα, χωρίς χρέωση</b><span>Διαλέγεις το θέμα που σε απασχολεί: επιστροφή, αγάπη, αλήθεια, συναστρία, οικονομικά, δική σου ερώτηση, αριθμολογία ή ταρώ. Κανονικά κοστίζει 20€.</span></li>
+        <li><b>Κάθε εβδομάδα οι τυχερές σου μέρες</b><span>Το Μαντείο συνδυάζει τον χάρτη σου, τους αριθμούς σου και το ταρώ και σου δείχνει ποιες μέρες της εβδομάδας είναι οι δικές σου. Κανονικά κοστίζει 20€ κάθε εβδομάδα.</span></li>
+        <li><b>Τα στοιχεία σου αποθηκευμένα</b><span>Τα γράφεις μία φορά και συμπληρώνονται μόνα τους στις ερωτήσεις σου.</span></li>
+        <li><b>Η δική σου σελίδα στο Μαντείο</b><span>Με το όνομα και τη φωτογραφία σου, από οποιοδήποτε κινητό.</span></li>
+        <li><b>Ακυρώνεις όποτε θέλεις</b><span>Με ένα πάτημα, χωρίς δέσμευση. Κρατάς όσα πλήρωσες μέχρι το τέλος του μήνα.</span></li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <h2>Τα στοιχεία σου</h2>
+      <form id="birthForm">
+        <p>Γράψε τα στοιχεία σου μία φορά. Το Μαντείο τα χρησιμοποιεί για τις τυχερές σου μέρες και τα συμπληρώνει μόνο του στην ερώτηση του μήνα.</p>
+        <label for="bName">Όνομα</label><input id="bName" autocomplete="given-name">
+        <label for="bDob">Ημερομηνία γέννησης</label><input id="bDob" type="date">
+        <label for="bTob">Ώρα γέννησης (αν την ξέρεις)</label><input id="bTob" type="time">
+        <label for="bPob">Τόπος γέννησης</label><input id="bPob" placeholder="π.χ. Αθήνα">
+        <button class="btn" type="submit" id="bSave">Αποθήκευση</button>
+        <div class="ok" id="bOk">Τα στοιχεία σου αποθηκεύτηκαν.</div>
+        <div class="err" id="bErr"></div>
+      </form>
+    </div>
+
     <div class="card">
       <h2>Η ερώτηση του μήνα</h2>
       <div id="qOpen">
@@ -105,15 +139,7 @@
 
     <div class="card">
       <h2>Οι τυχερές σου μέρες</h2>
-      <form id="birthForm" class="hide">
-        <p>Γράψε μία φορά τα στοιχεία σου και το Μαντείο σού δείχνει κάθε εβδομάδα ποιες μέρες είναι οι δικές σου.</p>
-        <label for="bName">Όνομα</label><input id="bName" autocomplete="given-name">
-        <label for="bDob">Ημερομηνία γέννησης</label><input id="bDob" type="date">
-        <label for="bTob">Ώρα γέννησης (αν την ξέρεις)</label><input id="bTob" type="time">
-        <label for="bPob">Τόπος γέννησης</label><input id="bPob" placeholder="π.χ. Αθήνα">
-        <button class="btn" type="submit">Δες τις τυχερές μου μέρες</button>
-        <div class="err" id="bErr"></div>
-      </form>
+      <p class="hide" id="needBirth">Γράψε πιο πάνω τα στοιχεία σου και εδώ θα εμφανιστούν οι τυχερές σου μέρες.</p>
       <div id="weekBox" class="hide">
         <p class="muted" id="weekLabel"></p>
         <div id="bestBox"></div>
@@ -150,7 +176,7 @@ function renderWeek(w) {
     const t = TIER[x.tier] || TIER.apli;
     return `<div class="day"><div class="dh"><b>${esc(x.label)}</b><span class="pill ${t[1]}">${t[0]}</span></div><p class="why">${esc(x.why)}</p><p class="why muted" style="margin-top:2px">Αριθμός ${esc(x.num)}${x.card ? " · " + esc(x.card) : ""}</p></div>`;
   }).join("");
-  show("birthForm", false); show("weekBox");
+  show("weekBox");
 }
 
 const MONTHS_ACC = ["Ιανουάριο","Φεβρουάριο","Μάρτιο","Απρίλιο","Μάιο","Ιούνιο","Ιούλιο","Αύγουστο","Σεπτέμβριο","Οκτώβριο","Νοέμβριο","Δεκέμβριο"];
@@ -178,14 +204,32 @@ function shrink(file) {
 function bindPhoto(token, name) {
   $("avFile").onchange = async () => {
     const f = $("avFile").files[0]; if (!f) return;
+    $("avErr").style.display = "none";
+    // Η φωτογραφία φαίνεται αμέσως· η σμίκρυνση και το ανέβασμα γίνονται από πίσω.
+    const quick = URL.createObjectURL(f);
+    $("av").style.backgroundImage = `url("${quick}")`; $("avInit").textContent = "";
+    $("avNote").innerHTML = "<b>Η φωτογραφία σου αποθηκεύεται…</b>";
     try {
       const data = await shrink(f);
-      $("av").style.backgroundImage = `url("${data}")`; $("avInit").textContent = "";
-      if (!token) return;
-      const r = await api({ action: "photo", token, img: data });
-      if (!r.ok) { $("avErr").textContent = r.d.error || "Η φωτογραφία δεν ανέβηκε."; $("avErr").style.display = "block"; }
-    } catch (e) { $("avErr").textContent = "Η φωτογραφία δεν ανέβηκε. Δοκίμασε μια άλλη."; $("avErr").style.display = "block"; }
+      $("av").style.backgroundImage = `url("${data}")`;
+      if (token) {
+        const r = await api({ action: "photo", token, img: data });
+        if (!r.ok) { $("avNote").textContent = ""; $("avErr").textContent = r.d.error || "Η φωτογραφία δεν ανέβηκε."; $("avErr").style.display = "block"; return; }
+      }
+      $("avNote").innerHTML = "<b>Η φωτογραφία σου αποθηκεύτηκε.</b> Πάτα τον κύκλο αν θέλεις να την αλλάξεις.";
+    } catch (e) { $("avNote").textContent = ""; $("avErr").textContent = "Η φωτογραφία δεν ανέβηκε. Δοκίμασε μια άλλη."; $("avErr").style.display = "block"; }
   };
+}
+
+// Συμπληρώνει τα στοιχεία στη φόρμα και στους συνδέσμους των ερωτήσεων.
+function applyBirth(b) {
+  if (!b) return;
+  $("bName").value = b.name || ""; $("bDob").value = b.dob || ""; $("bTob").value = b.tob || ""; $("bPob").value = b.pob || "";
+  document.querySelectorAll("#qOpen .grid a").forEach(a => {
+    const base = a.getAttribute("href").split("?")[0];
+    const qq = new URLSearchParams({ n: b.name || "", d: b.dob || "", t: b.tob || "", p: b.pob || "", src: "eklektoi" });
+    a.setAttribute("href", base + "?" + qq.toString());
+  });
 }
 
 function renderMe(me, demo) {
@@ -200,7 +244,7 @@ function renderMe(me, demo) {
 
 async function loadWeek(token) {
   const r = await api({ action: "week", token });
-  if (r.ok) renderWeek(r.d.week); else { show("birthForm"); }
+  if (r.ok) { show("needBirth", false); renderWeek(r.d.week); } else show("needBirth");
 }
 
 async function start() {
@@ -209,6 +253,8 @@ async function start() {
     show("demoBar");
     renderMe({ active: true, creditUsed: false, periodEnd: Math.floor(Date.now() / 1000) + 30 * 86400, name: "Σάββας", since: new Date().toISOString() }, true);
     bindPhoto("", "Σάββας");
+    applyBirth({ name: "Σάββας", dob: "1980-08-15", tob: "10:30", pob: "Αθήνα" });
+    $("birthForm").onsubmit = (e) => { e.preventDefault(); $("bOk").style.display = "block"; };
     const r = await api({ action: "demo" });
     if (r.ok) renderWeek(r.d.week);
     $("portal").onclick = () => alert("Στην πραγματική σελίδα εδώ ανοίγει η σελίδα του Stripe για διαχείριση ή ακύρωση.");
@@ -238,12 +284,14 @@ async function start() {
   if (!me.ok) { show("none"); return; }
   renderMe(me.d);
   bindPhoto(token, me.d.name);
-  if (me.d.birth) loadWeek(token); else show("birthForm");
+  if (me.d.birth) { applyBirth(me.d.birth); loadWeek(token); } else show("needBirth");
 
   $("birthForm").onsubmit = async (e) => {
-    e.preventDefault(); $("bErr").style.display = "none";
+    e.preventDefault(); $("bErr").style.display = "none"; $("bOk").style.display = "none";
     const r = await api({ action: "birth", token, name: $("bName").value, dob: $("bDob").value, tob: $("bTob").value, pob: $("bPob").value });
     if (!r.ok) { $("bErr").textContent = r.d.error || "Κάτι πήγε στραβά."; $("bErr").style.display = "block"; return; }
+    $("bOk").style.display = "block";
+    applyBirth({ name: $("bName").value.trim(), dob: $("bDob").value, tob: $("bTob").value, pob: $("bPob").value.trim() });
     $("pname").textContent = $("bName").value; if (!$("av").style.backgroundImage) $("avInit").textContent = $("bName").value.trim().charAt(0).toUpperCase();
     loadWeek(token);
   };
